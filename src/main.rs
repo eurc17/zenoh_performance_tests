@@ -14,9 +14,9 @@ async fn main() {
     async_std::task::spawn(subscribe_worker(zenoh.clone(), start_until));
     async_std::task::sleep(std::time::Duration::from_millis(50)).await;
     // async_std::task::spawn(publish_worker(zenoh.clone(), start_until));
-    let futures =
+    let pub_futures =
         (0..10000).map(|peer_index| publish_worker(zenoh.clone(), start_until, peer_index));
-    futures::future::try_join_all(futures).await.unwrap();
+    futures::future::try_join_all(pub_futures).await.unwrap();
     async_std::task::sleep(std::time::Duration::from_secs(1)).await;
 }
 
