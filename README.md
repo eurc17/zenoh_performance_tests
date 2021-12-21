@@ -3,6 +3,8 @@
 This is a repository that contains the codes to test the performance of [Zenoh](https://zenoh.io/).  
 Currently (2021/12/21), the Zenoh version tested is 0.5.0-beta9.
 
+We use [psrecord](https://github.com/astrofrog/psrecord) to record the CPU and memory usage of the test program.
+
 ## Build
 
 To build the program, please make sure you have [Rust](https://www.rust-lang.org/) installed.
