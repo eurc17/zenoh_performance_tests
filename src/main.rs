@@ -14,7 +14,7 @@ async fn main() {
     let sub_handle = async_std::task::spawn(subscribe_worker(zenoh.clone(), start_until, timeout));
     async_std::task::sleep(std::time::Duration::from_millis(50)).await;
     // async_std::task::spawn(publish_worker(zenoh.clone(), start_until));
-    let total_number = 100000;
+    let total_number = 10000;
     let pub_futures =
         (0..total_number).map(|peer_index| publish_worker(zenoh.clone(), start_until, peer_index));
     futures::future::try_join_all(pub_futures).await.unwrap();
@@ -37,6 +37,9 @@ async fn main() {
             total_number
         );
     }
+    let msg_payload = format!("Hello World from peer {:08}", 1 as usize);
+    let payload_size = std::mem::size_of_val(&msg_payload);
+    println!("payload size = {:?} bytes.", payload_size);
 }
 
 async fn publish_worker(zenoh: Arc<Zenoh>, start_until: Instant, peer_id: usize) -> Result<()> {
