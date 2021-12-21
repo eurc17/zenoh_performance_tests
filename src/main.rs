@@ -3,6 +3,7 @@ use zenoh::*;
 
 use anyhow::Result;
 use futures::{self, prelude::*};
+use log::*;
 use rayon::prelude::*;
 use std::{sync::*, time::*};
 
@@ -30,7 +31,7 @@ async fn main() {
     // async_std::task::spawn(publish_worker(zenoh.clone(), start_until));
     let total_put_number = 100000;
     let pub_futures = (0..total_put_number)
-        .map(|peer_index| publish_worker(zenoh.clone(), start_until, peer_index));
+        .map(|peer_index| publish_worker(zenoh.clone(), start_until, timeout, peer_index));
     futures::future::try_join_all(pub_futures).await.unwrap();
 
     // async_std::task::sleep(std::time::Duration::from_secs(1)).await;
@@ -66,7 +67,12 @@ async fn main() {
     println!("payload size = {:?} bytes.", payload_size);
 }
 
-async fn publish_worker(zenoh: Arc<Zenoh>, start_until: Instant, peer_id: usize) -> Result<()> {
+async fn publish_worker(
+    zenoh: Arc<Zenoh>,
+    start_until: Instant,
+    timeout: Instant,
+    peer_id: usize,
+) -> Result<()> {
     async_std::task::sleep(start_until - Instant::now()).await;
     let workspace = zenoh.workspace(None).await.unwrap();
     let msg_payload = format!("Hello World from peer {:08}", peer_id);
@@ -77,6 +83,9 @@ async fn publish_worker(zenoh: Arc<Zenoh>, start_until: Instant, peer_id: usize)
         )
         .await
         .unwrap();
+    if timeout <= Instant::now() {
+        warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
+    }
     Ok(())
 }
 
