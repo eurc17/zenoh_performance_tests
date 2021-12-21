@@ -6,5 +6,6 @@ Currently (2021/12/21), the Zenoh version tested is 0.5.0-beta9.
 ## Todo Lists
 - [x] Basic put/sub worker implementation
 - [x] Basic testing function with simple output msgs.
+- [ ] Support multiple subscribe workers
 - [ ] Implement CLI for parameter configuration   
 - [ ] Separate building blocks from main.rs 
