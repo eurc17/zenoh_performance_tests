@@ -14,7 +14,7 @@ async fn main() {
     let sub_handle = async_std::task::spawn(subscribe_worker(zenoh.clone(), start_until, timeout));
     async_std::task::sleep(std::time::Duration::from_millis(50)).await;
     // async_std::task::spawn(publish_worker(zenoh.clone(), start_until));
-    let total_number = 10000;
+    let total_number = 100000;
     let pub_futures =
         (0..total_number).map(|peer_index| publish_worker(zenoh.clone(), start_until, peer_index));
     futures::future::try_join_all(pub_futures).await.unwrap();
@@ -45,7 +45,7 @@ async fn main() {
 async fn publish_worker(zenoh: Arc<Zenoh>, start_until: Instant, peer_id: usize) -> Result<()> {
     async_std::task::sleep(start_until - Instant::now()).await;
     let workspace = zenoh.workspace(None).await.unwrap();
-    let msg_payload = format!("Hello World from peer {}", peer_id);
+    let msg_payload = format!("Hello World from peer {:08}", peer_id);
     workspace
         .put(
             &"/demo/example/hello".try_into().unwrap(),
