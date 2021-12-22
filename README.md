@@ -45,5 +45,6 @@ For people who are running experiment testings with this program. You may store 
 - [x] Add support for multiple subscribe workers
 - [x] Implement CLI for parameter configuration   
 - [x] Separate building blocks from main.rs 
+- [ ] Parallelize the peers by using all cores.
 - [ ] Add adjustable payload size for `test_worker_1`.
 - [ ] Add support for multiple machines
