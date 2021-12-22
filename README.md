@@ -41,6 +41,10 @@ Please do not modify the `main` function.
 
 For people who are running experiment testings with this program. You may store the psrecord generated files under the `experiment-results` folder which is ignored in `.gitignore` file.
 
+## Issues
+
+If you encountered the situation that the program didn't terminate, please interrupt it and reduce the number of messages sent or the number of peers created.
+
 ## Todo Lists
 - [x] Basic put/sub worker implementation
 - [x] Basic testing function with simple output msgs.
