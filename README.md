@@ -43,6 +43,6 @@ For people who are running experiment testings with this program. You may store 
 - [x] Basic testing function with simple output msgs.
 - [x] Add parser for [psrecord](https://github.com/astrofrog/psrecord) output
 - [x] Add support for multiple subscribe workers
-- [ ] Implement CLI for parameter configuration   
+- [x] Implement CLI for parameter configuration   
 - [ ] Separate building blocks from main.rs 
 - [ ] Add support for multiple machines
