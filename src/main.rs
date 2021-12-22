@@ -151,7 +151,12 @@ async fn test_worker_1(args: Cli) {
 
     let all_pub_fut = futures::future::join_all(pub_futs);
 
-    let demo_fut = demonstration_worker(rx, total_put_number, total_sub_number);
+    let demo_fut = demonstration_worker(
+        rx,
+        total_put_number,
+        total_sub_number,
+        args.num_msgs_per_peer,
+    );
 
     drop(tx);
 

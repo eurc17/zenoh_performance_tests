@@ -6,16 +6,11 @@ pub async fn demonstration_worker(
     rx: flume::Receiver<(usize, Vec<Change>)>,
     total_put_number: usize,
     total_sub_number: usize,
+    num_msgs_per_peer: usize,
 ) -> Result<()> {
     let mut vector_data = vec![];
     while let Ok(data) = rx.recv_async().await {
         let (id, change_vec) = data.clone();
-        // println!(
-        //     "sub peer {}: total received messages: {}/{}",
-        //     id,
-        //     change_vec.len(),
-        //     total_put_number
-        // );
         vector_data.push(data);
     }
     println!("Received data from {} of sub peers", vector_data.len());
@@ -25,7 +20,7 @@ pub async fn demonstration_worker(
             "sub peer {}: total received messages: {}/{}",
             id,
             change_vec.len(),
-            total_put_number
+            total_put_number * num_msgs_per_peer
         );
     }
     Ok(())
