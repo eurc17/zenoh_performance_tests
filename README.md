@@ -44,5 +44,6 @@ For people who are running experiment testings with this program. You may store 
 - [x] Add parser for [psrecord](https://github.com/astrofrog/psrecord) output
 - [x] Add support for multiple subscribe workers
 - [x] Implement CLI for parameter configuration   
-- [ ] Separate building blocks from main.rs 
+- [x] Separate building blocks from main.rs 
+- [ ] Add adjustable payload size for `test_worker_1`.
 - [ ] Add support for multiple machines
