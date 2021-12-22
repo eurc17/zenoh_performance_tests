@@ -28,12 +28,19 @@ struct Cli {
     #[structopt(short = "n", long, default_value = "8")]
     /// The payload size of the message.
     payload_size: usize,
+    #[structopt(long)]
+    /// The number of tasks to spawn for dealing with futures related to publisher peers
+    pub_cpu_num: Option<usize>,
+    #[structopt(long)]
+    /// The number of tasks to spawn for dealing with futures related to subscriber peers
+    sub_cpu_num: Option<usize>,
 }
 #[async_std::main]
 async fn main() {
     pretty_env_logger::init();
     let args = Cli::from_args();
     dbg!(&args);
+    println!("# of CPU cores = {}", num_cpus::get());
     test_worker_1(args).await;
 }
 
@@ -46,6 +53,13 @@ async fn test_worker_1(args: Cli) {
     let timeout = start_until + Duration::from_millis(args.round_timeout);
     let total_sub_number = args.num_sub_peer;
     let total_put_number = args.num_put_peer;
+    let total_cpu_num = num_cpus::get();
+    let available_cpu_num = (total_cpu_num - 2).max(1);
+    if args.sub_cpu_num.is_some() && args.pub_cpu_num.is_some() {
+        if args.sub_cpu_num.unwrap() + args.pub_cpu_num.unwrap() > available_cpu_num {
+            warn!("Spawning more than available cpu cores tasks for pub/sub.");
+        }
+    }
 
     // Old subscriber
     // let sub_handle_vec = (0..total_sub_number)
@@ -58,24 +72,33 @@ async fn test_worker_1(args: Cli) {
     //     .collect::<Vec<_>>();
 
     // new subscriber
-    let cpu_num = 2;
-    let per_peer_num = total_sub_number / cpu_num;
-    let mut sub_futs = (0..cpu_num)
+    let sub_cpu_num;
+    if let Some(args_sub_cpu_num) = args.sub_cpu_num {
+        sub_cpu_num = args_sub_cpu_num;
+        if args_sub_cpu_num > (available_cpu_num + 1) / 2 {
+            warn!("Spawning more than half of available cpu cores tasks for subscribers.");
+        }
+    } else {
+        sub_cpu_num = (available_cpu_num + 1) / 2;
+    }
+
+    let sub_per_peer_num = total_sub_number / sub_cpu_num;
+    let mut sub_futs = (0..sub_cpu_num)
         .into_iter()
         .map(|core_idx| {
-            let sub_futures = (0..per_peer_num).map(|peer_index| {
+            let sub_futures = (0..sub_per_peer_num).map(|peer_index| {
                 subscribe_worker(
                     zenoh.clone(),
                     start_until,
                     timeout,
-                    peer_index + core_idx * per_peer_num,
+                    peer_index + core_idx * sub_per_peer_num,
                     tx.clone(),
                 )
             });
             async_std::task::spawn(futures::future::join_all(sub_futures))
         })
         .collect::<Vec<_>>();
-    let remaining_sub = total_sub_number % cpu_num;
+    let remaining_sub = total_sub_number % sub_cpu_num;
     let mut remaining_sub_fut = (total_sub_number - remaining_sub..total_sub_number)
         .map(|peer_index| {
             subscribe_worker(zenoh.clone(), start_until, timeout, peer_index, tx.clone())
@@ -99,17 +122,25 @@ async fn test_worker_1(args: Cli) {
     // futures::future::try_join_all(pub_futures).await.unwrap();
 
     // new publisher futures
-    let cpu_num = 2;
-    let per_peer_num = total_put_number / cpu_num;
-    let mut pub_futs = (0..cpu_num)
+    let pub_cpu_num;
+    if let Some(args_pub_cpu_num) = args.pub_cpu_num {
+        pub_cpu_num = args_pub_cpu_num;
+        if args_pub_cpu_num > (available_cpu_num + 1) / 2 {
+            warn!("Spawning more than half of available cpu cores tasks for publishers.");
+        }
+    } else {
+        pub_cpu_num = (available_cpu_num + 1) / 2;
+    }
+    let pub_per_peer_num = total_put_number / pub_cpu_num;
+    let mut pub_futs = (0..pub_cpu_num)
         .into_iter()
         .map(|core_idx| {
-            let pub_futures = (0..per_peer_num).map(|peer_index| {
+            let pub_futures = (0..pub_per_peer_num).map(|peer_index| {
                 publish_worker(
                     zenoh.clone(),
                     start_until,
                     timeout,
-                    peer_index + core_idx * per_peer_num,
+                    peer_index + core_idx * pub_per_peer_num,
                     args.num_msgs_per_peer,
                     get_msg_payload(args.payload_size, peer_index),
                 )
@@ -117,7 +148,7 @@ async fn test_worker_1(args: Cli) {
             async_std::task::spawn(futures::future::join_all(pub_futures))
         })
         .collect::<Vec<_>>();
-    let remaining = total_put_number % cpu_num;
+    let remaining = total_put_number % pub_cpu_num;
     let mut remaining_fut = (total_put_number - remaining..total_put_number)
         .map(|peer_index| {
             publish_worker(
