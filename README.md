@@ -50,6 +50,6 @@ For people who are running experiment testings with this program. You may store 
 - [x] Separate building blocks from main.rs 
 - [x] Add adjustable message numbers for `test_worker_1`.
 - [x] Add adjustable payload size for `test_worker_1`.
-- [ ] Parallelize the peers by using all cores.
+- [x] Parallelize the peers by using all cores.
 - [ ] Add adjustable number of `async_std::tasks` spawned for pub/sub workers.
 - [ ] Add support for multiple machines
