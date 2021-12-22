@@ -23,6 +23,9 @@ struct Cli {
     #[structopt(short = "m", long, default_value = "1")]
     /// The number of messages each publisher peer will try to send.
     num_msgs_per_peer: usize,
+    #[structopt(short = "n", long, default_value = "8")]
+    /// The payload size of the message.
+    payload_size: usize,
 }
 #[async_std::main]
 async fn main() {
@@ -40,6 +43,24 @@ async fn test_worker_1(args: Cli) {
     let timeout = start_until + Duration::from_millis(args.round_timeout);
     let total_sub_number = args.num_sub_peer;
     let total_put_number = args.num_put_peer;
+
+    let mut msg_payload;
+
+    if args.payload_size == 8 {
+        msg_payload = format!("{:08}", 1 as usize);
+        let payload_size = std::mem::size_of_val(msg_payload.as_bytes());
+        assert!(payload_size == args.payload_size);
+    } else {
+        msg_payload = format!("{:08}", 1 as usize);
+        let additional_size = args.payload_size - 8;
+        let mut postpend_string = String::from(".");
+        for _ in 1..additional_size {
+            postpend_string.push_str(".");
+        }
+        msg_payload.push_str(&postpend_string);
+        let payload_size = std::mem::size_of_val(msg_payload.as_bytes());
+        assert!(payload_size == args.payload_size);
+    }
 
     let sub_handle_vec = (0..total_sub_number)
         .into_par_iter()
@@ -62,6 +83,7 @@ async fn test_worker_1(args: Cli) {
             timeout,
             peer_index,
             args.num_msgs_per_peer,
+            &msg_payload,
         )
     });
     futures::future::try_join_all(pub_futures).await.unwrap();
@@ -94,7 +116,4 @@ async fn test_worker_1(args: Cli) {
             );
         }
     }
-    let msg_payload = format!("Hello World from peer {:08}", 1 as usize);
-    let payload_size = std::mem::size_of_val(&msg_payload);
-    println!("payload size = {:?} bytes.", payload_size);
 }

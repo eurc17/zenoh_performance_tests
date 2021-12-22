@@ -6,18 +6,18 @@ pub async fn publish_worker(
     timeout: Instant,
     peer_id: usize,
     num_msgs_per_peer: usize,
+    msg_payload: &str,
 ) -> Result<()> {
     let curr_time = Instant::now();
     if start_until > curr_time {
         async_std::task::sleep(start_until - curr_time).await;
     }
     let workspace = zenoh.workspace(None).await.unwrap();
-    let msg_payload = format!("Hello World from peer {:08}", peer_id);
     for _ in 0..num_msgs_per_peer {
         workspace
             .put(
                 &"/demo/example/hello".try_into().unwrap(),
-                msg_payload.clone().into(),
+                msg_payload.into(),
             )
             .await
             .unwrap();
