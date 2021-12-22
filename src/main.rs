@@ -50,6 +50,11 @@ async fn test_worker_1(args: Cli) {
         msg_payload = format!("{:08}", 1 as usize);
         let payload_size = std::mem::size_of_val(msg_payload.as_bytes());
         assert!(payload_size == args.payload_size);
+    } else if args.payload_size < 8 {
+        warn!("Payload size cannot be less than 8 bytes, using 8 bytes for current test.");
+        msg_payload = format!("{:08}", 1 as usize);
+        let payload_size = std::mem::size_of_val(msg_payload.as_bytes());
+        assert!(payload_size == 8);
     } else {
         msg_payload = format!("{:08}", 1 as usize);
         let additional_size = args.payload_size - 8;
