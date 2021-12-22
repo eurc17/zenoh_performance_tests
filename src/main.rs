@@ -34,7 +34,12 @@ async fn main() {
     pretty_env_logger::init();
     let args = Cli::from_args();
     dbg!(&args);
+    test_worker_1(args).await;
+}
+
+async fn test_worker_1(args: Cli) {
     let zenoh = Arc::new(Zenoh::new(net::config::default()).await.unwrap());
+
     let start = Instant::now();
     let start_until = start + Duration::from_millis(args.init_time);
     let timeout = start_until + Duration::from_millis(args.round_timeout);
