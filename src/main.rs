@@ -1,19 +1,51 @@
+#![allow(unused)]
 use std::convert::TryInto;
 use zenoh::*;
 
 use anyhow::Result;
 use futures::{self, prelude::*};
 use log::*;
+use num_cpus;
+use pretty_env_logger;
 use rayon::prelude::*;
 use std::{sync::*, time::*};
+use structopt::StructOpt;
 
+#[derive(Debug, StructOpt)]
+struct Cli {
+    #[structopt(
+        short = "p",
+        long,
+        default_value = "1000",
+        help = "The total number of publisher peers"
+    )]
+    num_put_peer: usize,
+    #[structopt(
+        short = "s",
+        long,
+        default_value = "10",
+        help = "The total number of subscriber peers"
+    )]
+    num_sub_peer: usize,
+    #[structopt(short = "t", long, default_value = "100")]
+    /// The timeout for subscribers to stop receiving messages. Unit: milliseconds (ms).
+    /// The subscriber will start receiving the messages at the same time as the publishers.
+    round_timeout: u64,
+    #[structopt(short = "i", long, default_value = "100")]
+    /// The initial time for starting up futures.
+    init_time: u64,
+}
 #[async_std::main]
 async fn main() {
+    pretty_env_logger::init();
+    let args = Cli::from_args();
+    dbg!(&args);
     let zenoh = Arc::new(Zenoh::new(net::config::default()).await.unwrap());
     let start = Instant::now();
-    let start_until = start + Duration::from_millis(100);
-    let timeout = start_until + Duration::from_millis(100);
-    let total_sub_number = 10;
+    let start_until = start + Duration::from_millis(args.init_time);
+    let timeout = start_until + Duration::from_millis(args.round_timeout);
+    let total_sub_number = args.num_sub_peer;
+    let total_put_number = args.num_put_peer;
 
     let sub_handle_vec = (0..total_sub_number)
         .into_par_iter()
@@ -29,7 +61,6 @@ async fn main() {
         .collect::<Vec<_>>();
     async_std::task::sleep(std::time::Duration::from_millis(50)).await;
     // async_std::task::spawn(publish_worker(zenoh.clone(), start_until));
-    let total_put_number = 100000;
     let pub_futures = (0..total_put_number)
         .map(|peer_index| publish_worker(zenoh.clone(), start_until, timeout, peer_index));
     futures::future::try_join_all(pub_futures).await.unwrap();
@@ -73,7 +104,10 @@ async fn publish_worker(
     timeout: Instant,
     peer_id: usize,
 ) -> Result<()> {
-    async_std::task::sleep(start_until - Instant::now()).await;
+    let curr_time = Instant::now();
+    if start_until > curr_time {
+        async_std::task::sleep(start_until - curr_time).await;
+    }
     let workspace = zenoh.workspace(None).await.unwrap();
     let msg_payload = format!("Hello World from peer {:08}", peer_id);
     workspace
@@ -95,7 +129,6 @@ async fn subscribe_worker(
     timeout: Instant,
     peer_id: usize,
 ) -> (usize, Vec<Change>) {
-    async_std::task::sleep(start_until - Instant::now()).await;
     let mut change_vec = vec![];
     let workspace = zenoh.workspace(None).await.unwrap();
     let mut change_stream = workspace
