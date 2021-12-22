@@ -14,7 +14,7 @@ pub async fn demonstration_worker(
         vector_data.push(data);
     }
     println!("Received data from {} of sub peers", vector_data.len());
-    vector_data.sort_by_key(|k| k.0);
+    vector_data.par_sort_by_key(|k| k.0);
     for (id, change_vec) in vector_data.iter() {
         println!(
             "sub peer {}: total received messages: {}/{}",
