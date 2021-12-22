@@ -7,19 +7,11 @@ use workers::*;
 
 #[derive(Debug, StructOpt)]
 struct Cli {
-    #[structopt(
-        short = "p",
-        long,
-        default_value = "1000",
-        help = "The total number of publisher peers"
-    )]
+    #[structopt(short = "p", long, default_value = "1000")]
+    /// The total number of publisher peers
     num_put_peer: usize,
-    #[structopt(
-        short = "s",
-        long,
-        default_value = "10",
-        help = "The total number of subscriber peers"
-    )]
+    #[structopt(short = "s", long, default_value = "10")]
+    /// The total number of subscriber peers
     num_sub_peer: usize,
     #[structopt(short = "t", long, default_value = "100")]
     /// The timeout for subscribers to stop receiving messages. Unit: milliseconds (ms).
@@ -28,6 +20,9 @@ struct Cli {
     #[structopt(short = "i", long, default_value = "100")]
     /// The initial time for starting up futures.
     init_time: u64,
+    #[structopt(short = "m", long, default_value = "1")]
+    /// The number of messages each publisher peer will try to send.
+    num_msgs_per_peer: usize,
 }
 #[async_std::main]
 async fn main() {
@@ -60,8 +55,15 @@ async fn test_worker_1(args: Cli) {
         .collect::<Vec<_>>();
     async_std::task::sleep(std::time::Duration::from_millis(50)).await;
     // async_std::task::spawn(publish_worker(zenoh.clone(), start_until));
-    let pub_futures = (0..total_put_number)
-        .map(|peer_index| publish_worker(zenoh.clone(), start_until, timeout, peer_index));
+    let pub_futures = (0..total_put_number).map(|peer_index| {
+        publish_worker(
+            zenoh.clone(),
+            start_until,
+            timeout,
+            peer_index,
+            args.num_msgs_per_peer,
+        )
+    });
     futures::future::try_join_all(pub_futures).await.unwrap();
 
     // async_std::task::sleep(std::time::Duration::from_secs(1)).await;

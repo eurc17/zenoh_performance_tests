@@ -5,6 +5,7 @@ pub async fn publish_worker(
     start_until: Instant,
     timeout: Instant,
     peer_id: usize,
+    num_msgs_per_peer: usize,
 ) -> Result<()> {
     let curr_time = Instant::now();
     if start_until > curr_time {
@@ -12,15 +13,18 @@ pub async fn publish_worker(
     }
     let workspace = zenoh.workspace(None).await.unwrap();
     let msg_payload = format!("Hello World from peer {:08}", peer_id);
-    workspace
-        .put(
-            &"/demo/example/hello".try_into().unwrap(),
-            msg_payload.into(),
-        )
-        .await
-        .unwrap();
-    if timeout <= Instant::now() {
-        warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
+    for _ in 0..num_msgs_per_peer {
+        workspace
+            .put(
+                &"/demo/example/hello".try_into().unwrap(),
+                msg_payload.clone().into(),
+            )
+            .await
+            .unwrap();
+        if timeout <= Instant::now() {
+            warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
+            break;
+        }
     }
     Ok(())
 }
