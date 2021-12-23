@@ -1,5 +1,3 @@
-use flume::Receiver;
-
 use super::common::*;
 
 pub async fn demonstration_worker(
@@ -7,10 +5,9 @@ pub async fn demonstration_worker(
     total_put_number: usize,
     total_sub_number: usize,
     num_msgs_per_peer: usize,
-) -> Result<()> {
+) -> () {
     let mut vector_data = vec![];
     while let Ok(data) = rx.recv_async().await {
-        let (id, change_vec) = data.clone();
         vector_data.push(data);
     }
     println!("Received data from {} of sub peers", vector_data.len());
@@ -23,7 +20,6 @@ pub async fn demonstration_worker(
             total_put_number * num_msgs_per_peer
         );
     }
-    Ok(())
 }
 
 pub async fn publish_worker(
@@ -67,7 +63,7 @@ pub async fn subscribe_worker(
 
     if start_until < Instant::now() {
         warn!("Subscriber is not initialized after the initial time has passed. Please increase initialization time");
-        tx.send_async((peer_id, change_vec.clone())).await;
+        tx.send_async((peer_id, change_vec.clone())).await.unwrap();
         return Ok(());
     }
 
@@ -90,6 +86,6 @@ pub async fn subscribe_worker(
             break;
         }
     }
-    tx.send_async((peer_id, change_vec)).await;
+    tx.send_async((peer_id, change_vec)).await.unwrap();
     Ok(())
 }

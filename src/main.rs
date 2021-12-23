@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 mod common;
 mod utils;
 mod workers;
@@ -86,20 +84,22 @@ async fn test_worker_1(args: Cli) {
     let mut sub_futs = (0..sub_cpu_num)
         .into_iter()
         .map(|core_idx| {
-            let sub_futures = (0..sub_per_peer_num).map(|peer_index| {
-                subscribe_worker(
-                    zenoh.clone(),
-                    start_until,
-                    timeout,
-                    peer_index + core_idx * sub_per_peer_num,
-                    tx.clone(),
-                )
-            });
+            let sub_futures = (0..sub_per_peer_num)
+                .map(|peer_index| {
+                    subscribe_worker(
+                        zenoh.clone(),
+                        start_until,
+                        timeout,
+                        peer_index + core_idx * sub_per_peer_num,
+                        tx.clone(),
+                    )
+                })
+                .collect::<Vec<_>>();
             async_std::task::spawn(futures::future::join_all(sub_futures))
         })
         .collect::<Vec<_>>();
     let remaining_sub = total_sub_number % sub_cpu_num;
-    let mut remaining_sub_fut = (total_sub_number - remaining_sub..total_sub_number)
+    let remaining_sub_fut = (total_sub_number - remaining_sub..total_sub_number)
         .map(|peer_index| {
             subscribe_worker(zenoh.clone(), start_until, timeout, peer_index, tx.clone())
         })
@@ -135,16 +135,18 @@ async fn test_worker_1(args: Cli) {
     let mut pub_futs = (0..pub_cpu_num)
         .into_iter()
         .map(|core_idx| {
-            let pub_futures = (0..pub_per_peer_num).map(|peer_index| {
-                publish_worker(
-                    zenoh.clone(),
-                    start_until,
-                    timeout,
-                    peer_index + core_idx * pub_per_peer_num,
-                    args.num_msgs_per_peer,
-                    get_msg_payload(args.payload_size, peer_index),
-                )
-            });
+            let pub_futures = (0..pub_per_peer_num)
+                .map(|peer_index| {
+                    publish_worker(
+                        zenoh.clone(),
+                        start_until,
+                        timeout,
+                        peer_index + core_idx * pub_per_peer_num,
+                        args.num_msgs_per_peer,
+                        get_msg_payload(args.payload_size, peer_index),
+                    )
+                })
+                .collect::<Vec<_>>();
             async_std::task::spawn(futures::future::join_all(pub_futures))
         })
         .collect::<Vec<_>>();
