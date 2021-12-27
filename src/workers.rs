@@ -29,13 +29,21 @@ pub async fn publish_worker(
     peer_id: usize,
     num_msgs_per_peer: usize,
     msg_payload: String,
+    multipeer_mode: bool,
 ) -> Result<()> {
+    let zenoh_new;
+    let workspace;
+    if multipeer_mode {
+        zenoh_new = Zenoh::new(net::config::default()).await.unwrap();
+        workspace = zenoh_new.workspace(None).await.unwrap();
+    } else {
+        workspace = zenoh.workspace(None).await.unwrap();
+    }
+
     let curr_time = Instant::now();
     if start_until > curr_time {
         async_std::task::sleep(start_until - curr_time).await;
     }
-
-    let workspace = zenoh.workspace(None).await.unwrap();
     for _ in 0..num_msgs_per_peer {
         workspace
             .put(
@@ -58,6 +66,7 @@ pub async fn subscribe_worker(
     timeout: Instant,
     peer_id: usize,
     tx: flume::Sender<(usize, Vec<Change>)>,
+    multipeer_mode: bool,
 ) -> Result<()> {
     let mut change_vec = vec![];
 
@@ -66,8 +75,14 @@ pub async fn subscribe_worker(
         tx.send_async((peer_id, change_vec.clone())).await.unwrap();
         return Ok(());
     }
-
-    let workspace = zenoh.workspace(None).await.unwrap();
+    let zenoh_new;
+    let workspace;
+    if multipeer_mode {
+        zenoh_new = Zenoh::new(net::config::default()).await.unwrap();
+        workspace = zenoh_new.workspace(None).await.unwrap();
+    } else {
+        workspace = zenoh.workspace(None).await.unwrap();
+    }
     let mut change_stream = workspace
         .subscribe(&"/demo/example/**".try_into().unwrap())
         .await

@@ -32,6 +32,9 @@ struct Cli {
     #[structopt(long)]
     /// The number of tasks to spawn for dealing with futures related to subscriber peers
     sub_cpu_num: Option<usize>,
+    #[structopt(long)]
+    /// Create multiple zenoh runtimes on a single machine or not for each peer
+    multipeer_mode: bool,
 }
 #[async_std::main]
 async fn main() {
@@ -92,6 +95,7 @@ async fn test_worker_1(args: Cli) {
                         timeout,
                         peer_index + core_idx * sub_per_peer_num,
                         tx.clone(),
+                        args.multipeer_mode,
                     )
                 })
                 .collect::<Vec<_>>();
@@ -101,7 +105,14 @@ async fn test_worker_1(args: Cli) {
     let remaining_sub = total_sub_number % sub_cpu_num;
     let remaining_sub_fut = (total_sub_number - remaining_sub..total_sub_number)
         .map(|peer_index| {
-            subscribe_worker(zenoh.clone(), start_until, timeout, peer_index, tx.clone())
+            subscribe_worker(
+                zenoh.clone(),
+                start_until,
+                timeout,
+                peer_index,
+                tx.clone(),
+                args.multipeer_mode,
+            )
         })
         .collect::<Vec<_>>();
 
@@ -144,6 +155,7 @@ async fn test_worker_1(args: Cli) {
                         peer_index + core_idx * pub_per_peer_num,
                         args.num_msgs_per_peer,
                         get_msg_payload(args.payload_size, peer_index),
+                        args.multipeer_mode,
                     )
                 })
                 .collect::<Vec<_>>();
@@ -160,6 +172,7 @@ async fn test_worker_1(args: Cli) {
                 peer_index,
                 args.num_msgs_per_peer,
                 get_msg_payload(args.payload_size, peer_index),
+                args.multipeer_mode,
             )
         })
         .collect::<Vec<_>>();
@@ -172,6 +185,7 @@ async fn test_worker_1(args: Cli) {
                 peer_index,
                 args.num_msgs_per_peer,
                 get_msg_payload(args.payload_size, peer_index),
+                args.multipeer_mode,
             )
         })
         .collect::<Vec<_>>();
