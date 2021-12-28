@@ -10,7 +10,11 @@ pub async fn demonstration_worker(
     while let Ok(data) = rx.recv_async().await {
         vector_data.push(data);
     }
-    println!("Received data from {} of sub peers", vector_data.len());
+    println!(
+        "Received data from {}/{} sub peers",
+        vector_data.len(),
+        total_sub_number
+    );
     vector_data.par_sort_by_key(|k| k.0);
     for (id, change_vec) in vector_data.iter() {
         println!(

@@ -82,6 +82,7 @@ async fn test_worker_1(args: Cli) {
     } else {
         sub_cpu_num = (available_cpu_num + 1) / 2;
     }
+    println!("Will spawn up to {} tasks for subscribers", sub_cpu_num + 1);
 
     let sub_per_peer_num = total_sub_number / sub_cpu_num;
     let mut sub_futs = (0..sub_cpu_num)
@@ -144,6 +145,8 @@ async fn test_worker_1(args: Cli) {
     } else {
         pub_cpu_num = (available_cpu_num + 1) / 2;
     }
+    println!("Will spawn up to {} tasks for publishers", pub_cpu_num + 1);
+
     let pub_per_peer_num = total_put_number / pub_cpu_num;
     let mut pub_futs = (0..pub_cpu_num)
         .into_iter()
