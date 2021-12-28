@@ -96,6 +96,7 @@ async fn test_worker_1(args: Cli) {
                         peer_index + core_idx * sub_per_peer_num,
                         tx.clone(),
                         args.multipeer_mode,
+                        total_put_number * args.num_msgs_per_peer,
                     )
                 })
                 .collect::<Vec<_>>();
@@ -112,6 +113,7 @@ async fn test_worker_1(args: Cli) {
                 peer_index,
                 tx.clone(),
                 args.multipeer_mode,
+                total_put_number * args.num_msgs_per_peer,
             )
         })
         .collect::<Vec<_>>();

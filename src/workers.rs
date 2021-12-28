@@ -44,6 +44,7 @@ pub async fn publish_worker(
     if start_until > curr_time {
         async_std::task::sleep(start_until - curr_time).await;
     }
+    info!("start sending messages");
     for _ in 0..num_msgs_per_peer {
         workspace
             .put(
@@ -67,6 +68,7 @@ pub async fn subscribe_worker(
     peer_id: usize,
     tx: flume::Sender<(usize, Vec<Change>)>,
     multipeer_mode: bool,
+    total_msg_num: usize,
 ) -> Result<()> {
     let mut change_vec = vec![];
 
@@ -83,24 +85,39 @@ pub async fn subscribe_worker(
     } else {
         workspace = zenoh.workspace(None).await.unwrap();
     }
-    let mut change_stream = workspace
-        .subscribe(&"/demo/example/**".try_into().unwrap())
-        .await
-        .unwrap();
-    while let Some(change) = change_stream.next().await {
-        // println!(
-        //     "{} received >> {:?} for {} : {:?} at {}",
-        //     peer_id, change.kind, change.path, change.value, change.timestamp
-        // );
-        // let string = format!("{:?}", change.value);
-        if Instant::now() < timeout {
-            change_vec.push(change);
-            // println!("{}, change_vec.len = {}", peer_id, change_vec.len());
-        } else {
-            println!("{}, Timeout reached", peer_id);
-            break;
-        }
-    }
+    // let mut change_stream = workspace
+    //     .subscribe(&"/demo/example/**".try_into().unwrap())
+    //     .await
+    //     .unwrap();
+    // while let Some(change) = change_stream.next().await {
+    //     // println!(
+    //     //     "{} received >> {:?} for {} : {:?} at {}",
+    //     //     peer_id, change.kind, change.path, change.value, change.timestamp
+    //     // );
+    //     // let string = format!("{:?}", change.value);
+    //     if Instant::now() < timeout {
+    //         change_vec.push(change);
+    //         // println!("{}, change_vec.len = {}", peer_id, change_vec.len());
+    //     } else {
+    //         println!("{}, Timeout reached", peer_id);
+    //         break;
+    //     }
+    // }
+    let stream = workspace.subscribe(&"/demo/example/**".try_into()?).await?;
+
+    change_vec = stream
+        .take(total_msg_num)
+        .take_until({
+            async move {
+                let now = Instant::now();
+                if timeout >= now {
+                    async_std::task::sleep(timeout - Instant::now()).await;
+                }
+            }
+        })
+        .filter(|change| future::ready(change.kind == zenoh::ChangeKind::Put))
+        .collect::<Vec<Change>>()
+        .await;
     tx.send_async((peer_id, change_vec)).await.unwrap();
     Ok(())
 }
