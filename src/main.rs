@@ -7,10 +7,10 @@ use workers::*;
 
 #[derive(Debug, StructOpt)]
 struct Cli {
-    #[structopt(short = "p", long, default_value = "1000")]
+    #[structopt(short = "p", long, default_value = "1")]
     /// The total number of publisher peers
     num_put_peer: usize,
-    #[structopt(short = "s", long, default_value = "10")]
+    #[structopt(short = "s", long, default_value = "1")]
     /// The total number of subscriber peers
     num_sub_peer: usize,
     #[structopt(short = "t", long, default_value = "100")]
