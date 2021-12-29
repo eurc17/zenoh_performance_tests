@@ -181,20 +181,6 @@ async fn test_worker_1(args: Cli) {
             )
         })
         .collect::<Vec<_>>();
-    let mut additional_fut = (total_put_number..total_put_number + 1)
-        .map(|peer_index| {
-            publish_worker(
-                zenoh.clone(),
-                timeout,
-                timeout + Duration::from_millis(100),
-                peer_index,
-                args.num_msgs_per_peer,
-                get_msg_payload(args.payload_size, peer_index),
-                args.multipeer_mode,
-            )
-        })
-        .collect::<Vec<_>>();
-    remaining_fut.append(&mut additional_fut);
     let remain_futs = async_std::task::spawn(futures::future::join_all(remaining_fut));
 
     pub_futs.push(remain_futs);
