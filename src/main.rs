@@ -35,6 +35,10 @@ struct Cli {
     #[structopt(long)]
     /// Create multiple zenoh runtimes on a single machine or not for each peer
     multipeer_mode: bool,
+    #[structopt(long)]
+    /// Create a zenoh runtime for a pair of pub/sub or not.
+    /// If this flag is used, the total number of peers is read from `num_put_peers`.
+    pub_n_peer: bool,
 }
 #[async_std::main]
 async fn main() {
@@ -42,7 +46,76 @@ async fn main() {
     let args = Cli::from_args();
     dbg!(&args);
     println!("# of CPU cores = {}", num_cpus::get());
-    test_worker_1(args).await;
+    if args.pub_n_peer {
+        test_pub_and_sub_worker(args).await;
+    } else {
+        test_worker_1(args).await;
+    }
+}
+
+async fn test_pub_and_sub_worker(args: Cli) {
+    let (tx, rx) = flume::unbounded::<(usize, Vec<Change>)>();
+
+    let start = Instant::now();
+    let start_until = start + Duration::from_millis(args.init_time);
+    let timeout = start_until + Duration::from_millis(args.round_timeout);
+    let total_sub_number = args.num_put_peer;
+    let total_put_number = args.num_put_peer;
+    let total_cpu_num = num_cpus::get();
+    let available_cpu_num = (total_cpu_num - 2).max(1);
+    let per_peer_num = total_put_number / available_cpu_num;
+
+    let mut pub_sub_futs = (0..available_cpu_num)
+        .into_iter()
+        .map(|core_idx| {
+            let pub_sub_futures = (0..per_peer_num)
+                .map(|peer_index| {
+                    pub_and_sub_worker(
+                        start_until,
+                        timeout,
+                        peer_index + core_idx * per_peer_num,
+                        args.num_msgs_per_peer,
+                        get_msg_payload(args.payload_size, peer_index),
+                        tx.clone(),
+                        total_put_number * args.num_msgs_per_peer,
+                    )
+                })
+                .collect::<Vec<_>>();
+            async_std::task::spawn(futures::future::join_all(pub_sub_futures))
+        })
+        .collect::<Vec<_>>();
+
+    let remaining_pub_sub = total_put_number % available_cpu_num;
+    let remaining_pub_sub_fut = (total_put_number - remaining_pub_sub..total_put_number)
+        .map(|peer_index| {
+            pub_and_sub_worker(
+                start_until,
+                timeout,
+                peer_index,
+                args.num_msgs_per_peer,
+                get_msg_payload(args.payload_size, peer_index),
+                tx.clone(),
+                total_put_number * args.num_msgs_per_peer,
+            )
+        })
+        .collect::<Vec<_>>();
+
+    let remaining_pub_sub_fut =
+        async_std::task::spawn(futures::future::join_all(remaining_pub_sub_fut));
+    pub_sub_futs.push(remaining_pub_sub_fut);
+
+    let all_fut = futures::future::join_all(pub_sub_futs);
+
+    let demo_fut = demonstration_worker(
+        rx,
+        total_put_number,
+        total_sub_number,
+        args.num_msgs_per_peer,
+    );
+
+    drop(tx);
+
+    futures::join!(all_fut, demo_fut);
 }
 
 async fn test_worker_1(args: Cli) {

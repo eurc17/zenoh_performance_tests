@@ -55,6 +55,7 @@ pub async fn publish_worker(
                 .unwrap();
             if timeout <= Instant::now() {
                 warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
+                break;
             }
         }
         zenoh_new.close().await.unwrap();
@@ -75,6 +76,7 @@ pub async fn publish_worker(
                 .unwrap();
             if timeout <= Instant::now() {
                 warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
+                break;
             }
         }
     }
@@ -113,6 +115,8 @@ pub async fn subscribe_worker(
                     let now = Instant::now();
                     if timeout >= now {
                         async_std::task::sleep(timeout - Instant::now()).await;
+                    } else {
+                        async_std::task::sleep(timeout - timeout).await;
                     }
                 }
             })
@@ -133,6 +137,8 @@ pub async fn subscribe_worker(
                     let now = Instant::now();
                     if timeout >= now {
                         async_std::task::sleep(timeout - Instant::now()).await;
+                    } else {
+                        async_std::task::sleep(timeout - timeout).await;
                     }
                 }
             })
@@ -159,5 +165,40 @@ pub async fn subscribe_worker(
     //         break;
     //     }
     // }
+    Ok(())
+}
+
+pub async fn pub_and_sub_worker(
+    start_until: Instant,
+    timeout: Instant,
+    peer_id: usize,
+    num_msgs_per_peer: usize,
+    msg_payload: String,
+    tx: flume::Sender<(usize, Vec<Change>)>,
+    total_msg_num: usize,
+) -> Result<()> {
+    let zenoh = Arc::new(Zenoh::new(net::config::default()).await?);
+    let pub_future = publish_worker(
+        zenoh.clone(),
+        start_until,
+        timeout,
+        peer_id,
+        num_msgs_per_peer,
+        msg_payload,
+        false,
+    );
+    let sub_future = subscribe_worker(
+        zenoh.clone(),
+        start_until,
+        timeout,
+        peer_id,
+        tx,
+        false,
+        total_msg_num,
+    );
+    futures::try_join!(pub_future, sub_future)?;
+    let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
+    zenoh.close().await?;
+
     Ok(())
 }
