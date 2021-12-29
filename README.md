@@ -62,5 +62,5 @@ If you encountered the situation that the program didn't terminate, please inter
 - [x] Add adjustable payload size for `test_worker_1`.
 - [x] Parallelize the peers by using all cores.
 - [x] Add adjustable number of `async_std::tasks` spawned for pub/sub workers.
-- [ ] Add support for peer mode (pub/sub/pub+sub)
+- [x] Add support for peer mode (pub, sub/pub+sub)
 - [ ] Add support for multiple machines
