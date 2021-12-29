@@ -199,4 +199,6 @@ async fn test_worker_1(args: Cli) {
     drop(tx);
 
     futures::join!(all_pub_fut, all_sub_fut, demo_fut);
+    let zenoh = Arc::try_unwrap(zenoh).ok().unwrap();
+    zenoh.close().await.unwrap();
 }
