@@ -37,7 +37,7 @@ pub async fn publish_worker(
     zenoh: Arc<Zenoh>,
     start_until: Instant,
     timeout: Instant,
-    peer_id: usize,
+    _peer_id: usize,
     num_msgs_per_peer: usize,
     msg_payload: String,
     multipeer_mode: bool,

@@ -277,7 +277,7 @@ async fn test_worker_1(args: Cli) {
         })
         .collect::<Vec<_>>();
     let remaining = total_put_number % pub_cpu_num;
-    let mut remaining_fut = (total_put_number - remaining..total_put_number)
+    let remaining_fut = (total_put_number - remaining..total_put_number)
         .map(|peer_index| {
             publish_worker(
                 zenoh.clone(),
