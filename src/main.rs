@@ -38,7 +38,7 @@ pub struct Cli {
     sub_cpu_num: Option<usize>,
     #[structopt(long)]
     /// Create multiple zenoh runtimes on a single machine or not for each peer.
-    /// Will always be set to false if pub_sub_sep is not set.
+    /// It will always be set to false if pub_sub_sep is not set, since the worker will generate a new zenoh instance for each pair of pub and sub worker.
     multipeer_mode: bool,
     #[structopt(long)]
     /// Create a zenoh runtime for a pair of pub/sub if not set.
