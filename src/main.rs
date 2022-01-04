@@ -44,6 +44,9 @@ pub struct Cli {
     /// Create a zenoh runtime for a pair of pub/sub if not set.
     /// If this flag not set, the total number of peers is read from `num_put_peers`.
     pub_sub_separate: bool,
+    #[structopt(short = "l", long)]
+    /// Specifies locators for each peer to connect to. Currently only works with pub and sub sharing same zenoh instances.
+    locators: Option<String>,
 }
 #[async_std::main]
 async fn main() {
@@ -82,6 +85,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                     get_msg_payload(args.payload_size, peer_index),
                     tx.clone(),
                     total_put_number * args.num_msgs_per_peer,
+                    args.locators.clone(),
                 ))
             })
             .collect::<Vec<_>>();
@@ -112,6 +116,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                             get_msg_payload(args.payload_size, peer_index),
                             tx.clone(),
                             total_put_number * args.num_msgs_per_peer,
+                            args.locators.clone(),
                         )
                     })
                     .collect::<Vec<_>>();
@@ -130,6 +135,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                     get_msg_payload(args.payload_size, peer_index),
                     tx.clone(),
                     total_put_number * args.num_msgs_per_peer,
+                    args.locators.clone(),
                 )
             })
             .collect::<Vec<_>>();

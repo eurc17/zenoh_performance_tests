@@ -218,8 +218,13 @@ pub async fn pub_and_sub_worker(
     msg_payload: String,
     tx: flume::Sender<(usize, Vec<Change>)>,
     total_msg_num: usize,
+    locators: Option<String>,
 ) -> Result<()> {
-    let zenoh = Arc::new(Zenoh::new(net::config::default()).await?);
+    let mut config = Properties::default();
+    if let Some(locators) = locators {
+        config.insert("peer".to_string(), locators);
+    }
+    let zenoh = Arc::new(Zenoh::new(config.into()).await?);
     let pub_future = publish_worker(
         zenoh.clone(),
         start_until,
