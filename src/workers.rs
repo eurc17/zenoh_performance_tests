@@ -23,14 +23,49 @@ pub async fn demonstration_worker(
         total_sub_number
     );
     vector_data.par_sort_by_key(|k| k.0);
-    for (id, change_vec) in vector_data.iter() {
-        println!(
-            "sub peer {}: total received messages: {}/{}",
-            id,
-            change_vec.len(),
-            total_put_number * num_msgs_per_peer
-        );
-    }
+    let total_msg_num = total_put_number * num_msgs_per_peer;
+
+    let peer_result = vector_data
+        .par_iter()
+        .map(|(id, change_vec)| {
+            println!(
+                "sub peer {}: total received messages: {}/{}",
+                id,
+                change_vec.len(),
+                total_msg_num
+            );
+            PeerResult {
+                peer_id: *id,
+                receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
+                recvd_msg_num: change_vec.len(),
+                expected_msg_num: total_msg_num,
+            }
+        })
+        .collect::<Vec<_>>();
+    let total_received_msgs = vector_data
+        .par_iter()
+        .map(|(_, change_vec)| change_vec.len())
+        .sum::<usize>();
+    let total_receive_rate =
+        (total_received_msgs as f64) / (vector_data.len() as f64 * total_msg_num as f64);
+    let file_path = args.output_dir.join(format!(
+        "{}-{}-{}.json",
+        total_put_number, total_sub_number, num_msgs_per_peer
+    ));
+    let test_result = TestResult {
+        config: args,
+        total_sub_returned: vector_data.len(),
+        total_receive_rate,
+        per_peer_result: peer_result,
+    };
+
+    let mut file = std::fs::File::create(file_path).unwrap();
+    writeln!(
+        &mut file,
+        "{}",
+        serde_json::to_string_pretty(&test_result).unwrap()
+    )
+    .unwrap();
 }
 
 pub async fn publish_worker(
