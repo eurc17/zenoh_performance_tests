@@ -12,10 +12,10 @@ pub struct Cli {
     /// The path to store the output .json file.
     output_dir: PathBuf,
     #[structopt(short = "p", long, default_value = "1")]
-    /// The total number of publisher peers
+    /// The total number of publisher peers.
     num_put_peer: usize,
     #[structopt(short = "s", long, default_value = "1")]
-    /// The total number of subscriber peers
+    /// The total number of subscriber peers.
     num_sub_peer: usize,
     #[structopt(short = "t", long, default_value = "100")]
     /// The timeout for subscribers to stop receiving messages. Unit: milliseconds (ms).
@@ -31,18 +31,19 @@ pub struct Cli {
     /// The payload size of the message.
     payload_size: usize,
     #[structopt(long)]
-    /// The number of tasks to spawn for dealing with futures related to publisher peers
+    /// The number of tasks to spawn for dealing with futures related to publisher peers.
     pub_cpu_num: Option<usize>,
     #[structopt(long)]
-    /// The number of tasks to spawn for dealing with futures related to subscriber peers
+    /// The number of tasks to spawn for dealing with futures related to subscriber peers.
     sub_cpu_num: Option<usize>,
     #[structopt(long)]
-    /// Create multiple zenoh runtimes on a single machine or not for each peer
+    /// Create multiple zenoh runtimes on a single machine or not for each peer.
+    /// Will always be set to false if pub_sub_sep is not set.
     multipeer_mode: bool,
     #[structopt(long)]
-    /// Create a zenoh runtime for a pair of pub/sub or not.
-    /// If this flag is used, the total number of peers is read from `num_put_peers`.
-    pub_n_peer: bool,
+    /// Create a zenoh runtime for a pair of pub/sub if not set.
+    /// If this flag not set, the total number of peers is read from `num_put_peers`.
+    pub_sub_separate: bool,
 }
 #[async_std::main]
 async fn main() {
@@ -50,10 +51,10 @@ async fn main() {
     let args = Cli::from_args();
     dbg!(&args);
     println!("# of CPU cores = {}", num_cpus::get());
-    if args.pub_n_peer {
-        test_pub_and_sub_worker(args).await;
-    } else {
+    if args.pub_sub_separate {
         test_worker_1(args).await;
+    } else {
+        test_pub_and_sub_worker(args).await;
     }
 }
 
