@@ -1,3 +1,9 @@
+use crate::{
+    utils::{PeerResult, TestResult},
+    Cli,
+};
+use std::io::Write;
+
 use super::common::*;
 
 pub async fn demonstration_worker(
@@ -5,6 +11,7 @@ pub async fn demonstration_worker(
     total_put_number: usize,
     total_sub_number: usize,
     num_msgs_per_peer: usize,
+    args: Cli,
 ) -> () {
     let mut vector_data = vec![];
     while let Ok(data) = rx.recv_async().await {

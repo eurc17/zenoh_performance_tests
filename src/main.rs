@@ -2,11 +2,15 @@ mod common;
 mod utils;
 mod workers;
 use common::*;
+use std::path::PathBuf;
 use utils::*;
 use workers::*;
 
-#[derive(Debug, StructOpt)]
-struct Cli {
+#[derive(Debug, StructOpt, Serialize, Deserialize, Clone)]
+pub struct Cli {
+    #[structopt(short = "o", long, default_value = "./", parse(from_os_str))]
+    /// The path to store the output .json file.
+    output_dir: PathBuf,
     #[structopt(short = "p", long, default_value = "1")]
     /// The total number of publisher peers
     num_put_peer: usize,
@@ -87,6 +91,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
             total_put_number,
             total_sub_number,
             args.num_msgs_per_peer,
+            args.clone(),
         );
 
         drop(tx);
@@ -139,6 +144,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
             total_put_number,
             total_sub_number,
             args.num_msgs_per_peer,
+            args.clone(),
         );
 
         drop(tx);
@@ -296,6 +302,7 @@ async fn test_worker_1(args: Cli) {
         total_put_number,
         total_sub_number,
         args.num_msgs_per_peer,
+        args.clone(),
     );
 
     drop(tx);

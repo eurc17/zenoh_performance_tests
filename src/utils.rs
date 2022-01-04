@@ -1,4 +1,23 @@
+use crate::Cli;
+
 use super::common::*;
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub struct PeerResult {
+    pub peer_id: usize,
+    pub receive_rate: f64,
+    pub recvd_msg_num: usize,
+    pub expected_msg_num: usize,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+
+pub struct TestResult {
+    pub config: Cli,
+    pub total_sub_returned: usize,
+    pub total_receive_rate: f64,
+    pub per_peer_result: Vec<PeerResult>,
+}
 
 pub fn get_msg_payload(args_payload_size: usize, peer_id: usize) -> String {
     let mut msg_payload;
