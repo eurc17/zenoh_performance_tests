@@ -47,6 +47,8 @@ pub struct Cli {
     #[structopt(short = "l", long)]
     /// Specifies locators for each peer to connect to.
     locators: Option<String>,
+    #[structopt(short = "a", long, default_value = "0")]
+    remote_pub_peers: usize,
 }
 #[async_std::main]
 async fn main() {
@@ -84,7 +86,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                     args.num_msgs_per_peer,
                     get_msg_payload(args.payload_size, peer_index),
                     tx.clone(),
-                    total_put_number * args.num_msgs_per_peer,
+                    (total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
                     args.locators.clone(),
                 ))
             })
@@ -96,6 +98,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
             total_put_number,
             total_sub_number,
             args.num_msgs_per_peer,
+            args.remote_pub_peers,
             args.clone(),
         );
 
@@ -115,7 +118,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                             args.num_msgs_per_peer,
                             get_msg_payload(args.payload_size, peer_index),
                             tx.clone(),
-                            total_put_number * args.num_msgs_per_peer,
+                            (total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
                             args.locators.clone(),
                         )
                     })
@@ -134,7 +137,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                     args.num_msgs_per_peer,
                     get_msg_payload(args.payload_size, peer_index),
                     tx.clone(),
-                    total_put_number * args.num_msgs_per_peer,
+                    (total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
                     args.locators.clone(),
                 )
             })
@@ -151,6 +154,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
             total_put_number,
             total_sub_number,
             args.num_msgs_per_peer,
+            args.remote_pub_peers,
             args.clone(),
         );
 
@@ -216,7 +220,7 @@ async fn test_worker_1(args: Cli) {
                         peer_index + core_idx * sub_per_peer_num,
                         tx.clone(),
                         args.multipeer_mode,
-                        total_put_number * args.num_msgs_per_peer,
+                        (total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
                         args.locators.clone(),
                     )
                 })
@@ -234,7 +238,7 @@ async fn test_worker_1(args: Cli) {
                 peer_index,
                 tx.clone(),
                 args.multipeer_mode,
-                total_put_number * args.num_msgs_per_peer,
+                (total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
                 args.locators.clone(),
             )
         })
@@ -317,6 +321,7 @@ async fn test_worker_1(args: Cli) {
         total_put_number,
         total_sub_number,
         args.num_msgs_per_peer,
+        args.remote_pub_peers,
         args.clone(),
     );
 

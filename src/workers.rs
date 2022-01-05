@@ -11,6 +11,7 @@ pub async fn demonstration_worker(
     total_put_number: usize,
     total_sub_number: usize,
     num_msgs_per_peer: usize,
+    additional_pub_num: usize,
     args: Cli,
 ) -> () {
     let mut vector_data = vec![];
@@ -23,7 +24,7 @@ pub async fn demonstration_worker(
         total_sub_number
     );
     vector_data.par_sort_by_key(|k| k.0);
-    let total_msg_num = total_put_number * num_msgs_per_peer;
+    let total_msg_num = (total_put_number + additional_pub_num) * num_msgs_per_peer;
 
     let peer_result = vector_data
         .par_iter()
