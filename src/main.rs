@@ -45,7 +45,7 @@ pub struct Cli {
     /// If this flag not set, the total number of peers is read from `num_put_peers`.
     pub_sub_separate: bool,
     #[structopt(short = "l", long)]
-    /// Specifies locators for each peer to connect to. Currently only works with pub and sub sharing same zenoh instances.
+    /// Specifies locators for each peer to connect to.
     locators: Option<String>,
 }
 #[async_std::main]
