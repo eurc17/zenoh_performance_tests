@@ -2,12 +2,12 @@ use crate::{
     utils::{PeerResult, TestResult},
     Cli,
 };
-use std::io::Write;
+use std::{io::Write, str::FromStr};
 
 use super::common::*;
 
 pub async fn demonstration_worker(
-    rx: flume::Receiver<(usize, Vec<Change>)>,
+    rx: flume::Receiver<(usize, Vec<Sample>)>,
     total_put_number: usize,
     total_sub_number: usize,
     num_msgs_per_peer: usize,
@@ -70,7 +70,7 @@ pub async fn demonstration_worker(
 }
 
 pub async fn publish_worker(
-    zenoh: Arc<Zenoh>,
+    zenoh: Arc<Session>,
     start_until: Instant,
     timeout: Instant,
     _peer_id: usize,
@@ -80,25 +80,21 @@ pub async fn publish_worker(
     locators: Option<String>,
 ) -> Result<()> {
     let zenoh_new;
-    let workspace;
     if multipeer_mode {
-        let mut config = Properties::default();
+        let mut config = config::default();
         if let Some(locators) = locators {
-            config.insert("peer".to_string(), locators);
+            let locator = Locator::from_str(locators.as_str()).unwrap();
+            config.set_peers(vec![locator]).unwrap();
         }
-        zenoh_new = Zenoh::new(config.into()).await.unwrap();
-        workspace = zenoh_new.workspace(None).await.unwrap();
+        zenoh_new = zenoh::open(config).await.unwrap();
         let curr_time = Instant::now();
         if start_until > curr_time {
             async_std::task::sleep(start_until - curr_time).await;
         }
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
-            workspace
-                .put(
-                    &"/demo/example/hello".try_into().unwrap(),
-                    msg_payload.clone().into(),
-                )
+            zenoh_new
+                .put("/demo/example/hello", msg_payload.clone())
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
@@ -108,18 +104,14 @@ pub async fn publish_worker(
         }
         zenoh_new.close().await.unwrap();
     } else {
-        workspace = zenoh.workspace(None).await.unwrap();
         let curr_time = Instant::now();
         if start_until > curr_time {
             async_std::task::sleep(start_until - curr_time).await;
         }
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
-            workspace
-                .put(
-                    &"/demo/example/hello".try_into().unwrap(),
-                    msg_payload.clone().into(),
-                )
+            zenoh
+                .put("/demo/example/hello", msg_payload.clone())
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
@@ -133,11 +125,11 @@ pub async fn publish_worker(
 }
 
 pub async fn subscribe_worker(
-    zenoh: Arc<Zenoh>,
+    zenoh: Arc<Session>,
     start_until: Instant,
     timeout: Instant,
     peer_id: usize,
-    tx: flume::Sender<(usize, Vec<Change>)>,
+    tx: flume::Sender<(usize, Vec<Sample>)>,
     multipeer_mode: bool,
     total_msg_num: usize,
     locators: Option<String>,
@@ -150,38 +142,38 @@ pub async fn subscribe_worker(
         return Ok(());
     }
     let zenoh_new;
-    let workspace;
     if multipeer_mode {
-        let mut config = Properties::default();
+        let mut config = config::default();
         if let Some(locators) = locators {
-            config.insert("peer".to_string(), locators);
+            let locator = Locator::from_str(locators.as_str()).unwrap();
+            config.set_peers(vec![locator]).unwrap();
         }
-        zenoh_new = Zenoh::new(config.into()).await.unwrap();
-        workspace = zenoh_new.workspace(None).await.unwrap();
+        zenoh_new = zenoh::open(config).await.unwrap();
+        {
+            let mut subscriber = zenoh_new.subscribe("/demo/example/**").await.unwrap();
 
-        let stream = workspace.subscribe(&"/demo/example/**".try_into()?).await?;
+            let stream = subscriber.receiver();
 
-        change_vec = stream
-            .take(total_msg_num)
-            .take_until({
-                async move {
-                    let now = Instant::now();
-                    if timeout >= now {
-                        async_std::task::sleep(timeout - Instant::now()).await;
-                    } else {
-                        async_std::task::sleep(timeout - timeout).await;
+            change_vec = stream
+                .take(total_msg_num)
+                .take_until({
+                    async move {
+                        let now = Instant::now();
+                        if timeout >= now {
+                            async_std::task::sleep(timeout - Instant::now()).await;
+                        } else {
+                            async_std::task::sleep(timeout - timeout).await;
+                        }
                     }
-                }
-            })
-            .filter(|change| future::ready(change.kind == zenoh::ChangeKind::Put))
-            .collect::<Vec<Change>>()
-            .await;
-        tx.send_async((peer_id, change_vec)).await.unwrap();
+                })
+                .collect::<Vec<Sample>>()
+                .await;
+            tx.send_async((peer_id, change_vec)).await.unwrap();
+        }
         zenoh_new.close().await.unwrap();
     } else {
-        workspace = zenoh.workspace(None).await.unwrap();
-
-        let stream = workspace.subscribe(&"/demo/example/**".try_into()?).await?;
+        let mut subscriber = zenoh.subscribe("/demo/example/**").await.unwrap();
+        let stream = subscriber.receiver();
 
         change_vec = stream
             .take(total_msg_num)
@@ -195,8 +187,7 @@ pub async fn subscribe_worker(
                     }
                 }
             })
-            .filter(|change| future::ready(change.kind == zenoh::ChangeKind::Put))
-            .collect::<Vec<Change>>()
+            .collect::<Vec<Sample>>()
             .await;
         tx.send_async((peer_id, change_vec)).await.unwrap();
     }
@@ -227,15 +218,16 @@ pub async fn pub_and_sub_worker(
     peer_id: usize,
     num_msgs_per_peer: usize,
     msg_payload: String,
-    tx: flume::Sender<(usize, Vec<Change>)>,
+    tx: flume::Sender<(usize, Vec<Sample>)>,
     total_msg_num: usize,
     locators: Option<String>,
 ) -> Result<()> {
-    let mut config = Properties::default();
+    let mut config = config::default();
     if let Some(locators) = locators.clone() {
-        config.insert("peer".to_string(), locators);
+        let locator = Locator::from_str(locators.as_str()).unwrap();
+        config.set_peers(vec![locator]).unwrap();
     }
-    let zenoh = Arc::new(Zenoh::new(config.into()).await?);
+    let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let pub_future = publish_worker(
         zenoh.clone(),
         start_until,
@@ -258,7 +250,7 @@ pub async fn pub_and_sub_worker(
     );
     futures::try_join!(pub_future, sub_future)?;
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
-    zenoh.close().await?;
+    zenoh.close().await.unwrap();
 
     Ok(())
 }

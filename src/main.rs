@@ -3,6 +3,7 @@ mod utils;
 mod workers;
 use common::*;
 use std::path::PathBuf;
+use std::str::FromStr;
 use utils::*;
 use workers::*;
 
@@ -64,7 +65,7 @@ async fn main() {
 }
 
 async fn test_pub_and_sub_worker(args: Cli) {
-    let (tx, rx) = flume::unbounded::<(usize, Vec<Change>)>();
+    let (tx, rx) = flume::unbounded::<(usize, Vec<Sample>)>();
 
     let start = Instant::now();
     let start_until = start + Duration::from_millis(args.init_time);
@@ -165,12 +166,13 @@ async fn test_pub_and_sub_worker(args: Cli) {
 }
 
 async fn test_worker_1(args: Cli) {
-    let (tx, rx) = flume::unbounded::<(usize, Vec<Change>)>();
-    let mut config = Properties::default();
+    let (tx, rx) = flume::unbounded::<(usize, Vec<Sample>)>();
+    let mut config = config::default();
     if let Some(locators) = args.locators.clone() {
-        config.insert("peer".to_string(), locators);
+        let locator = Locator::from_str(locators.as_str()).unwrap();
+        config.set_peers(vec![locator]).unwrap();
     }
-    let zenoh = Arc::new(Zenoh::new(config.into()).await.unwrap());
+    let zenoh = Arc::new(zenoh::open(config).await.unwrap());
 
     let start = Instant::now();
     let start_until = start + Duration::from_millis(args.init_time);
