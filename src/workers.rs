@@ -76,11 +76,16 @@ pub async fn publish_worker(
     num_msgs_per_peer: usize,
     msg_payload: String,
     multipeer_mode: bool,
+    locators: Option<String>,
 ) -> Result<()> {
     let zenoh_new;
     let workspace;
     if multipeer_mode {
-        zenoh_new = Zenoh::new(net::config::default()).await.unwrap();
+        let mut config = Properties::default();
+        if let Some(locators) = locators {
+            config.insert("peer".to_string(), locators);
+        }
+        zenoh_new = Zenoh::new(config.into()).await.unwrap();
         workspace = zenoh_new.workspace(None).await.unwrap();
         let curr_time = Instant::now();
         if start_until > curr_time {
@@ -134,6 +139,7 @@ pub async fn subscribe_worker(
     tx: flume::Sender<(usize, Vec<Change>)>,
     multipeer_mode: bool,
     total_msg_num: usize,
+    locators: Option<String>,
 ) -> Result<()> {
     let mut change_vec = vec![];
 
@@ -145,7 +151,11 @@ pub async fn subscribe_worker(
     let zenoh_new;
     let workspace;
     if multipeer_mode {
-        zenoh_new = Zenoh::new(net::config::default()).await.unwrap();
+        let mut config = Properties::default();
+        if let Some(locators) = locators {
+            config.insert("peer".to_string(), locators);
+        }
+        zenoh_new = Zenoh::new(config.into()).await.unwrap();
         workspace = zenoh_new.workspace(None).await.unwrap();
 
         let stream = workspace.subscribe(&"/demo/example/**".try_into()?).await?;
@@ -221,7 +231,7 @@ pub async fn pub_and_sub_worker(
     locators: Option<String>,
 ) -> Result<()> {
     let mut config = Properties::default();
-    if let Some(locators) = locators {
+    if let Some(locators) = locators.clone() {
         config.insert("peer".to_string(), locators);
     }
     let zenoh = Arc::new(Zenoh::new(config.into()).await?);
@@ -233,6 +243,7 @@ pub async fn pub_and_sub_worker(
         num_msgs_per_peer,
         msg_payload,
         false,
+        locators.clone(),
     );
     let sub_future = subscribe_worker(
         zenoh.clone(),
@@ -242,6 +253,7 @@ pub async fn pub_and_sub_worker(
         tx,
         false,
         total_msg_num,
+        locators.clone(),
     );
     futures::try_join!(pub_future, sub_future)?;
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();

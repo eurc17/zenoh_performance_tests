@@ -162,7 +162,11 @@ async fn test_pub_and_sub_worker(args: Cli) {
 
 async fn test_worker_1(args: Cli) {
     let (tx, rx) = flume::unbounded::<(usize, Vec<Change>)>();
-    let zenoh = Arc::new(Zenoh::new(net::config::default()).await.unwrap());
+    let mut config = Properties::default();
+    if let Some(locators) = args.locators.clone() {
+        config.insert("peer".to_string(), locators);
+    }
+    let zenoh = Arc::new(Zenoh::new(config.into()).await.unwrap());
 
     let start = Instant::now();
     let start_until = start + Duration::from_millis(args.init_time);
@@ -213,6 +217,7 @@ async fn test_worker_1(args: Cli) {
                         tx.clone(),
                         args.multipeer_mode,
                         total_put_number * args.num_msgs_per_peer,
+                        args.locators.clone(),
                     )
                 })
                 .collect::<Vec<_>>();
@@ -230,6 +235,7 @@ async fn test_worker_1(args: Cli) {
                 tx.clone(),
                 args.multipeer_mode,
                 total_put_number * args.num_msgs_per_peer,
+                args.locators.clone(),
             )
         })
         .collect::<Vec<_>>();
@@ -276,6 +282,7 @@ async fn test_worker_1(args: Cli) {
                         args.num_msgs_per_peer,
                         get_msg_payload(args.payload_size, peer_index),
                         args.multipeer_mode,
+                        args.locators.clone(),
                     )
                 })
                 .collect::<Vec<_>>();
@@ -293,6 +300,7 @@ async fn test_worker_1(args: Cli) {
                 args.num_msgs_per_peer,
                 get_msg_payload(args.payload_size, peer_index),
                 args.multipeer_mode,
+                args.locators.clone(),
             )
         })
         .collect::<Vec<_>>();
