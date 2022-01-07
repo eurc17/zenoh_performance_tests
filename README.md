@@ -66,3 +66,5 @@ If you encountered the situation that the program didn't terminate, please inter
 - [x] Add logging for successful tests
 - [x] Add support for multiple machines
 - [x] Upgrade master to test zenoh 0.6.0-dev
+- [x] Add test script for multiple test running
+- [ ] Add parsing script to parse the multiple test results
