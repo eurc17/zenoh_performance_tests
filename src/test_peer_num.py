@@ -47,7 +47,7 @@ if __name__ == "__main__":
         default="./",
     )
     parser.add_argument(
-        "-s",
+        "-a",
         "--peer_num_start",
         type=int,
         help="The starting number of peer of the test",
