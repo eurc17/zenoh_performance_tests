@@ -48,6 +48,7 @@ pub struct Cli {
     pub_sub_separate: bool,
     #[structopt(short = "l", long)]
     /// Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).
+    /// If you'd like to connect to several addresses, separate them with a comma (example: tcp/x.x.x.x:7447,tcp/y.y.y.y:7447)
     locators: Option<String>,
     #[structopt(short = "a", long, default_value = "0")]
     /// Number of remote subscriber peers.
