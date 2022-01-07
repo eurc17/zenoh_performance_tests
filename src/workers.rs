@@ -83,8 +83,12 @@ pub async fn publish_worker(
     if multipeer_mode {
         let mut config = config::default();
         if let Some(locators) = locators {
-            let locator = Locator::from_str(locators.as_str()).unwrap();
-            config.set_peers(vec![locator]).unwrap();
+            let locator_vec = locators
+                .split(",")
+                .filter(|str| *str != "")
+                .map(|locator| Locator::from_str(locator).unwrap())
+                .collect::<Vec<_>>();
+            config.set_peers(locator_vec).unwrap();
         }
         zenoh_new = zenoh::open(config).await.unwrap();
         let curr_time = Instant::now();
@@ -145,8 +149,12 @@ pub async fn subscribe_worker(
     if multipeer_mode {
         let mut config = config::default();
         if let Some(locators) = locators {
-            let locator = Locator::from_str(locators.as_str()).unwrap();
-            config.set_peers(vec![locator]).unwrap();
+            let locator_vec = locators
+                .split(",")
+                .filter(|str| *str != "")
+                .map(|locator| Locator::from_str(locator).unwrap())
+                .collect::<Vec<_>>();
+            config.set_peers(locator_vec).unwrap();
         }
         zenoh_new = zenoh::open(config).await.unwrap();
         {
@@ -224,8 +232,12 @@ pub async fn pub_and_sub_worker(
 ) -> Result<()> {
     let mut config = config::default();
     if let Some(locators) = locators.clone() {
-        let locator = Locator::from_str(locators.as_str()).unwrap();
-        config.set_peers(vec![locator]).unwrap();
+        let locator_vec = locators
+            .split(",")
+            .filter(|str| *str != "")
+            .map(|locator| Locator::from_str(locator).unwrap())
+            .collect::<Vec<_>>();
+        config.set_peers(locator_vec).unwrap();
     }
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let pub_future = publish_worker(
