@@ -46,7 +46,7 @@ pub struct Cli {
     /// Create a zenoh runtime for a pair of pub/sub if not set.
     /// If this flag not set, the total number of peers is read from `num_put_peers`.
     pub_sub_separate: bool,
-    #[structopt(short = "l", long)]
+    #[structopt(short = "e", long)]
     /// Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).
     /// If you'd like to connect to several addresses, separate them with a comma (example: tcp/x.x.x.x:7447,tcp/y.y.y.y:7447)
     locators: Option<String>,
