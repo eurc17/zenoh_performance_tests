@@ -105,6 +105,8 @@ async fn test_pub_and_sub_worker(args: Cli) {
             total_sub_number,
             args.num_msgs_per_peer,
             args.remote_pub_peers,
+            args.payload_size,
+            args.round_timeout,
             args.clone(),
         );
 
@@ -161,6 +163,8 @@ async fn test_pub_and_sub_worker(args: Cli) {
             total_sub_number,
             args.num_msgs_per_peer,
             args.remote_pub_peers,
+            args.payload_size,
+            args.round_timeout,
             args.clone(),
         );
 
@@ -329,6 +333,8 @@ async fn test_worker_1(args: Cli) {
         total_sub_number,
         args.num_msgs_per_peer,
         args.remote_pub_peers,
+        args.payload_size,
+        args.round_timeout,
         args.clone(),
     );
 
