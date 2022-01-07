@@ -23,7 +23,7 @@ pub struct Cli {
     /// The timeout for subscribers to stop receiving messages. Unit: milliseconds (ms).
     /// The subscriber will start receiving the messages at the same time as the publishers.
     round_timeout: u64,
-    #[structopt(short = "i", long, default_value = "100")]
+    #[structopt(short = "i", long, default_value = "1000")]
     /// The initialization time (ms) for starting up futures.
     init_time: u64,
     #[structopt(short = "m", long, default_value = "1")]
