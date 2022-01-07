@@ -14,6 +14,7 @@ pub struct Cli {
     output_dir: PathBuf,
     #[structopt(short = "p", long, default_value = "1")]
     /// The total number of publisher peers.
+    /// If pub-sub-separate flag not used, this will be the total number of peers.
     num_put_peer: usize,
     #[structopt(short = "s", long, default_value = "1")]
     /// The total number of subscriber peers.
@@ -23,13 +24,13 @@ pub struct Cli {
     /// The subscriber will start receiving the messages at the same time as the publishers.
     round_timeout: u64,
     #[structopt(short = "i", long, default_value = "100")]
-    /// The initial time for starting up futures.
+    /// The initialization time (ms) for starting up futures.
     init_time: u64,
     #[structopt(short = "m", long, default_value = "1")]
     /// The number of messages each publisher peer will try to send.
     num_msgs_per_peer: usize,
     #[structopt(short = "n", long, default_value = "8")]
-    /// The payload size of the message.
+    /// The payload size (bytes) of the message.
     payload_size: usize,
     #[structopt(long)]
     /// The number of tasks to spawn for dealing with futures related to publisher peers.
@@ -46,7 +47,7 @@ pub struct Cli {
     /// If this flag not set, the total number of peers is read from `num_put_peers`.
     pub_sub_separate: bool,
     #[structopt(short = "l", long)]
-    /// Specifies locators for each peer to connect to.
+    /// Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).
     locators: Option<String>,
     #[structopt(short = "a", long, default_value = "0")]
     /// Number of remote subscriber peers.
