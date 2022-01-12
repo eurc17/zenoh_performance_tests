@@ -47,7 +47,7 @@ def main(args):
     fig, ax1 = plt.subplots()
 
     color = "tab:red"
-    ax1.set_xlabel("number of peers")
+    ax1.set_xlabel("payload size (bytes)")
     ax1.set_ylabel("peak cpu usage (%)", color=color)
     ax1.plot(payload_list, cpu_list, color=color)
     ax1.tick_params(axis="y", labelcolor=color)
