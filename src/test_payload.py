@@ -35,6 +35,7 @@ def main(args):
         os.system(cmd)
         # sleep for 10 seconds before running new tests
         time.sleep(10)
+        os.system("pkill zenoh_perfornmance_tests")
 
 
 if __name__ == "__main__":
