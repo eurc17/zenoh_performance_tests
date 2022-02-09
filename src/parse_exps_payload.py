@@ -66,8 +66,8 @@ def main(args):
     fig, ax1 = plt.subplots()
 
     color = "tab:red"
-    ax1.set_xlabel("payload size (bytes)")
-    ax1.set_ylabel("peak cpu usage (%)", color=color)
+    ax1.set_xlabel("payload size (bytes)", fontweight="bold")
+    ax1.set_ylabel("peak cpu usage (%)", color=color, fontweight="bold")
     ax1.plot(payload_list, cpu_list, color=color)
     ax1.tick_params(axis="y", labelcolor=color)
 
@@ -82,14 +82,25 @@ def main(args):
     plt.savefig(args.output_dir + "/resource.png")
     # plt.show()
     plt.clf()
-    plt.plot(payload_list, recv_rate_list, label="msg recv rate")
+    fig, ax = plt.subplots()
+
+    ax.plot(payload_list, recv_rate_list)
+    ax.set_xlabel("number of peers", fontweight="bold")
+    ax.set_ylabel("msg recv rate", fontweight="bold")
+    ax.grid(True)
+
+    ax.set_title(
+        "Msg recv rate\n",
+        fontsize=14,
+        fontweight="bold",
+    )
     plt.savefig(args.output_dir + "/recv_rate.png")
     plt.show()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Run multiple zenoh-performance-test with increasing peer numbers"
+        description="Run multiple zenoh-performance-test with increasing peer numbers. RUST_LOG=info must be set"
     )
     parser.add_argument(
         "-o",
