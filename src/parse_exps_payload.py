@@ -8,6 +8,8 @@ import json
 
 def main(args):
     print(args)
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
     payload_list = []
     mem_list = []
     cpu_list = []
