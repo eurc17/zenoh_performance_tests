@@ -82,6 +82,8 @@ pub async fn publish_worker(
     multipeer_mode: bool,
     locators: Option<String>,
     output_dir: PathBuf,
+    total_put_number: usize,
+    payload_size: usize,
 ) -> Result<()> {
     let zenoh_new;
     let mut timeout_flag = false;
@@ -133,12 +135,12 @@ pub async fn publish_worker(
     }
 
     if timeout_flag {
-        let file_path = output_dir.join(format!("{}-info.txt", peer_id));
+        let file_path = output_dir.join(format!("info-{}.txt", peer_id));
         let mut file = std::fs::File::create(file_path).unwrap();
         writeln!(
             &mut file,
-            "Peer-{} publisher timeout during message sending",
-            peer_id
+            "Peer-{} publisher timeout. Put_peer_num = {}, payload_size = {}",
+            peer_id, total_put_number, payload_size,
         )
         .unwrap();
     }
@@ -248,6 +250,8 @@ pub async fn pub_and_sub_worker(
     total_msg_num: usize,
     locators: Option<String>,
     output_dir: PathBuf,
+    total_put_number: usize,
+    payload_size: usize,
 ) -> Result<()> {
     let mut config = config::default();
     if let Some(locators) = locators.clone() {
@@ -269,6 +273,8 @@ pub async fn pub_and_sub_worker(
         false,
         locators.clone(),
         output_dir,
+        total_put_number,
+        payload_size,
     );
     let sub_future = subscribe_worker(
         zenoh.clone(),
