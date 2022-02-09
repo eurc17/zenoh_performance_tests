@@ -4,6 +4,23 @@ import glob
 import argparse
 import matplotlib.pyplot as plt
 import json
+from functools import cmp_to_key
+
+
+def sort_file(filename1, filename2):
+    base_name1 = os.path.basename(filename1).split(".")[0]
+    base_name2 = os.path.basename(filename2).split(".")[0]
+    int_list1 = list(map(int, base_name1.split("-")))
+    int_list2 = list(map(int, base_name2.split("-")))
+    for i in range(len(int_list1)):
+        if int_list1[i] > int_list2[i]:
+            return 1
+        elif int_list1[i] < int_list2[i]:
+            return -1
+    return 0
+
+
+sort_file_key = cmp_to_key(sort_file)
 
 
 def main(args):
@@ -14,7 +31,7 @@ def main(args):
     mem_list = []
     cpu_list = []
     recv_rate_list = []
-    for json_file in sorted(glob.glob(args.input_dir + "/*.json")):
+    for json_file in sorted(glob.glob(args.input_dir + "/*.json"), key=sort_file_key):
         with open(json_file) as json_opened_file:
             data = json.load(json_opened_file)
             recv_rate = float(data["total_receive_rate"])
