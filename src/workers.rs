@@ -2,6 +2,7 @@ use crate::{
     utils::{PeerResult, TestResult},
     Cli,
 };
+use std::path::PathBuf;
 use std::{io::Write, str::FromStr};
 
 use super::common::*;
@@ -75,13 +76,15 @@ pub async fn publish_worker(
     zenoh: Arc<Session>,
     start_until: Instant,
     timeout: Instant,
-    _peer_id: usize,
+    peer_id: usize,
     num_msgs_per_peer: usize,
     msg_payload: String,
     multipeer_mode: bool,
     locators: Option<String>,
+    output_dir: PathBuf,
 ) -> Result<()> {
     let zenoh_new;
+    let mut timeout_flag = false;
     if multipeer_mode {
         let mut config = config::default();
         if let Some(locators) = locators {
@@ -104,6 +107,7 @@ pub async fn publish_worker(
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
+                timeout_flag = true;
                 warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
                 break;
             }
@@ -121,10 +125,22 @@ pub async fn publish_worker(
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
+                timeout_flag = true;
                 warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
                 break;
             }
         }
+    }
+
+    if timeout_flag {
+        let file_path = output_dir.join(format!("{}-info.txt", peer_id));
+        let mut file = std::fs::File::create(file_path).unwrap();
+        writeln!(
+            &mut file,
+            "Peer-{} publisher timeout during message sending",
+            peer_id
+        )
+        .unwrap();
     }
 
     Ok(())
@@ -231,6 +247,7 @@ pub async fn pub_and_sub_worker(
     tx: flume::Sender<(usize, Vec<Sample>)>,
     total_msg_num: usize,
     locators: Option<String>,
+    output_dir: PathBuf,
 ) -> Result<()> {
     let mut config = config::default();
     if let Some(locators) = locators.clone() {
@@ -251,6 +268,7 @@ pub async fn pub_and_sub_worker(
         msg_payload,
         false,
         locators.clone(),
+        output_dir,
     );
     let sub_future = subscribe_worker(
         zenoh.clone(),

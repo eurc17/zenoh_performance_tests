@@ -94,6 +94,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                     tx.clone(),
                     (total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
                     args.locators.clone(),
+                    args.output_dir.clone(),
                 ))
             })
             .collect::<Vec<_>>();
@@ -128,6 +129,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                             tx.clone(),
                             (total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
                             args.locators.clone(),
+                            args.output_dir.clone(),
                         )
                     })
                     .collect::<Vec<_>>();
@@ -147,6 +149,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
                     tx.clone(),
                     (total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
                     args.locators.clone(),
+                    args.output_dir.clone(),
                 )
             })
             .collect::<Vec<_>>();
@@ -298,6 +301,7 @@ async fn test_worker_1(args: Cli) {
                         get_msg_payload(args.payload_size, peer_index),
                         args.multipeer_mode,
                         args.locators.clone(),
+                        args.output_dir.clone(),
                     )
                 })
                 .collect::<Vec<_>>();
@@ -316,6 +320,7 @@ async fn test_worker_1(args: Cli) {
                 get_msg_payload(args.payload_size, peer_index),
                 args.multipeer_mode,
                 args.locators.clone(),
+                args.output_dir.clone(),
             )
         })
         .collect::<Vec<_>>();
