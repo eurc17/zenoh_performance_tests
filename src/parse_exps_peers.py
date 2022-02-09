@@ -66,15 +66,15 @@ def main(args):
     fig, ax1 = plt.subplots()
 
     color = "tab:red"
-    ax1.set_xlabel("number of peers")
-    ax1.set_ylabel("peak cpu usage (%)", color=color)
+    ax1.set_xlabel("number of peers", fontweight="bold")
+    ax1.set_ylabel("peak cpu usage (%)", color=color, fontweight="bold")
     ax1.plot(peer_list, cpu_list, color=color)
     ax1.tick_params(axis="y", labelcolor=color)
 
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
     color = "tab:blue"
-    ax2.set_ylabel("peak memory usage (MB)", color=color)
+    ax2.set_ylabel("peak memory usage (MB)", color=color, fontweight="bold")
     ax2.plot(peer_list, mem_list, color=color)
     ax2.tick_params(axis="y", labelcolor=color)
 
@@ -82,7 +82,18 @@ def main(args):
     plt.savefig(args.output_dir + "/resource.png")
     # plt.show()
     plt.clf()
-    plt.plot(peer_list, recv_rate_list, label="msg recv rate")
+    fig, ax = plt.subplots()
+
+    ax.plot(peer_list, recv_rate_list)
+    ax.set_xlabel("number of peers", fontweight="bold")
+    ax.set_ylabel("msg recv rate", fontweight="bold")
+    ax.grid(True)
+
+    ax.set_title(
+        "Msg recv rate\n",
+        fontsize=14,
+        fontweight="bold",
+    )
     plt.savefig(args.output_dir + "/recv_rate.png")
     plt.show()
 
