@@ -16,7 +16,7 @@ def main(args):
     for payload_size in range(
         args.payload_size_start, args.payload_size_end + 1, args.payload_size_step
     ):
-        file_name = "{}-{}-{}-{}-{}".format(
+        file_name = "{:03d}-{:03d}-{:03d}-{:05d}-{:05d}".format(
             peer_num, peer_num, num_msgs_per_peer, payload_size, round_timeout
         )
         cmd = 'psrecord "./target/release/zenoh_performance_tests -p {} -m {} -n {} -t {} -o {}" --plot {}/plot-{}.png --log {}/log-{}.txt --include-children --duration {}'.format(
