@@ -68,3 +68,4 @@ If you encountered the situation that the program didn't terminate, please inter
 - [x] Upgrade master to test zenoh 0.6.0-dev
 - [x] Add test script for multiple test running
 - [x] Add parsing script to parse the multiple test results
+- [ ] Apply parallelism to worker initialization
