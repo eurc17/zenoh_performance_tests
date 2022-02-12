@@ -19,12 +19,13 @@ def main(args):
         file_name = "{}-{}-{}-{}-{}".format(
             peer_num, peer_num, num_msgs_per_peer, payload_size, round_timeout
         )
-        cmd = 'psrecord "./target/release/zenoh_performance_tests -p {} -m {} -n {} -t {} -o {}" --plot {}/plot-{}.png --log {}/log-{}.txt --include-children --duration {}'.format(
+        cmd = 'psrecord "./target/release/zenoh_performance_tests -p {} -m {} -n {} -t {} -o {} -i {}" --plot {}/plot-{}.png --log {}/log-{}.txt --include-children --duration {}'.format(
             peer_num,
             num_msgs_per_peer,
             payload_size,
             round_timeout,
             args.output_dir,
+            args.init_time,
             args.output_dir,
             file_name,
             args.output_dir,
@@ -90,6 +91,13 @@ if __name__ == "__main__":
         type=int,
         help="The timeout (in ms) for each round",
         default=100,
+    )
+    parser.add_argument(
+        "-i",
+        "--init_time",
+        type=int,
+        help="The initialization time (in ms) before the first round",
+        default=1000,
     )
 
     args = parser.parse_args()
