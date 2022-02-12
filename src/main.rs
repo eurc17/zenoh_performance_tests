@@ -83,7 +83,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
 
     if total_put_number < available_cpu_num {
         let pub_sub_futs = (0..total_put_number)
-            .into_iter()
+            .into_par_iter()
             .map(|peer_index| {
                 async_std::task::spawn(pub_and_sub_worker(
                     start_until,
@@ -118,9 +118,10 @@ async fn test_pub_and_sub_worker(args: Cli) {
         futures::join!(all_fut, demo_fut);
     } else {
         let mut pub_sub_futs = (0..available_cpu_num)
-            .into_iter()
+            .into_par_iter()
             .map(|core_idx| {
                 let pub_sub_futures = (0..per_peer_num)
+                    .into_par_iter()
                     .map(|peer_index| {
                         pub_and_sub_worker(
                             start_until,
@@ -143,6 +144,7 @@ async fn test_pub_and_sub_worker(args: Cli) {
 
         let remaining_pub_sub = total_put_number % available_cpu_num;
         let remaining_pub_sub_fut = (total_put_number - remaining_pub_sub..total_put_number)
+            .into_par_iter()
             .map(|peer_index| {
                 pub_and_sub_worker(
                     start_until,
@@ -229,9 +231,10 @@ async fn test_worker_1(args: Cli) {
 
     let sub_per_peer_num = total_sub_number / sub_cpu_num;
     let mut sub_futs = (0..sub_cpu_num)
-        .into_iter()
+        .into_par_iter()
         .map(|core_idx| {
             let sub_futures = (0..sub_per_peer_num)
+                .into_par_iter()
                 .map(|peer_index| {
                     subscribe_worker(
                         zenoh.clone(),
@@ -250,6 +253,7 @@ async fn test_worker_1(args: Cli) {
         .collect::<Vec<_>>();
     let remaining_sub = total_sub_number % sub_cpu_num;
     let remaining_sub_fut = (total_sub_number - remaining_sub..total_sub_number)
+        .into_par_iter()
         .map(|peer_index| {
             subscribe_worker(
                 zenoh.clone(),
@@ -294,9 +298,10 @@ async fn test_worker_1(args: Cli) {
 
     let pub_per_peer_num = total_put_number / pub_cpu_num;
     let mut pub_futs = (0..pub_cpu_num)
-        .into_iter()
+        .into_par_iter()
         .map(|core_idx| {
             let pub_futures = (0..pub_per_peer_num)
+                .into_par_iter()
                 .map(|peer_index| {
                     publish_worker(
                         zenoh.clone(),
@@ -318,6 +323,7 @@ async fn test_worker_1(args: Cli) {
         .collect::<Vec<_>>();
     let remaining = total_put_number % pub_cpu_num;
     let remaining_fut = (total_put_number - remaining..total_put_number)
+        .into_par_iter()
         .map(|peer_index| {
             publish_worker(
                 zenoh.clone(),
