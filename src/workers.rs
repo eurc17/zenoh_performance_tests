@@ -53,8 +53,13 @@ pub async fn demonstration_worker(
     let total_receive_rate =
         (total_received_msgs as f64) / (vector_data.len() as f64 * total_msg_num as f64);
     let file_path = args.output_dir.join(format!(
-        "{}-{}-{}-{}-{}.json",
-        total_put_number, total_sub_number, num_msgs_per_peer, payload_size, round_timeout
+        "{}-{}-{}-{}-{}-{}.json",
+        total_put_number,
+        total_sub_number,
+        num_msgs_per_peer,
+        payload_size,
+        round_timeout,
+        args.init_time
     ));
     let test_result = TestResult {
         config: args,

@@ -16,8 +16,13 @@ def main(args):
     for payload_size in range(
         args.payload_size_start, args.payload_size_end + 1, args.payload_size_step
     ):
-        file_name = "{}-{}-{}-{}-{}".format(
-            peer_num, peer_num, num_msgs_per_peer, payload_size, round_timeout
+        file_name = "{}-{}-{}-{}-{}-{}".format(
+            peer_num,
+            peer_num,
+            num_msgs_per_peer,
+            payload_size,
+            round_timeout,
+            args.init_time,
         )
         cmd = 'psrecord "./target/release/zenoh_performance_tests -p {} -m {} -n {} -t {} -o {} -i {}" --plot {}/plot-{}.png --log {}/log-{}.txt --include-children --duration {}'.format(
             peer_num,
@@ -41,7 +46,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Run multiple zenoh-performance-test with increasing peer numbers"
+        description="Run multiple zenoh-performance-test with increasing payload size"
     )
     parser.add_argument(
         "-o",

@@ -14,8 +14,13 @@ def main(args):
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     for peer_num in range(args.peer_num_start, args.peer_num_end + 1):
-        file_name = "{}-{}-{}-{}-{}".format(
-            peer_num, peer_num, num_msgs_per_peer, payload_size, round_timeout
+        file_name = "{}-{}-{}-{}-{}-{}".format(
+            peer_num,
+            peer_num,
+            num_msgs_per_peer,
+            payload_size,
+            round_timeout,
+            args.init_time,
         )
         cmd = 'psrecord "./target/release/zenoh_performance_tests -p {} -m {} -n {} -t {} -o {} -i {}" --plot {}/plot-{}.png --log {}/log-{}.txt --include-children --duration {}'.format(
             peer_num,
