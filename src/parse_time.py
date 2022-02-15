@@ -166,8 +166,8 @@ def plot(exp_dict, output_dir, dist=0.15):
             y.extend([peer_id - dist, peer_id - dist, None])
         fig.add_trace(go.Scatter(x=x, y=y, name="after_receiving"))
 
-        fig.write_image(output_dir + "/" + exp_key + ".png")
-        fig.write_html(output_dir + "/" + exp_key + ".html")
+        fig.write_image(output_dir + "/time_" + exp_key + ".png")
+        fig.write_html(output_dir + "/time_" + exp_key + ".html")
 
 
 def main(args):
