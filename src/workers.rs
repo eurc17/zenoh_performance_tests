@@ -2,6 +2,7 @@ use crate::{
     utils::{PeerResult, TestResult},
     Cli,
 };
+use std::fs::OpenOptions;
 use std::path::PathBuf;
 use std::{io::Write, str::FromStr};
 
@@ -89,9 +90,18 @@ pub async fn publish_worker(
     output_dir: PathBuf,
     total_put_number: usize,
     payload_size: usize,
+    args: Cli,
+    start: Instant,
+    session_start_time: Option<Instant>,
+    pub_sub_worker_start: Option<Instant>,
 ) -> Result<()> {
+    let start_worker = Instant::now() - start;
     let zenoh_new;
     let mut timeout_flag = false;
+    let before_sending;
+    let start_sending;
+    let after_sending;
+    let mut session_start = session_start_time;
     if multipeer_mode {
         let mut config = config::default();
         if let Some(locators) = locators {
@@ -103,10 +113,13 @@ pub async fn publish_worker(
             config.set_peers(locator_vec).unwrap();
         }
         zenoh_new = zenoh::open(config).await.unwrap();
+        session_start = Some(Instant::now());
         let curr_time = Instant::now();
+        before_sending = curr_time - start;
         if start_until > curr_time {
             async_std::task::sleep(start_until - curr_time).await;
         }
+        start_sending = Instant::now() - start;
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
             zenoh_new
@@ -119,12 +132,15 @@ pub async fn publish_worker(
                 break;
             }
         }
+        after_sending = Instant::now() - start;
         zenoh_new.close().await.unwrap();
     } else {
         let curr_time = Instant::now();
+        before_sending = curr_time - start;
         if start_until > curr_time {
             async_std::task::sleep(start_until - curr_time).await;
         }
+        start_sending = Instant::now() - start;
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
             zenoh
@@ -137,11 +153,16 @@ pub async fn publish_worker(
                 break;
             }
         }
+        after_sending = Instant::now() - start;
     }
 
     if timeout_flag {
         let file_path = output_dir.join(format!("info-{}.txt", peer_id));
-        let mut file = std::fs::File::create(file_path).unwrap();
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .open(file_path)
+            .unwrap();
         writeln!(
             &mut file,
             "Peer-{} publisher timeout. Put_peer_num = {}, payload_size = {}",
@@ -149,6 +170,47 @@ pub async fn publish_worker(
         )
         .unwrap();
     }
+
+    let file_path = args.output_dir.join(format!(
+        "put_{}_info-{}-{}-{}-{}-{}-{}.json",
+        peer_id,
+        total_put_number,
+        args.num_put_peer,
+        num_msgs_per_peer,
+        payload_size,
+        args.round_timeout,
+        args.init_time
+    ));
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .open(file_path)
+        .unwrap();
+    writeln!(&mut file, "start_worker: {} ms", start_worker.as_millis()).unwrap();
+    if let Some(session_start) = session_start {
+        writeln!(
+            &mut file,
+            "session_start: {} ms",
+            (session_start - start).as_millis()
+        )
+        .unwrap();
+    }
+    if let Some(pub_sub_worker_start) = pub_sub_worker_start {
+        writeln!(
+            &mut file,
+            "pub_sub_worker_start: {} ms",
+            (pub_sub_worker_start - start).as_millis()
+        )
+        .unwrap();
+    }
+    writeln!(
+        &mut file,
+        "before_sending: {} ms",
+        before_sending.as_millis()
+    )
+    .unwrap();
+    writeln!(&mut file, "start_sending: {} ms", start_sending.as_millis()).unwrap();
+    writeln!(&mut file, "after_sending: {} ms", after_sending.as_millis()).unwrap();
 
     Ok(())
 }
@@ -162,8 +224,17 @@ pub async fn subscribe_worker(
     multipeer_mode: bool,
     total_msg_num: usize,
     locators: Option<String>,
+    args: Cli,
+    start: Instant,
+    session_start_time: Option<Instant>,
+    pub_sub_worker_start: Option<Instant>,
 ) -> Result<()> {
+    let start_worker = Instant::now() - start;
     let mut change_vec = vec![];
+    let after_subscribing;
+    let start_receiving;
+    let after_receiving;
+    let mut session_start = session_start_time;
 
     if start_until < Instant::now() {
         warn!("Subscriber is not initialized after the initial time has passed. Please increase initialization time");
@@ -182,11 +253,12 @@ pub async fn subscribe_worker(
             config.set_peers(locator_vec).unwrap();
         }
         zenoh_new = zenoh::open(config).await.unwrap();
+        session_start = Some(Instant::now());
         {
             let mut subscriber = zenoh_new.subscribe("/demo/example/**").await.unwrap();
-
+            after_subscribing = Instant::now() - start;
             let stream = subscriber.receiver();
-
+            start_receiving = Instant::now() - start;
             change_vec = stream
                 .take(total_msg_num)
                 .take_until({
@@ -201,13 +273,15 @@ pub async fn subscribe_worker(
                 })
                 .collect::<Vec<Sample>>()
                 .await;
+            after_receiving = Instant::now() - start;
             tx.send_async((peer_id, change_vec)).await.unwrap();
         }
         zenoh_new.close().await.unwrap();
     } else {
         let mut subscriber = zenoh.subscribe("/demo/example/**").await.unwrap();
+        after_subscribing = Instant::now() - start;
         let stream = subscriber.receiver();
-
+        start_receiving = Instant::now() - start;
         change_vec = stream
             .take(total_msg_num)
             .take_until({
@@ -222,26 +296,59 @@ pub async fn subscribe_worker(
             })
             .collect::<Vec<Sample>>()
             .await;
+        after_receiving = Instant::now() - start;
         tx.send_async((peer_id, change_vec)).await.unwrap();
     }
-    // let mut change_stream = workspace
-    //     .subscribe(&"/demo/example/**".try_into().unwrap())
-    //     .await
-    //     .unwrap();
-    // while let Some(change) = change_stream.next().await {
-    //     // println!(
-    //     //     "{} received >> {:?} for {} : {:?} at {}",
-    //     //     peer_id, change.kind, change.path, change.value, change.timestamp
-    //     // );
-    //     // let string = format!("{:?}", change.value);
-    //     if Instant::now() < timeout {
-    //         change_vec.push(change);
-    //         // println!("{}, change_vec.len = {}", peer_id, change_vec.len());
-    //     } else {
-    //         println!("{}, Timeout reached", peer_id);
-    //         break;
-    //     }
-    // }
+    let file_path = args.output_dir.join(format!(
+        "sub_{}_info-{}-{}-{}-{}-{}-{}.json",
+        peer_id,
+        args.num_put_peer,
+        args.num_put_peer,
+        args.num_msgs_per_peer,
+        args.payload_size,
+        args.round_timeout,
+        args.init_time
+    ));
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .open(file_path)
+        .unwrap();
+    writeln!(&mut file, "start_worker: {} ms", start_worker.as_millis()).unwrap();
+    if let Some(session_start) = session_start {
+        writeln!(
+            &mut file,
+            "session_start: {} ms",
+            (session_start - start).as_millis()
+        )
+        .unwrap();
+    }
+    if let Some(pub_sub_worker_start) = pub_sub_worker_start {
+        writeln!(
+            &mut file,
+            "pub_sub_worker_start: {} ms",
+            (pub_sub_worker_start - start).as_millis()
+        )
+        .unwrap();
+    }
+    writeln!(
+        &mut file,
+        "before_sending: {} ms",
+        after_subscribing.as_millis()
+    )
+    .unwrap();
+    writeln!(
+        &mut file,
+        "start_sending: {} ms",
+        start_receiving.as_millis()
+    )
+    .unwrap();
+    writeln!(
+        &mut file,
+        "after_sending: {} ms",
+        after_receiving.as_millis()
+    )
+    .unwrap();
     Ok(())
 }
 
@@ -257,7 +364,10 @@ pub async fn pub_and_sub_worker(
     output_dir: PathBuf,
     total_put_number: usize,
     payload_size: usize,
+    args: Cli,
+    start: Instant,
 ) -> Result<()> {
+    let pub_sub_worker_start = Some(Instant::now());
     let mut config = config::default();
     if let Some(locators) = locators.clone() {
         let locator_vec = locators
@@ -268,6 +378,7 @@ pub async fn pub_and_sub_worker(
         config.set_peers(locator_vec).unwrap();
     }
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
+    let session_start_time = Some(Instant::now());
     let pub_future = publish_worker(
         zenoh.clone(),
         start_until,
@@ -280,6 +391,10 @@ pub async fn pub_and_sub_worker(
         output_dir,
         total_put_number,
         payload_size,
+        args.clone(),
+        start,
+        session_start_time,
+        pub_sub_worker_start,
     );
     let sub_future = subscribe_worker(
         zenoh.clone(),
@@ -290,6 +405,10 @@ pub async fn pub_and_sub_worker(
         false,
         total_msg_num,
         locators.clone(),
+        args.clone(),
+        start,
+        session_start_time,
+        pub_sub_worker_start,
     );
     futures::try_join!(pub_future, sub_future)?;
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
