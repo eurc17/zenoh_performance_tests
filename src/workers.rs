@@ -165,8 +165,14 @@ pub async fn publish_worker(
             .unwrap();
         writeln!(
             &mut file,
-            "Peer-{} publisher timeout. Put_peer_num = {}, payload_size = {}",
-            peer_id, total_put_number, payload_size,
+            "Peer-{} publisher timeout. Exp: {}-{}-{}-{}-{}-{}",
+            peer_id,
+            total_put_number,
+            args.num_put_peer,
+            num_msgs_per_peer,
+            payload_size,
+            args.round_timeout,
+            args.init_time
         )
         .unwrap();
     }
