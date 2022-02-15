@@ -3,6 +3,26 @@ use crate::Cli;
 use super::common::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub struct PubTimeStatus {
+    pub start_pub_worker: u128,
+    pub session_start: Option<u128>,
+    pub pub_sub_worker_start: Option<u128>,
+    pub before_sending: u128,
+    pub start_sending: u128,
+    pub after_sending: u128,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub struct SubTimeStatus {
+    pub start_sub_worker: u128,
+    pub session_start: Option<u128>,
+    pub pub_sub_worker_start: Option<u128>,
+    pub after_subscribing: u128,
+    pub start_receiving: u128,
+    pub after_receiving: u128,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct PeerResult {
     pub peer_id: usize,
     pub receive_rate: f64,

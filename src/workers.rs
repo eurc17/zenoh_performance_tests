@@ -1,5 +1,5 @@
 use crate::{
-    utils::{PeerResult, TestResult},
+    utils::{PeerResult, PubTimeStatus, SubTimeStatus, TestResult},
     Cli,
 };
 use std::fs::OpenOptions;
@@ -172,7 +172,7 @@ pub async fn publish_worker(
     }
 
     let file_path = args.output_dir.join(format!(
-        "put_{}_info-{}-{}-{}-{}-{}-{}.txt",
+        "put_{}_info_{}-{}-{}-{}-{}-{}.json",
         peer_id,
         total_put_number,
         args.num_put_peer,
@@ -181,36 +181,33 @@ pub async fn publish_worker(
         args.round_timeout,
         args.init_time
     ));
+    let session_start_millis = match session_start {
+        Some(time) => Some((time - start).as_millis()),
+        _ => None,
+    };
+    let pub_sub_worker_start_millis = match pub_sub_worker_start {
+        Some(time) => Some((time - start).as_millis()),
+        _ => None,
+    };
+    let pub_time_status = PubTimeStatus {
+        start_pub_worker: start_worker.as_millis(),
+        session_start: session_start_millis,
+        pub_sub_worker_start: pub_sub_worker_start_millis,
+        before_sending: before_sending.as_millis(),
+        start_sending: start_sending.as_millis(),
+        after_sending: after_sending.as_millis(),
+    };
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
         .open(file_path)
         .unwrap();
-    writeln!(&mut file, "start_worker: {} ms", start_worker.as_millis()).unwrap();
-    if let Some(session_start) = session_start {
-        writeln!(
-            &mut file,
-            "session_start: {} ms",
-            (session_start - start).as_millis()
-        )
-        .unwrap();
-    }
-    if let Some(pub_sub_worker_start) = pub_sub_worker_start {
-        writeln!(
-            &mut file,
-            "pub_sub_worker_start: {} ms",
-            (pub_sub_worker_start - start).as_millis()
-        )
-        .unwrap();
-    }
     writeln!(
         &mut file,
-        "before_sending: {} ms",
-        before_sending.as_millis()
+        "{}",
+        serde_json::to_string_pretty(&pub_time_status).unwrap()
     )
     .unwrap();
-    writeln!(&mut file, "start_sending: {} ms", start_sending.as_millis()).unwrap();
-    writeln!(&mut file, "after_sending: {} ms", after_sending.as_millis()).unwrap();
 
     Ok(())
 }
@@ -299,8 +296,24 @@ pub async fn subscribe_worker(
         after_receiving = Instant::now() - start;
         tx.send_async((peer_id, change_vec)).await.unwrap();
     }
+    let session_start_millis = match session_start {
+        Some(time) => Some((time - start).as_millis()),
+        _ => None,
+    };
+    let pub_sub_worker_start_millis = match pub_sub_worker_start {
+        Some(time) => Some((time - start).as_millis()),
+        _ => None,
+    };
+    let sub_time_status = SubTimeStatus {
+        start_sub_worker: start_worker.as_millis(),
+        session_start: session_start_millis,
+        pub_sub_worker_start: pub_sub_worker_start_millis,
+        after_subscribing: after_subscribing.as_millis(),
+        start_receiving: start_receiving.as_millis(),
+        after_receiving: after_receiving.as_millis(),
+    };
     let file_path = args.output_dir.join(format!(
-        "sub_{}_info-{}-{}-{}-{}-{}-{}.txt",
+        "sub_{}_info_{}-{}-{}-{}-{}-{}.json",
         peer_id,
         args.num_put_peer,
         args.num_put_peer,
@@ -314,41 +327,13 @@ pub async fn subscribe_worker(
         .create(true)
         .open(file_path)
         .unwrap();
-    writeln!(&mut file, "start_worker: {} ms", start_worker.as_millis()).unwrap();
-    if let Some(session_start) = session_start {
-        writeln!(
-            &mut file,
-            "session_start: {} ms",
-            (session_start - start).as_millis()
-        )
-        .unwrap();
-    }
-    if let Some(pub_sub_worker_start) = pub_sub_worker_start {
-        writeln!(
-            &mut file,
-            "pub_sub_worker_start: {} ms",
-            (pub_sub_worker_start - start).as_millis()
-        )
-        .unwrap();
-    }
     writeln!(
         &mut file,
-        "before_sending: {} ms",
-        after_subscribing.as_millis()
+        "{}",
+        serde_json::to_string_pretty(&sub_time_status).unwrap()
     )
     .unwrap();
-    writeln!(
-        &mut file,
-        "start_sending: {} ms",
-        start_receiving.as_millis()
-    )
-    .unwrap();
-    writeln!(
-        &mut file,
-        "after_sending: {} ms",
-        after_receiving.as_millis()
-    )
-    .unwrap();
+
     Ok(())
 }
 
