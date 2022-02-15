@@ -42,7 +42,7 @@ def main(args):
         file = (
             args.input_dir
             + "/log-"
-            + os.path.basename(json_file).split(".json")[0]
+            + os.path.basename(json_file).split(".json")[0].split("_")[1]
             + ".txt"
         )
         print(file)
