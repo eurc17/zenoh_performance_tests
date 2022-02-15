@@ -51,7 +51,13 @@ For people who are running experiment testings with this program. You may store 
 
 If you encountered the situation that the program didn't terminate, please interrupt it and reduce the number of messages sent or the number of peers created.
 
-## Todo Lists
+# Version Update Notes:
+
+## 0.1.2
+- [x] Added time analysis
+## 0.1.1 
+- [x] Apply parallelism to worker initialization
+## 0.1.0
 - [x] Basic put/sub worker implementation
 - [x] Basic testing function with simple output msgs.
 - [x] Add parser for [psrecord](https://github.com/astrofrog/psrecord) output
@@ -68,4 +74,5 @@ If you encountered the situation that the program didn't terminate, please inter
 - [x] Upgrade master to test zenoh 0.6.0-dev
 - [x] Add test script for multiple test running
 - [x] Add parsing script to parse the multiple test results
-- [x] Apply parallelism to worker initialization
+
+
