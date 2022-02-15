@@ -10,7 +10,7 @@ def main(args):
     num_msgs_per_peer = args.num_msgs_per_peer
     payload_size = args.payload_size
     round_timeout = args.round_timeout  # ms
-    program_timeout = 10  # s
+    program_timeout = 10 + (args.init_time) / 1000  # s
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     for peer_num in range(args.peer_num_start, args.peer_num_end + 1):
@@ -38,8 +38,9 @@ def main(args):
         print(cmd)
         os.system(cmd)
         # sleep for 10 seconds before running new tests
-        time.sleep(10)
+        time.sleep(program_timeout)
         os.system("pkill zenoh_perfornmance_tests")
+        time.sleep(1)
 
 
 if __name__ == "__main__":
