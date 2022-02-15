@@ -160,6 +160,7 @@ pub async fn publish_worker(
         let file_path = output_dir.join(format!("info-{}.txt", peer_id));
         let mut file = OpenOptions::new()
             .write(true)
+            .append(true)
             .create(true)
             .open(file_path)
             .unwrap();
