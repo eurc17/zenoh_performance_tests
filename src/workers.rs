@@ -172,7 +172,7 @@ pub async fn publish_worker(
     }
 
     let file_path = args.output_dir.join(format!(
-        "put_{}_info-{}-{}-{}-{}-{}-{}.json",
+        "put_{}_info-{}-{}-{}-{}-{}-{}.txt",
         peer_id,
         total_put_number,
         args.num_put_peer,
@@ -300,7 +300,7 @@ pub async fn subscribe_worker(
         tx.send_async((peer_id, change_vec)).await.unwrap();
     }
     let file_path = args.output_dir.join(format!(
-        "sub_{}_info-{}-{}-{}-{}-{}-{}.json",
+        "sub_{}_info-{}-{}-{}-{}-{}-{}.txt",
         peer_id,
         args.num_put_peer,
         args.num_put_peer,
