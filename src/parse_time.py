@@ -166,6 +166,15 @@ def plot(exp_dict, output_dir, dist=0.15):
             y.extend([peer_id - dist, peer_id - dist, None])
         fig.add_trace(go.Scatter(x=x, y=y, name="after_receiving"))
 
+        # Update layout
+        fig.update_layout(
+            title=exp_key,
+            xaxis_title="Time (ms)",
+            yaxis_title="Peer ID",
+            legend_title="Program Stages",
+            font=dict(family="arial, monospace", size=18, color="black"),
+        )
+
         fig.write_image(output_dir + "/time_" + exp_key + ".png")
         fig.write_html(output_dir + "/time_" + exp_key + ".html")
 
