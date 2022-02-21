@@ -55,16 +55,15 @@ pub struct Cli {
     remote_pub_peers: usize,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TimeStatus {
     pub session_start: Option<u128>,
     pub pub_sub_worker_start: Option<u128>,
-    pub first_timestamp: u128,
-    pub first_timestamp_res: usize,
-    pub second_timestamp: u128,
-    pub second_timestamp_res: usize,
-    pub third_timestamp: u128,
-    pub third_timestamp_res: usize,
+    pub list_start_timestamp: Vec<u128>,
+    pub list_sess_start_timestamp: Vec<u128>,
+    pub list_timestamp_peer_num: Vec<usize>,
+    pub list_timestamp_res: Vec<Vec<String>>,
+    pub session_id: String,
 }
 
 pub fn get_msg_payload(args_payload_size: usize, peer_id: usize) -> String {
@@ -118,19 +117,73 @@ pub async fn pub_and_sub_worker(
     }
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
-    // Todo: Sleep and get duration & peer info
-    async_std::task::sleep(Duration::from_millis(1000)).await;
-    let sleep_end_time = Instant::now();
-    let session_info = zenoh.info().await;
-    for (key, val) in session_info.iter() {
-        println!("key: {} val: {}", key, val);
+    let mut list_start_timestamp: Vec<u128> = vec![];
+    let mut list_sess_start_timestamp: Vec<u128> = vec![];
+    let mut list_timestamp_peer_num: Vec<usize> = vec![];
+    let mut list_timestamp_res: Vec<Vec<String>> = vec![];
+    let mut session_id: Option<String> = None;
+
+    while Instant::now() < timeout {
+        // Todo: Sleep and get duration & peer info
+        let sleep_end_time = Instant::now();
+        let session_info = zenoh.info().await;
+        let after_session_info = Instant::now();
+        if session_id.is_none() {
+            session_id = Some(session_info.get(&0).unwrap().clone());
+        }
+        list_start_timestamp.push((after_session_info - start).as_millis());
+        list_sess_start_timestamp
+            .push((after_session_info - session_start_time.unwrap()).as_millis());
+        let curr_peer_num = session_info
+            .get(&1)
+            .unwrap()
+            .split(",")
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
+        list_timestamp_peer_num.push(curr_peer_num.len());
+        list_timestamp_res.push(curr_peer_num);
+        println!(
+            "Process time = {} ms",
+            (Instant::now() - after_session_info).as_millis()
+        );
+
+        async_std::task::sleep(Duration::from_millis(100)).await;
     }
+
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
     zenoh.close().await.unwrap();
 
+    let file_path = args.output_dir.join(format!(
+        "Session_{}-{}-{}-{}-{}-{}.json",
+        total_put_number,
+        total_put_number,
+        num_msgs_per_peer,
+        payload_size,
+        args.round_timeout,
+        args.init_time
+    ));
+    let session_start = Some((session_start_time.unwrap() - start).as_millis());
+    let pus_sub_work_start_dur = Some((pub_sub_worker_start.unwrap() - start).as_millis());
+    let test_result = TimeStatus {
+        session_start,
+        pub_sub_worker_start: pus_sub_work_start_dur,
+        list_start_timestamp,
+        list_sess_start_timestamp,
+        list_timestamp_peer_num,
+        list_timestamp_res,
+        session_id: session_id.unwrap(),
+    };
+
+    let mut file = std::fs::File::create(file_path).unwrap();
+    writeln!(
+        &mut file,
+        "{}",
+        serde_json::to_string_pretty(&test_result).unwrap()
+    )
+    .unwrap();
+
     Ok(())
 }
-
 
 #[async_std::main]
 async fn main() {
@@ -227,7 +280,6 @@ async fn main() {
         let all_fut = futures::future::join_all(pub_sub_futs);
         futures::join!(all_fut);
     }
-
 
     // Test run info
     let mut config = config::default();
