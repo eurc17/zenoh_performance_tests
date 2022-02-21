@@ -280,25 +280,4 @@ async fn main() {
         let all_fut = futures::future::join_all(pub_sub_futs);
         futures::join!(all_fut);
     }
-
-    // Test run info
-    let mut config = config::default();
-    let zenoh = Arc::new(zenoh::open(config).await.unwrap());
-    let session_start_time = Some(Instant::now());
-    // Todo: Sleep and get duration & peer info
-    async_std::task::sleep(Duration::from_millis(1000)).await;
-    let sleep_end_time = Instant::now();
-    let session_info = zenoh.info().await;
-    //match key {
-    //     0x00 => Some("info_pid".to_string()),
-    //     0x01 => Some("info_peer_pid".to_string()),
-    //     0x02 => Some("info_router_pid".to_string()),
-    //     key => Some(key.to_string()),
-    // }
-    for (key, val) in session_info.iter() {
-        println!("key: {} val: {}", key, val);
-    }
-    // Todo: get string in key == 0x01 and split it by comma
-    let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
-    zenoh.close().await.unwrap();
 }
