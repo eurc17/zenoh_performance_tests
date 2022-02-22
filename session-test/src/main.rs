@@ -123,7 +123,7 @@ pub async fn pub_and_sub_worker(
     let mut list_timestamp_res: Vec<Vec<String>> = vec![];
     let mut session_id: Option<String> = None;
 
-    while Instant::now() < timeout {
+    while Instant::now() < timeout || session_id.is_none() {
         // Todo: Sleep and get duration & peer info
         let sleep_end_time = Instant::now();
         let session_info = zenoh.info().await;
