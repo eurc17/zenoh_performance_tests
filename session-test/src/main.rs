@@ -143,10 +143,10 @@ pub async fn pub_and_sub_worker(
             .collect::<Vec<String>>();
         list_timestamp_peer_num.push(curr_peer_num.len());
         list_timestamp_res.push(curr_peer_num);
-        println!(
-            "Process time = {} ms",
-            (Instant::now() - after_session_info).as_millis()
-        );
+        // println!(
+        //     "Process time = {} ms",
+        //     (Instant::now() - after_session_info).as_millis()
+        // );
 
         async_std::task::sleep(Duration::from_millis(100)).await;
     }
