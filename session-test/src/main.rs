@@ -139,6 +139,7 @@ pub async fn pub_and_sub_worker(
             .unwrap()
             .split(",")
             .map(|s| s.to_string())
+            .filter(|s| s != "")
             .collect::<Vec<String>>();
         list_timestamp_peer_num.push(curr_peer_num.len());
         list_timestamp_res.push(curr_peer_num);
