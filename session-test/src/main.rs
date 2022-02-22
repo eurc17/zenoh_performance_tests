@@ -63,7 +63,7 @@ pub struct TimeStatus {
     pub list_sess_start_timestamp: Vec<u128>,
     pub list_timestamp_peer_num: Vec<usize>,
     pub list_timestamp_res: Vec<Vec<String>>,
-    pub session_id: String,
+    pub session_id: Option<String>,
 }
 
 pub fn get_msg_payload(args_payload_size: usize, peer_id: usize) -> String {
@@ -171,7 +171,7 @@ pub async fn pub_and_sub_worker(
         list_sess_start_timestamp,
         list_timestamp_peer_num,
         list_timestamp_res,
-        session_id: session_id.unwrap(),
+        session_id,
     };
 
     let mut file = std::fs::File::create(file_path).unwrap();
