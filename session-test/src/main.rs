@@ -155,7 +155,8 @@ pub async fn pub_and_sub_worker(
     zenoh.close().await.unwrap();
 
     let file_path = args.output_dir.join(format!(
-        "Session_{}-{}-{}-{}-{}-{}.json",
+        "Session_{}_info_{}-{}-{}-{}-{}-{}.json",
+        peer_id,
         total_put_number,
         total_put_number,
         num_msgs_per_peer,
