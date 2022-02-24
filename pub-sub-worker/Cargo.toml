@@ -1,0 +1,23 @@
+[package]
+name = "pub-sub-worker"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+zenoh = {git = "https://github.com/eclipse-zenoh/zenoh.git", rev = "f7309d6af9aa8c5c6e55e744fc68ea4f6f18e8e9"}
+async-std = "1.9.0"
+futures = "0.3.17"
+derivative = "2.2.0"
+serde = "1.0.131"
+serde_json = "1.0.73"
+anyhow = "1.0.51"
+rayon = "1.5.1"
+log = "0.4.14"
+structopt = "0.3.25"
+num_cpus = "1.13.1"
+pretty_env_logger = "0.4.0"
+tokio = "1.15.0"
+flume = "0.10.9"
+datetime = "0.5.2"
