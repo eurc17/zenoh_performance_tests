@@ -13,7 +13,18 @@ pub struct PubTimeStatus {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub struct ShortConfig {
+    pub peer_id: usize,
+    pub total_put_number: usize,
+    pub num_msgs_per_peer: usize,
+    pub payload_size: usize,
+    pub round_timeout: u64,
+    pub init_time: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct SubTimeStatus {
+    pub short_config: ShortConfig,
     pub process_start_sec: i64,
     pub process_start_millis: i16,
     pub start_sub_worker: u128,

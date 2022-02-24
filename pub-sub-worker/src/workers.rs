@@ -1,5 +1,5 @@
 use crate::{
-    utils::{PeerResult, PubTimeStatus, SubTimeStatus, TestResult},
+    utils::{PeerResult, PubTimeStatus, ShortConfig, SubTimeStatus, TestResult},
     Cli,
 };
 use std::fs::OpenOptions;
@@ -339,7 +339,16 @@ pub async fn subscribe_worker(
         Some(time) => Some((time - start).as_millis()),
         _ => None,
     };
+    let short_config = ShortConfig {
+        peer_id,
+        total_put_number: args.total_put_number,
+        num_msgs_per_peer: args.num_msgs_per_peer,
+        payload_size: args.payload_size,
+        round_timeout: args.round_timeout,
+        init_time: args.init_time,
+    };
     let sub_time_status = SubTimeStatus {
+        short_config,
         process_start_sec: process_start.seconds(),
         process_start_millis: process_start.milliseconds(),
         start_sub_worker: start_worker.as_millis(),
