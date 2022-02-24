@@ -24,7 +24,6 @@ pub struct ShortConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct SubTimeStatus {
-    pub short_config: ShortConfig,
     pub process_start_sec: i64,
     pub process_start_millis: i16,
     pub start_sub_worker: u128,
@@ -37,6 +36,7 @@ pub struct SubTimeStatus {
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct PeerResult {
+    pub short_config: Option<ShortConfig>,
     pub peer_id: usize,
     pub receive_rate: f64,
     pub recvd_msg_num: usize,

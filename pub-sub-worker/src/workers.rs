@@ -40,6 +40,7 @@ pub async fn demonstration_worker(
                 total_msg_num
             );
             PeerResult {
+                short_config: None,
                 peer_id: *id,
                 receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
                 recvd_msg_num: change_vec.len(),
@@ -303,7 +304,16 @@ pub async fn subscribe_worker(
         after_receiving = Instant::now() - start;
         // tx.send_async((peer_id, change_vec)).await.unwrap();
     }
+    let short_config = ShortConfig {
+        peer_id,
+        total_put_number: args.total_put_number,
+        num_msgs_per_peer: args.num_msgs_per_peer,
+        payload_size: args.payload_size,
+        round_timeout: args.round_timeout,
+        init_time: args.init_time,
+    };
     let peer_result = PeerResult {
+        short_config: Some(short_config),
         peer_id,
         receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
         recvd_msg_num: change_vec.len(),
@@ -339,16 +349,8 @@ pub async fn subscribe_worker(
         Some(time) => Some((time - start).as_millis()),
         _ => None,
     };
-    let short_config = ShortConfig {
-        peer_id,
-        total_put_number: args.total_put_number,
-        num_msgs_per_peer: args.num_msgs_per_peer,
-        payload_size: args.payload_size,
-        round_timeout: args.round_timeout,
-        init_time: args.init_time,
-    };
+
     let sub_time_status = SubTimeStatus {
-        short_config,
         process_start_sec: process_start.seconds(),
         process_start_millis: process_start.milliseconds(),
         start_sub_worker: start_worker.as_millis(),
