@@ -1,24 +1,11 @@
 [package]
-name = "zenoh_performance_tests"
-version = "0.1.2"
+name = "session-test-worker"
+version = "0.1.0"
 edition = "2021"
-
-[workspace]
-
-members = [
-    "usage-parser",
-    "session-test",
-    "pub-sub-worker",
-    "session-test-worker",
-]
-# exclude = [
-    
-# ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# zenoh = "0.6.0-dev"
 zenoh = {git = "https://github.com/eclipse-zenoh/zenoh.git", rev = "f7309d6af9aa8c5c6e55e744fc68ea4f6f18e8e9"}
 async-std = "1.9.0"
 futures = "0.3.17"
@@ -33,4 +20,3 @@ num_cpus = "1.13.1"
 pretty_env_logger = "0.4.0"
 tokio = "1.15.0"
 flume = "0.10.9"
-

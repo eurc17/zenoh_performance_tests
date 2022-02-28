@@ -44,7 +44,7 @@ pub struct Cli {
     /// Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).
     /// If you'd like to connect to several addresses, separate them with a comma (example: tcp/x.x.x.x:7447,tcp/y.y.y.y:7447)
     locators: Option<String>,
-    #[structopt(short = "a", long, default_value = "0")]
+    #[structopt(short = "r", long, default_value = "0")]
     /// Number of remote subscriber peers.
     /// Used to notify subscribers to receive messages from remote peers.
     /// Note that the num_msgs_per_peer needs to be the same on both remote and local machines
