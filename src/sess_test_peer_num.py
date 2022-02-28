@@ -39,7 +39,7 @@ def main(args):
         os.system(cmd)
         # sleep for 10 seconds before running new tests
         time.sleep(program_timeout)
-        os.system("pkill zenoh_perfornmance_tests")
+        os.system("pkill session-test")
         time.sleep(1)
 
 
