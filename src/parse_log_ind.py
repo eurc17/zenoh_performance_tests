@@ -115,12 +115,12 @@ def main(args):
         if not exp_key in exp_dict.keys():
             exp_dict[exp_key] = {}
         exp_dict[exp_key][peer_id] = get_data_from_file(log_info_file)
-        plot_usage(exp_dict, args.output_dir)
-        # with open(put_info_file) as json_opened_file:
-        #     data = json.load(json_opened_file)
-        #     if not exp_key in exp_dict.keys():
-        #         exp_dict[exp_key] = {}
-        #     exp_dict[exp_key][peer_id] = data
+    plot_usage(exp_dict, args.output_dir)
+    # with open(put_info_file) as json_opened_file:
+    #     data = json.load(json_opened_file)
+    #     if not exp_key in exp_dict.keys():
+    #         exp_dict[exp_key] = {}
+    #     exp_dict[exp_key][peer_id] = data
 
 
 if __name__ == "__main__":
