@@ -19,7 +19,7 @@ def main(args):
         ["which", "sleepuntil"], stdout=subprocess.PIPE
     ).stdout.decode("utf-8")
 
-    if sleep_until == "":
+    if sleep_until == "" or True:
         for peer_id in range(args.total_pub_peers):
             file_name = "{}_{}-{}-{}-{}-{}-{}".format(
                 peer_id,
