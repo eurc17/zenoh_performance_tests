@@ -18,9 +18,9 @@ def get_sleep():
         )
     )
     if cur_time[2] > 53:
-        return 120
+        return 120 - cur_time[2]
     else:
-        return 60
+        return 60 - cur_time[2]
 
 
 def main(args):
