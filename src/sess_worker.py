@@ -46,7 +46,7 @@ def main(args):
                 cmd,
                 shell=True,
             )
-            cmd = "psrecord {} --plot {}/plot_{}.png --log {}/log_{}.txt --include-children --duration {} &".format(
+            cmd = "psrecord {} --plot {}/plot_{}.png --log {}/log_{}.txt --include-children --duration {} --interval 0.01 &".format(
                 proc.pid,
                 args.output_dir,
                 file_name,
