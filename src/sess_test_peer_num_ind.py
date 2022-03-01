@@ -6,6 +6,23 @@ import time
 import subprocess
 
 
+def get_sleep():
+    cur_time = list(
+        map(
+            int,
+            subprocess.run(["date", '+"%T"'], stdout=subprocess.PIPE)
+            .stdout.decode("utf-8")
+            .rstrip()
+            .strip('"')
+            .split(":"),
+        )
+    )
+    if cur_time[2] > 53:
+        return 120
+    else:
+        return 60
+
+
 def main(args):
     print(args)
     num_msgs_per_peer = args.num_msgs_per_peer
@@ -13,17 +30,24 @@ def main(args):
     round_timeout = args.round_timeout  # ms
     startup_delay = max((10 * args.peer_num_end) / 1000, 2)
     program_timeout = 10 + (args.init_time) / 1000 + startup_delay  # s
+    sleep_until = subprocess.run(
+        ["which", "sleepuntil"], stdout=subprocess.PIPE
+    ).stdout.decode("utf-8")
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     for peer_num in range(args.peer_num_start, args.peer_num_end + 1):
-        file_name = "{}-{}-{}-{}-{}-{}".format(
-            peer_num,
-            peer_num,
-            num_msgs_per_peer,
-            payload_size,
-            round_timeout,
-            args.init_time,
-        )
+        if sleep_until == "":
+            actual_program_timeout = program_timeout
+        else:
+            actual_program_timeout = program_timeout + get_sleep()
+        # file_name = "{}-{}-{}-{}-{}-{}".format(
+        #     peer_num,
+        #     peer_num,
+        #     num_msgs_per_peer,
+        #     payload_size,
+        #     round_timeout,
+        #     args.init_time,
+        # )
         cmd = "python3 ./src/sess_worker.py -p {} -m {} -n {} -t {} -o {} -i {}".format(
             peer_num,
             num_msgs_per_peer,
@@ -39,7 +63,7 @@ def main(args):
             shell=True,
         )
         # sleep for 10 seconds before running new tests
-        time.sleep(program_timeout)
+        time.sleep(actual_program_timeout)
         os.system("pkill session-test-worker")
         time.sleep(1)
 

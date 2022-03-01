@@ -15,44 +15,119 @@ def main(args):
         os.makedirs(args.output_dir)
     start = time.time()
 
-    for peer_id in range(args.total_pub_peers):
-        file_name = "{}_{}-{}-{}-{}-{}-{}".format(
-            peer_id,
-            args.total_pub_peers,
-            args.total_pub_peers,
-            num_msgs_per_peer,
-            payload_size,
-            round_timeout,
-            args.init_time,
-        )
+    sleep_until = subprocess.run(
+        ["which", "sleepuntil"], stdout=subprocess.PIPE
+    ).stdout.decode("utf-8")
+
+    if sleep_until == "":
+        for peer_id in range(args.total_pub_peers):
+            file_name = "{}_{}-{}-{}-{}-{}-{}".format(
+                peer_id,
+                args.total_pub_peers,
+                args.total_pub_peers,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.init_time,
+            )
+            end = time.time()
+            cmd = "./target/release/session-test-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {}".format(
+                peer_id,
+                args.total_pub_peers,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+                int(round((end - start) * 1000)),
+            )
+            # print(cmd)
+            proc = subprocess.Popen(
+                cmd,
+                shell=True,
+            )
+            cmd = "psrecord {} --plot {}/plot_{}.png --log {}/log_{}.txt --include-children --duration {} &".format(
+                proc.pid,
+                args.output_dir,
+                file_name,
+                args.output_dir,
+                file_name,
+                program_timeout,
+            )
+            os.system(cmd)
+            # print(proc.pid)
         end = time.time()
-        cmd = "./target/release/session-test-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {}".format(
-            peer_id,
-            args.total_pub_peers,
-            num_msgs_per_peer,
-            payload_size,
-            round_timeout,
-            args.output_dir,
-            args.init_time,
-            int(round((end - start) * 1000)),
+        print("Elapsed time = ", end - start)
+    else:
+        cur_time = list(
+            map(
+                int,
+                subprocess.run(["date", '+"%T"'], stdout=subprocess.PIPE)
+                .stdout.decode("utf-8")
+                .rstrip()
+                .strip('"')
+                .split(":"),
+            )
         )
-        # print(cmd)
-        proc = subprocess.Popen(
-            cmd,
-            shell=True,
-        )
-        cmd = "psrecord {} --plot {}/plot_{}.png --log {}/log_{}.txt --include-children --duration {} &".format(
-            proc.pid,
-            args.output_dir,
-            file_name,
-            args.output_dir,
-            file_name,
-            program_timeout,
-        )
-        os.system(cmd)
-        # print(proc.pid)
-    end = time.time()
-    print("Elapsed time = ", end - start)
+        if cur_time[2] > 55:
+            cur_time[2] = 0
+            if cur_time[1] < 58:
+                cur_time[1] += 2
+            else:
+                cur_time[1] = (cur_time[1] + 2) % 60
+                if cur_time[0] != 23:
+                    cur_time[0] += 1
+                else:
+                    cur_time[0] = 0
+        else:
+            cur_time[2] = 0
+            if cur_time[1] != 59:
+                cur_time[1] += 1
+            else:
+                cur_time[1] = 0
+                if cur_time[0] != 23:
+                    cur_time[0] += 1
+                else:
+                    cur_time[0] = 0
+        for peer_id in range(args.total_pub_peers):
+            file_name = "{}_{}-{}-{}-{}-{}-{}".format(
+                peer_id,
+                args.total_pub_peers,
+                args.total_pub_peers,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.init_time,
+            )
+            end = time.time()
+            cmd = "sleepuntil {}:{} && ./target/release/session-test-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {}".format(
+                cur_time[0],
+                cur_time[1],
+                peer_id,
+                args.total_pub_peers,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+            )
+            # print(cmd)
+            proc = subprocess.Popen(
+                cmd,
+                shell=True,
+            )
+            cmd = "psrecord {} --plot {}/plot_{}.png --log {}/log_{}.txt --include-children --duration {} &".format(
+                proc.pid,
+                args.output_dir,
+                file_name,
+                args.output_dir,
+                file_name,
+                program_timeout,
+            )
+            os.system(cmd)
+            # print(proc.pid)
+        end = time.time()
+        print("Elapsed time = ", end - start)
 
 
 if __name__ == "__main__":
