@@ -52,6 +52,8 @@ def plot_usage(exp_dict, output_dir, dist=0.15):
         # fig = go.Figure()
         total_cpu_usage = []
         total_mem_usage = []
+        time_diff_sum = 0
+        cnt = 0
         for peer_id in exp_dict[exp_key]:
             # up to pub_sub_worker_start
             data_peer = exp_dict[exp_key][peer_id]
@@ -64,13 +66,17 @@ def plot_usage(exp_dict, output_dir, dist=0.15):
                     total_mem_usage.append(data_vec[2])
                 else:
                     total_mem_usage[i] += data_vec[2]
+                if i != 0:
+                    cnt += 1
+                    time_diff_sum += data_peer[i][0] - data_peer[i - 1][0]
+        avg_time_diff = time_diff_sum / cnt
 
         # Create figure with secondary y-axis
 
         # Add traces
         fig.add_trace(
             go.Scatter(
-                x=[i * 0.01 for i in range(0, len(total_cpu_usage))],
+                x=[i * avg_time_diff for i in range(0, len(total_cpu_usage))],
                 y=total_cpu_usage,
                 name="CPU Usage",
             ),
@@ -79,7 +85,7 @@ def plot_usage(exp_dict, output_dir, dist=0.15):
 
         fig.add_trace(
             go.Scatter(
-                x=[i * 0.01 for i in range(0, len(total_mem_usage))],
+                x=[i * avg_time_diff for i in range(0, len(total_mem_usage))],
                 y=total_mem_usage,
                 name="Mem Usage",
             ),
