@@ -89,7 +89,7 @@ def plot_usage(exp_dict, output_dir, dist=0.15):
         # # Update layout
         fig.update_layout(
             title=exp_key,
-            xaxis_title="Time (ms)",
+            xaxis_title="Time (s)",
             legend_title="Utilization",
             font=dict(family="arial, monospace", size=18, color="black"),
         )
