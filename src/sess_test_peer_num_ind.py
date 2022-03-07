@@ -48,13 +48,14 @@ def main(args):
         #     round_timeout,
         #     args.init_time,
         # )
-        cmd = "python3 ./src/sess_worker.py -p {} -m {} -n {} -t {} -o {} -i {}".format(
+        cmd = "python3 ./src/sess_worker.py -p {} -m {} -n {} -t {} -o {} -i {} -d {}".format(
             peer_num,
             num_msgs_per_peer,
             payload_size,
             round_timeout,
             args.output_dir,
             args.init_time,
+            args.scout_delay,
         )
         # print(cmd)
         # os.system(cmd)
@@ -120,6 +121,13 @@ if __name__ == "__main__":
         type=int,
         help="The initialization time (in ms) before the first round",
         default=1000,
+    )
+    parser.add_argument(
+        "-d",
+        "--scout_delay",
+        type=float,
+        help="In peer mode, the period dedicated to scouting first remote peers before doing anything else. ",
+        default=0.2,
     )
 
     args = parser.parse_args()

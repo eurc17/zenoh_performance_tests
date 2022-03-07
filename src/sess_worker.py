@@ -30,7 +30,7 @@ def main(args):
             args.init_time,
         )
         end = time.time()
-        cmd = "./target/release/session-test-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {}".format(
+        cmd = "./target/release/session-test-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} -s {}".format(
             peer_id,
             args.total_pub_peers,
             num_msgs_per_peer,
@@ -38,6 +38,7 @@ def main(args):
             round_timeout,
             args.output_dir,
             args.init_time,
+            args.scout_delay,
             int(round((end - start) * 1000)),
         )
         # print(cmd)
@@ -101,6 +102,13 @@ if __name__ == "__main__":
         type=int,
         help="The initialization time (ms) for starting up futures.",
         default=3000,
+    )
+    parser.add_argument(
+        "-d",
+        "--scout_delay",
+        type=float,
+        help="In peer mode, the period dedicated to scouting first remote peers before doing anything else. ",
+        default=0.2,
     )
 
     args = parser.parse_args()

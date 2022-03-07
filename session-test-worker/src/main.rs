@@ -55,6 +55,8 @@ pub struct Cli {
     remote_pub_peers: usize,
     #[structopt(short = "d", long, default_value = "0")]
     delay_startup: u64,
+    #[structopt(short = "s", long, default_value = "0.2")]
+    scout_delay: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -117,6 +119,7 @@ pub async fn pub_and_sub_worker(
             .collect::<Vec<_>>();
         config.set_peers(locator_vec).unwrap();
     }
+    config.scouting.set_delay(Some(args.scout_delay)).unwrap();
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
     let mut list_start_timestamp: Vec<u128> = vec![];
