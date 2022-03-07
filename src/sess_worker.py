@@ -38,8 +38,8 @@ def main(args):
             round_timeout,
             args.output_dir,
             args.init_time,
-            args.scout_delay,
             int(round((end - start) * 1000)),
+            args.scout_delay,
         )
         # print(cmd)
         proc = subprocess.Popen(
