@@ -103,5 +103,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if not os.path.exists(args.input_path):
         print("Input path {} does not exists".format(args.input_path))
+        exit(1)
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
 
     main(args)
