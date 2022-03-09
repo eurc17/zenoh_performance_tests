@@ -1,6 +1,39 @@
 import os
 import argparse
+from sre_parse import expand_template
+from matplotlib.pyplot import text
 import plotly.graph_objects as go
+import pandas as pd
+import plotly.express as px
+
+pd.options.plotting.backend = "plotly"
+
+
+def plot_figs_df(exp_dict, output_dir):
+    for exp_key in exp_dict:
+        # print(exp_dict[exp_key]["delay"])
+        fig = px.box(exp_dict[exp_key], x="delay", y="actual_time", color="delay")
+        df = exp_dict[exp_key]
+        for s in df.delay.unique():
+            # print(str(len(df[df["delay"] == s]["actual_time"])))
+            fig.add_annotation(
+                x=s,
+                y=df[df["delay"] == s]["actual_time"].max(),
+                text="count = " + str(len(df[df["delay"] == s]["actual_time"])),
+                yshift=10,
+                showarrow=False,
+            )
+        # Update layout
+        fig.update_layout(
+            title=exp_key,
+            xaxis_title="Assigned Sleep Time (ms)",
+            yaxis_title="Actual Sleep Time (ms)",
+            legend_title="Assigned Sleep Time",
+            font=dict(family="arial, monospace", size=18, color="black"),
+        )
+
+        fig.write_image(output_dir + "/delay_time_" + str(exp_key) + ".png")
+        fig.write_html(output_dir + "/delay_time_" + str(exp_key) + ".html")
 
 
 def plot_figs(exp_dict, output_dir):
@@ -12,8 +45,7 @@ def plot_figs(exp_dict, output_dir):
                     y=exp_dict[exp_key][delay],
                     quartilemethod="linear",
                     name=str(delay),
-                    text=[len(exp_dict[exp_key][delay])],
-                    textposition="top center",
+                    text=["count = " + str(len(exp_dict[exp_key][delay]))],
                 )
             )
         # Update layout
@@ -80,7 +112,23 @@ def main(args):
             line = open_file.readline()
             # break
     # print(exp_dict)
-    plot_figs(exp_dict, args.output_dir)
+    df_dict = {}
+    for total_pub_peers in exp_dict:
+        d = dict()
+        d["delay"] = []
+        d["actual_time"] = []
+        for delay in exp_dict[total_pub_peers]:
+            for time in exp_dict[total_pub_peers][delay]:
+                d["delay"].append(delay)
+                d["actual_time"].append(time)
+        df = pd.DataFrame(d)
+        # print(df.head())
+        df_dict[total_pub_peers] = df
+
+    # df = pd.DataFrame(exp_dict[40])
+    # print(df_dict)
+    # print(exp_dict[39])
+    plot_figs_df(df_dict, args.output_dir)
 
 
 if __name__ == "__main__":
