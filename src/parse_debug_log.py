@@ -12,6 +12,8 @@ def plot_figs(exp_dict, output_dir):
                     y=exp_dict[exp_key][delay],
                     quartilemethod="linear",
                     name=str(delay),
+                    text=[len(exp_dict[exp_key][delay])],
+                    textposition="top center",
                 )
             )
         # Update layout
