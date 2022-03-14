@@ -3,7 +3,6 @@ mod utils;
 mod workers;
 use common::*;
 use std::path::PathBuf;
-use std::str::FromStr;
 use utils::*;
 use workers::*;
 
@@ -56,7 +55,7 @@ pub struct Cli {
 async fn main() {
     pretty_env_logger::init();
     // Get & parse arguments
-    let args = Cli::from_args();
+    let args = Cli::parse();
 
     // Parameters
     let start = Instant::now();
@@ -80,5 +79,5 @@ async fn main() {
         start,
         process_start,
     );
-    futures::join!(pub_sub_fut);
+    let _result = futures::join!(pub_sub_fut);
 }

@@ -1,7 +1,6 @@
 mod common;
 
 use crate::common::*;
-use std::fs::OpenOptions;
 use std::path::PathBuf;
 use std::{io::Write, str::FromStr};
 
@@ -93,14 +92,14 @@ pub fn get_msg_payload(args_payload_size: usize, peer_id: usize) -> String {
 }
 
 pub async fn pub_and_sub_worker(
-    start_until: Instant,
+    _start_until: Instant,
     timeout: Instant,
     peer_id: usize,
     num_msgs_per_peer: usize,
-    msg_payload: String,
-    total_msg_num: usize,
+    _msg_payload: String,
+    _total_msg_num: usize,
     locators: Option<String>,
-    output_dir: PathBuf,
+    _output_dir: PathBuf,
     total_put_number: usize,
     payload_size: usize,
     args: Cli,
@@ -127,7 +126,7 @@ pub async fn pub_and_sub_worker(
 
     while Instant::now() < timeout || session_id.is_none() {
         // Todo: Sleep and get duration & peer info
-        let sleep_end_time = Instant::now();
+        let _sleep_end_time = Instant::now();
         let session_info = zenoh.info().await;
         let after_session_info = Instant::now();
         if session_id.is_none() {
@@ -193,13 +192,13 @@ pub async fn pub_and_sub_worker(
 async fn main() {
     pretty_env_logger::init();
     // Get & parse arguments
-    let args = Cli::from_args();
+    let args = Cli::parse();
 
     // Parameters
     let start = Instant::now();
     let start_until = start + Duration::from_millis(args.init_time);
     let timeout = start_until + Duration::from_millis(args.round_timeout);
-    let total_sub_number = args.num_put_peer;
+    let _total_sub_number = args.num_put_peer;
     let total_put_number = args.num_put_peer;
     let total_cpu_num = num_cpus::get();
     let available_cpu_num = (total_cpu_num - 2).max(1);

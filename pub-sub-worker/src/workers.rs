@@ -8,7 +8,7 @@ use std::{io::Write, str::FromStr};
 
 use super::common::*;
 
-pub async fn demonstration_worker(
+pub async fn _demonstration_worker(
     rx: flume::Receiver<(usize, Vec<Sample>)>,
     total_put_number: usize,
     total_sub_number: usize,
@@ -236,7 +236,7 @@ pub async fn subscribe_worker(
     process_start: datetime::Instant,
 ) -> Result<()> {
     let start_worker = Instant::now() - start;
-    let mut change_vec = vec![];
+    let change_vec;
     let after_subscribing;
     let start_receiving;
     let after_receiving;

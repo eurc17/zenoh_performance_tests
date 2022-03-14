@@ -1,7 +1,6 @@
 mod common;
 
 use crate::common::*;
-use std::fs::OpenOptions;
 use std::path::PathBuf;
 use std::{io::Write, str::FromStr};
 
@@ -97,14 +96,14 @@ pub fn get_msg_payload(args_payload_size: usize, peer_id: usize) -> String {
 }
 
 pub async fn pub_and_sub_worker(
-    start_until: Instant,
+    _start_until: Instant,
     timeout: Instant,
     peer_id: usize,
     num_msgs_per_peer: usize,
-    msg_payload: String,
-    total_msg_num: usize,
+    _msg_payload: String,
+    _total_msg_num: usize,
     locators: Option<String>,
-    output_dir: PathBuf,
+    _output_dir: PathBuf,
     total_put_number: usize,
     payload_size: usize,
     args: Cli,
@@ -132,7 +131,7 @@ pub async fn pub_and_sub_worker(
 
     while Instant::now() < timeout || session_id.is_none() {
         // Todo: Sleep and get duration & peer info
-        let sleep_end_time = Instant::now();
+        let _sleep_end_time = Instant::now();
         let session_info = zenoh.info().await;
         let after_session_info = Instant::now();
         if session_id.is_none() {
@@ -198,7 +197,7 @@ pub async fn pub_and_sub_worker(
 async fn main() {
     pretty_env_logger::init();
     // Get & parse arguments
-    let args = Cli::from_args();
+    let args = Cli::parse();
     let default_wait_time = (10 * args.num_put_peer as u64).max(2000);
 
     async_std::task::sleep(Duration::from_millis(
@@ -214,7 +213,7 @@ async fn main() {
     let total_put_number = args.num_put_peer;
     let total_cpu_num = num_cpus::get();
     let available_cpu_num = (total_cpu_num - 2).max(1);
-    let per_peer_num = total_put_number / available_cpu_num;
+    let _per_peer_num = total_put_number / available_cpu_num;
 
     let pub_sub_futs = pub_and_sub_worker(
         start_until,
@@ -231,5 +230,5 @@ async fn main() {
         start,
     );
 
-    futures::join!(pub_sub_futs);
+    let _result = futures::join!(pub_sub_futs);
 }
