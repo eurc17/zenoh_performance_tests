@@ -196,7 +196,11 @@ async fn test_worker_1(args: Cli) {
     let mut config = config::default();
     if let Some(locators) = args.locators.clone() {
         let locator = Locator::from_str(locators.as_str()).unwrap();
-        config.set_peers(vec![locator]).unwrap();
+        let endpoint = EndPoint::from(locator);
+        let listerner_config = ListenConfig {
+            endpoints: vec![endpoint],
+        };
+        config.set_listen(listerner_config).unwrap();
     }
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
 

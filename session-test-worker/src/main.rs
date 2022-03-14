@@ -56,7 +56,7 @@ pub struct Cli {
     #[structopt(short = "d", long, default_value = "0")]
     delay_startup: u64,
     #[structopt(short = "s", long, default_value = "0.2")]
-    scout_delay: f64,
+    scout_delay: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -112,12 +112,13 @@ pub async fn pub_and_sub_worker(
     let pub_sub_worker_start = Some(Instant::now());
     let mut config = config::default();
     if let Some(locators) = locators.clone() {
-        let locator_vec = locators
+        let endpoints = locators
             .split(",")
             .filter(|str| *str != "")
-            .map(|locator| Locator::from_str(locator).unwrap())
+            .map(|locator| EndPoint::from(Locator::from_str(locator).unwrap()))
             .collect::<Vec<_>>();
-        config.set_peers(locator_vec).unwrap();
+        let listerner_config = ListenConfig { endpoints };
+        config.set_listen(listerner_config).unwrap();
     }
     config.scouting.set_delay(Some(args.scout_delay)).unwrap();
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());

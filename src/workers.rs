@@ -1,3 +1,4 @@
+use super::common::*;
 use crate::{
     utils::{PeerResult, PubTimeStatus, SubTimeStatus, TestResult},
     Cli,
@@ -5,8 +6,6 @@ use crate::{
 use std::fs::OpenOptions;
 use std::path::PathBuf;
 use std::{io::Write, str::FromStr};
-
-use super::common::*;
 
 pub async fn demonstration_worker(
     rx: flume::Receiver<(usize, Vec<Sample>)>,
@@ -105,12 +104,13 @@ pub async fn publish_worker(
     if multipeer_mode {
         let mut config = config::default();
         if let Some(locators) = locators {
-            let locator_vec = locators
+            let endpoints = locators
                 .split(",")
                 .filter(|str| *str != "")
-                .map(|locator| Locator::from_str(locator).unwrap())
+                .map(|locator| EndPoint::from(Locator::from_str(locator).unwrap()))
                 .collect::<Vec<_>>();
-            config.set_peers(locator_vec).unwrap();
+            let listerner_config = ListenConfig { endpoints };
+            config.set_listen(listerner_config).unwrap();
         }
         zenoh_new = zenoh::open(config).await.unwrap();
         session_start = Some(Instant::now());
@@ -249,12 +249,13 @@ pub async fn subscribe_worker(
     if multipeer_mode {
         let mut config = config::default();
         if let Some(locators) = locators {
-            let locator_vec = locators
+            let endpoints = locators
                 .split(",")
                 .filter(|str| *str != "")
-                .map(|locator| Locator::from_str(locator).unwrap())
+                .map(|locator| EndPoint::from(Locator::from_str(locator).unwrap()))
                 .collect::<Vec<_>>();
-            config.set_peers(locator_vec).unwrap();
+            let listerner_config = ListenConfig { endpoints };
+            config.set_listen(listerner_config).unwrap();
         }
         zenoh_new = zenoh::open(config).await.unwrap();
         session_start = Some(Instant::now());
@@ -362,12 +363,13 @@ pub async fn pub_and_sub_worker(
     let pub_sub_worker_start = Some(Instant::now());
     let mut config = config::default();
     if let Some(locators) = locators.clone() {
-        let locator_vec = locators
+        let endpoints = locators
             .split(",")
             .filter(|str| *str != "")
-            .map(|locator| Locator::from_str(locator).unwrap())
+            .map(|locator| EndPoint::from(Locator::from_str(locator).unwrap()))
             .collect::<Vec<_>>();
-        config.set_peers(locator_vec).unwrap();
+        let listerner_config = ListenConfig { endpoints };
+        config.set_listen(listerner_config).unwrap();
     }
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
