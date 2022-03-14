@@ -43,7 +43,7 @@ pub struct Cli {
     #[clap(short = 'e', long)]
     /// Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).
     /// If you'd like to connect to several addresses, separate them with a comma (example: tcp/x.x.x.x:7447,tcp/y.y.y.y:7447)
-    locators: Option<String>,
+    locators: Vec<Locator>,
     #[clap(short = 'r', long, default_value = "0")]
     /// Number of remote subscriber peers.
     /// Used to notify subscribers to receive messages from remote peers.

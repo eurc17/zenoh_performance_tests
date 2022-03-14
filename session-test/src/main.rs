@@ -1,8 +1,8 @@
 mod common;
 
 use crate::common::*;
+use std::io::Write;
 use std::path::PathBuf;
-use std::{io::Write, str::FromStr};
 
 #[derive(Debug, Parser, Serialize, Deserialize, Clone)]
 #[clap(author, version, about, long_about = None)]
@@ -47,7 +47,7 @@ pub struct Cli {
     #[clap(short = 'e', long)]
     /// Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).
     /// If you'd like to connect to several addresses, separate them with a comma (example: tcp/x.x.x.x:7447,tcp/y.y.y.y:7447)
-    locators: Option<String>,
+    locators: Vec<Locator>,
     #[clap(short = 'a', long, default_value = "0")]
     /// Number of remote subscriber peers.
     /// Used to notify subscribers to receive messages from remote peers.
@@ -98,7 +98,7 @@ pub async fn pub_and_sub_worker(
     num_msgs_per_peer: usize,
     _msg_payload: String,
     _total_msg_num: usize,
-    locators: Option<String>,
+    locators: Vec<Locator>,
     _output_dir: PathBuf,
     total_put_number: usize,
     payload_size: usize,
@@ -107,15 +107,12 @@ pub async fn pub_and_sub_worker(
 ) -> anyhow::Result<()> {
     let pub_sub_worker_start = Some(Instant::now());
     let mut config = config::default();
-    if let Some(locators) = locators.clone() {
-        let endpoints = locators
-            .split(",")
-            .filter(|str| *str != "")
-            .map(|locator| EndPoint::from(Locator::from_str(locator).unwrap()))
-            .collect::<Vec<_>>();
-        let listerner_config = ListenConfig { endpoints };
-        config.set_listen(listerner_config).unwrap();
-    }
+    let endpoints = locators
+        .into_iter()
+        .map(|locator| EndPoint::from(locator))
+        .collect::<Vec<_>>();
+    let listerner_config = ListenConfig { endpoints };
+    config.set_listen(listerner_config).unwrap();
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
     let mut list_start_timestamp: Vec<u128> = vec![];
