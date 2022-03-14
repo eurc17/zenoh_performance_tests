@@ -41,7 +41,8 @@ pub struct Cli {
     /// The number of tasks to spawn for dealing with futures related to subscriber peers.
     sub_cpu_num: Option<usize>,
     #[clap(long)]
-    /// Create multiple zenoh runtimes on a single machine or not for each peer. It will always be set to false if pub_sub_sep is not set, since the worker will generate a new zenoh instance for each pair of pub and sub worker.
+    /// Create multiple zenoh runtimes on a single machine or not for each peer. \
+    /// It will always be set to false if pub_sub_sep is not set, since the worker will generate a new zenoh instance for each pair of pub and sub worker.
     multipeer_mode: bool,
     #[clap(long)]
     /// Create a zenoh runtime for a pair of pub/sub if not set.
