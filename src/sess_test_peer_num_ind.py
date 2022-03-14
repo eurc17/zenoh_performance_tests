@@ -125,9 +125,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-d",
         "--scout_delay",
-        type=float,
-        help="In peer mode, the period dedicated to scouting first remote peers before doing anything else. ",
-        default=0.2,
+        type=int,
+        help="In peer mode, the period dedicated to scouting first remote peers before doing anything else. Unit: ms",
+        default=200,
     )
 
     args = parser.parse_args()
