@@ -4,7 +4,6 @@ mod workers;
 use clap::Parser;
 use common::*;
 use std::path::PathBuf;
-use std::str::FromStr;
 use utils::*;
 use workers::*;
 
@@ -48,10 +47,10 @@ pub struct Cli {
     /// Create a zenoh runtime for a pair of pub/sub if not set.
     /// If this flag not set, the total number of peers is read from `num_put_peers`.
     pub_sub_separate: bool,
-    #[clap(short = 'e', long)]
+    #[clap(short = 'e', long, value_delimiter = ',')]
     /// Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).
     /// If you'd like to connect to several addresses, separate them with a comma (example: tcp/x.x.x.x:7447,tcp/y.y.y.y:7447)
-    locators: Option<String>,
+    locators: Vec<Locator>,
     #[clap(short = 'a', long, default_value = "0")]
     /// Number of remote subscriber peers.
     /// Used to notify subscribers to receive messages from remote peers.
@@ -196,14 +195,16 @@ async fn test_pub_and_sub_worker(args: Cli) {
 async fn test_worker_1(args: Cli) {
     let (tx, rx) = flume::unbounded::<(usize, Vec<Sample>)>();
     let mut config = config::default();
-    if let Some(locators) = args.locators.clone() {
-        let locator = Locator::from_str(locators.as_str()).unwrap();
-        let endpoint = EndPoint::from(locator);
-        let listerner_config = ListenConfig {
-            endpoints: vec![endpoint],
-        };
-        config.set_listen(listerner_config).unwrap();
-    }
+
+    let endpoints = args
+        .locators
+        .clone()
+        .into_iter()
+        .map(|locator| EndPoint::from(locator))
+        .collect::<Vec<_>>();
+    let listerner_config = ListenConfig { endpoints };
+    config.set_listen(listerner_config).unwrap();
+
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
 
     let start = Instant::now();

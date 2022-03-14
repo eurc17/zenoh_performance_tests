@@ -4,8 +4,8 @@ use crate::{
     Cli,
 };
 use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::PathBuf;
-use std::{io::Write, str::FromStr};
 
 pub async fn demonstration_worker(
     rx: flume::Receiver<(usize, Vec<Sample>)>,
@@ -85,7 +85,7 @@ pub async fn publish_worker(
     num_msgs_per_peer: usize,
     msg_payload: String,
     multipeer_mode: bool,
-    locators: Option<String>,
+    locators: Vec<Locator>,
     output_dir: PathBuf,
     total_put_number: usize,
     payload_size: usize,
@@ -103,15 +103,13 @@ pub async fn publish_worker(
     let mut session_start = session_start_time;
     if multipeer_mode {
         let mut config = config::default();
-        if let Some(locators) = locators {
-            let endpoints = locators
-                .split(",")
-                .filter(|str| *str != "")
-                .map(|locator| EndPoint::from(Locator::from_str(locator).unwrap()))
-                .collect::<Vec<_>>();
-            let listerner_config = ListenConfig { endpoints };
-            config.set_listen(listerner_config).unwrap();
-        }
+        let endpoints = locators
+            .into_iter()
+            .map(|locator| EndPoint::from(locator))
+            .collect::<Vec<_>>();
+        let listerner_config = ListenConfig { endpoints };
+        config.set_listen(listerner_config).unwrap();
+
         zenoh_new = zenoh::open(config).await.unwrap();
         session_start = Some(Instant::now());
         let curr_time = Instant::now();
@@ -227,7 +225,7 @@ pub async fn subscribe_worker(
     tx: flume::Sender<(usize, Vec<Sample>)>,
     multipeer_mode: bool,
     total_msg_num: usize,
-    locators: Option<String>,
+    locators: Vec<Locator>,
     args: Cli,
     start: Instant,
     session_start_time: Option<Instant>,
@@ -248,15 +246,14 @@ pub async fn subscribe_worker(
     let zenoh_new;
     if multipeer_mode {
         let mut config = config::default();
-        if let Some(locators) = locators {
-            let endpoints = locators
-                .split(",")
-                .filter(|str| *str != "")
-                .map(|locator| EndPoint::from(Locator::from_str(locator).unwrap()))
-                .collect::<Vec<_>>();
-            let listerner_config = ListenConfig { endpoints };
-            config.set_listen(listerner_config).unwrap();
-        }
+
+        let endpoints = locators
+            .into_iter()
+            .map(|locator| EndPoint::from(locator))
+            .collect::<Vec<_>>();
+        let listerner_config = ListenConfig { endpoints };
+        config.set_listen(listerner_config).unwrap();
+
         zenoh_new = zenoh::open(config).await.unwrap();
         session_start = Some(Instant::now());
         {
@@ -353,7 +350,7 @@ pub async fn pub_and_sub_worker(
     msg_payload: String,
     tx: flume::Sender<(usize, Vec<Sample>)>,
     total_msg_num: usize,
-    locators: Option<String>,
+    locators: Vec<Locator>,
     output_dir: PathBuf,
     total_put_number: usize,
     payload_size: usize,
@@ -362,15 +359,14 @@ pub async fn pub_and_sub_worker(
 ) -> Result<()> {
     let pub_sub_worker_start = Some(Instant::now());
     let mut config = config::default();
-    if let Some(locators) = locators.clone() {
-        let endpoints = locators
-            .split(",")
-            .filter(|str| *str != "")
-            .map(|locator| EndPoint::from(Locator::from_str(locator).unwrap()))
-            .collect::<Vec<_>>();
-        let listerner_config = ListenConfig { endpoints };
-        config.set_listen(listerner_config).unwrap();
-    }
+
+    let endpoints = locators
+        .iter()
+        .map(|locator| EndPoint::from(locator.clone()))
+        .collect::<Vec<_>>();
+    let listerner_config = ListenConfig { endpoints };
+    config.set_listen(listerner_config).unwrap();
+
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
     let pub_future = publish_worker(
@@ -398,7 +394,7 @@ pub async fn pub_and_sub_worker(
         tx,
         false,
         total_msg_num,
-        locators.clone(),
+        locators,
         args.clone(),
         start,
         session_start_time,
