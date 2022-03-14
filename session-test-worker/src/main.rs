@@ -5,57 +5,58 @@ use std::fs::OpenOptions;
 use std::path::PathBuf;
 use std::{io::Write, str::FromStr};
 
-#[derive(Debug, StructOpt, Serialize, Deserialize, Clone)]
+#[derive(Parser, Debug, Serialize, Deserialize, Clone)]
+#[clap(author, version, about, long_about = None)]
 pub struct Cli {
-    #[structopt(short = "o", long, default_value = "./", parse(from_os_str))]
+    #[clap(short = 'o', long, default_value = "./", parse(from_os_str))]
     /// The path to store the output .json file.
     output_dir: PathBuf,
-    #[structopt(short = "p", long)]
+    #[clap(short = 'p', long)]
     /// The peer ID for this process
     peer_id: usize,
-    #[structopt(short = "a", long)]
+    #[clap(short = 'a', long)]
     /// The total number of publisher peers.
     /// If pub-sub-separate flag not used, this will be the total number of peers.
     num_put_peer: usize,
-    #[structopt(short = "t", long, default_value = "100")]
+    #[clap(short = 't', long, default_value = "100")]
     /// The timeout for subscribers to stop receiving messages. Unit: milliseconds (ms).
     /// The subscriber will start receiving the messages at the same time as the publishers.
     round_timeout: u64,
-    #[structopt(short = "i", long, default_value = "1000")]
+    #[clap(short = 'i', long, default_value = "1000")]
     /// The initialization time (ms) for starting up futures.
     init_time: u64,
-    #[structopt(short = "m", long, default_value = "1")]
+    #[clap(short = 'm', long, default_value = "1")]
     /// The number of messages each publisher peer will try to send.
     num_msgs_per_peer: usize,
-    #[structopt(short = "n", long, default_value = "8")]
+    #[clap(short = 'n', long, default_value = "8")]
     /// The payload size (bytes) of the message.
     payload_size: usize,
-    #[structopt(long)]
+    #[clap(long)]
     /// The number of tasks to spawn for dealing with futures related to publisher peers.
     pub_cpu_num: Option<usize>,
-    #[structopt(long)]
+    #[clap(long)]
     /// The number of tasks to spawn for dealing with futures related to subscriber peers.
     sub_cpu_num: Option<usize>,
-    #[structopt(long)]
+    #[clap(long)]
     /// Create multiple zenoh runtimes on a single machine or not for each peer.
     /// It will always be set to false if pub_sub_sep is not set, since the worker will generate a new zenoh instance for each pair of pub and sub worker.
     multipeer_mode: bool,
-    #[structopt(long)]
+    #[clap(long)]
     /// Create a zenoh runtime for a pair of pub/sub if not set.
     /// If this flag not set, the total number of peers is read from `num_put_peers`.
     pub_sub_separate: bool,
-    #[structopt(short = "e", long)]
+    #[clap(short = 'e', long)]
     /// Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).
     /// If you'd like to connect to several addresses, separate them with a comma (example: tcp/x.x.x.x:7447,tcp/y.y.y.y:7447)
     locators: Option<String>,
-    #[structopt(short = "r", long, default_value = "0")]
+    #[clap(short = 'r', long, default_value = "0")]
     /// Number of remote subscriber peers.
     /// Used to notify subscribers to receive messages from remote peers.
     /// Note that the num_msgs_per_peer needs to be the same on both remote and local machines
     remote_pub_peers: usize,
-    #[structopt(short = "d", long, default_value = "0")]
+    #[clap(short = 'd', long, default_value = "0")]
     delay_startup: u64,
-    #[structopt(short = "s", long, default_value = "0.2")]
+    #[clap(short = 's', long, default_value = "0.2")]
     scout_delay: u64,
 }
 
