@@ -8,7 +8,6 @@ pub use rayon::prelude::*;
 pub use serde::{Deserialize, Serialize};
 pub use std::convert::TryInto;
 pub use std::{sync::*, time::*};
-pub use structopt::StructOpt;
 pub use tokio;
 pub use zenoh::config::*;
 pub use zenoh::net::link::EndPoint;
