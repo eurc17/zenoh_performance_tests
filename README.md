@@ -1,7 +1,7 @@
 # Zenoh Performance Tests
 
 This is a repository that contains the codes to test the performance of [Zenoh](https://zenoh.io/).  
-Currently (2022/02/09), the Zenoh version tested is 0.6.0-dev, rev="f7309d6af9aa8c5c6e55e744fc68ea4f6f18e8e9".
+Currently (2022/03/14), the Zenoh version tested is 0.6.0-dev, rev="1b71ef9345629682e9eae125bd4a95c55794afe5".
 
 We use [psrecord](https://github.com/astrofrog/psrecord) to record the CPU and memory usage of the test program.
 
@@ -52,6 +52,11 @@ For people who are running experiment testings with this program. You may store 
 If you encountered the situation that the program didn't terminate, please interrupt it and reduce the number of messages sent or the number of peers created.
 
 # Version Update Notes:
+
+## Master
+
+- [x] Update code to use new config in [Zenoh](https://github.com/eclipse-zenoh/zenoh)
+- [x] Replaced StructOpt with Clap
 
 ## 0.1.2
 - [x] Added time analysis
