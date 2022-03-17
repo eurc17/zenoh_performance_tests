@@ -58,6 +58,7 @@ If you encountered the situation that the program didn't terminate, please inter
 - [x] Update code to use new config in [Zenoh](https://github.com/eclipse-zenoh/zenoh)
 - [x] Replaced StructOpt with Clap
 - [x] Added scout-delay analysis
+- []
 
 ## 0.1.2
 - [x] Added time analysis
