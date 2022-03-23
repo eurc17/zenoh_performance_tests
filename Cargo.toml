@@ -18,9 +18,9 @@ members = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# zenoh = "0.6.0-dev"
+zenoh = "0.6.0-dev.0"
 # zenoh = {git = "https://github.com/eclipse-zenoh/zenoh.git", rev = "f7309d6af9aa8c5c6e55e744fc68ea4f6f18e8e9"}
-zenoh = {git = "https://github.com/eurc17/zenoh.git", rev = "1b71ef9345629682e9eae125bd4a95c55794afe5"}
+
 async-std = "1.10.0"
 futures = "0.3.17"
 derivative = "2.2.0"
@@ -35,3 +35,5 @@ tokio = "1.15.0"
 flume = "0.10.9"
 clap = {version = "3.1.6", features = [ "derive" ]}
 
+[patch.crates-io]
+zenoh = {git = "https://github.com/eurc17/zenoh.git", rev = "1b71ef9345629682e9eae125bd4a95c55794afe5"}
