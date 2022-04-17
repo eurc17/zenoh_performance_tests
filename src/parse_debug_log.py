@@ -77,7 +77,7 @@ def main(args):
                 if not total_pub_peers in exp_dict.keys():
                     exp_dict[total_pub_peers] = {}
             if (
-                "[/home/vkuo/zenoh/zenoh/src/net/runtime/orchestrator.rs:541] delay ="
+                "orchestrator.rs:541] delay ="
                 in line
             ):
                 delay = line.split("= ")[-1].rstrip()
@@ -91,7 +91,7 @@ def main(args):
                 if not delay in exp_dict[total_pub_peers].keys():
                     exp_dict[total_pub_peers][delay] = []
             if (
-                "[/home/vkuo/zenoh/zenoh/src/net/runtime/orchestrator.rs:541] elapsed_time.as_millis() ="
+                "orchestrator.rs:541] elapsed_time ="
                 in line
             ):
                 elapsed_time = line.split("= ")[-1].rstrip()
