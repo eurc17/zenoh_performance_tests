@@ -49,6 +49,8 @@ pub struct Cli {
     /// Used to notify subscribers to receive messages from remote peers.
     /// Note that the num_msgs_per_peer needs to be the same on both remote and local machines
     remote_pub_peers: usize,
+    #[clap(short = 'd', long, default_value = "0")]
+    delay_startup: u64,
 }
 
 #[async_std::main]
@@ -56,9 +58,16 @@ async fn main() {
     pretty_env_logger::init();
     // Get & parse arguments
     let args = Cli::parse();
+    let default_wait_time = (10 * args.total_put_number as u64).max(2000);
+
+    async_std::task::sleep(Duration::from_millis(
+        default_wait_time - args.delay_startup,
+    ))
+    .await;
 
     // Parameters
     let start = Instant::now();
+    println!("Peer {}, start = {:?}", args.peer_id, start);
     let process_start = datetime::Instant::now();
     let start_until = start + Duration::from_millis(args.init_time);
     let timeout = start_until + Duration::from_millis(args.round_timeout);
