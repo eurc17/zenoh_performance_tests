@@ -35,8 +35,6 @@ def plot(exp_dict, output_dir):
     recv_rate_list = []
     for exp_key in exp_dict:
         peer_num = int(exp_key.split("-")[0])
-        print(exp_key)
-        print("Peer num = ", peer_num)
         recv_rate = float(exp_dict[exp_key]["total_recvd_msg_num"]) / float(
             exp_dict[exp_key]["total_expected_msg_num"]
         )
