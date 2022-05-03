@@ -104,6 +104,7 @@ pub async fn publish_worker(
     let after_sending;
     let mut session_start = session_start_time;
     if multipeer_mode {
+        //default = false
         let mut config = config::default();
         let endpoints = locators
             .into_iter()
@@ -246,6 +247,7 @@ pub async fn subscribe_worker(
     }
     let zenoh_new;
     if multipeer_mode {
+        //default = false
         let mut config = config::default();
         let endpoints = locators
             .into_iter()
