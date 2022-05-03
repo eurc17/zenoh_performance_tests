@@ -5,6 +5,7 @@ use crate::{
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
+use uhlc::{Timestamp, HLC};
 
 use super::common::*;
 
@@ -95,6 +96,7 @@ pub async fn publish_worker(
     start: Instant,
     session_start_time: Option<Instant>,
     pub_sub_worker_start: Option<Instant>,
+    hlc: Arc<HLC>,
 ) -> Result<()> {
     let start_worker = Instant::now() - start;
     let zenoh_new;
@@ -143,6 +145,10 @@ pub async fn publish_worker(
         start_sending = Instant::now() - start;
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
+            let hlc_timestamp = zenoh.hlc().unwrap().new_timestamp(); //hlc.new_timestamp();
+            let hlc_timestamp_string = serde_json::to_string(&hlc_timestamp)?;
+            let hlc_timestamp_value = serde_json::to_value(hlc_timestamp)?;
+            dbg!(hlc_timestamp_string.len());
             zenoh
                 .put("/demo/example/hello", msg_payload.clone())
                 .await
@@ -232,6 +238,7 @@ pub async fn subscribe_worker(
     session_start_time: Option<Instant>,
     pub_sub_worker_start: Option<Instant>,
     process_start: datetime::Instant,
+    hlc: Arc<HLC>,
 ) -> Result<()> {
     let start_worker = Instant::now() - start;
     let change_vec;
@@ -301,6 +308,13 @@ pub async fn subscribe_worker(
             .await;
         after_receiving = Instant::now() - start;
         // tx.send_async((peer_id, change_vec)).await.unwrap();
+    }
+    for change in change_vec.iter() {
+        let json_value = change.value.clone().as_json().unwrap();
+        let timestamp_in_msg: Timestamp = serde_json::from_value(json_value)?;
+        let tagged_timestamp = change.timestamp.clone().unwrap();
+        let time_diff = tagged_timestamp.get_diff_duration(&timestamp_in_msg);
+        dbg!(time_diff);
     }
     let short_config = ShortConfig {
         peer_id,
@@ -407,8 +421,11 @@ pub async fn pub_and_sub_worker(
         .collect::<Vec<_>>();
     let listerner_config = ListenConfig { endpoints };
     config.set_listen(listerner_config).unwrap();
+    config.set_add_timestamp(Some(true)).unwrap();
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
+    // Todo: Use the internel hlc in zenoh (not present for default config)
+    let hlc = Arc::new(HLC::default());
     let pub_future = publish_worker(
         zenoh.clone(),
         start_until,
@@ -425,6 +442,7 @@ pub async fn pub_and_sub_worker(
         start,
         session_start_time,
         pub_sub_worker_start,
+        hlc.clone(),
     );
     let sub_future = subscribe_worker(
         zenoh.clone(),
@@ -439,6 +457,7 @@ pub async fn pub_and_sub_worker(
         session_start_time,
         pub_sub_worker_start,
         process_start,
+        hlc,
     );
     futures::try_join!(pub_future, sub_future)?;
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
