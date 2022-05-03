@@ -184,6 +184,8 @@ pub async fn publish_worker(
         .unwrap();
     }
 
+    std::fs::create_dir_all(&args.output_dir)?;
+
     let file_path = args.output_dir.join(format!(
         "put_{}_info_{}-{}-{}-{}-{}-{}.json",
         peer_id,
