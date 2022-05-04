@@ -334,6 +334,9 @@ pub async fn subscribe_worker(
         // dbg!(time_diff_sub_pub);
         // dbg!(&change.0.key_expr);
         let key_expr_string = change.0.key_expr.to_string();
+        if key_expr_string == format!("/demo/example/{}", peer_id) {
+            continue;
+        }
         if result_map.get_mut(&key_expr_string).is_some() {
             let pub_peer_stat = result_map.get_mut(&key_expr_string).unwrap();
             pub_peer_stat.msg_cnt += 1;
