@@ -126,7 +126,7 @@ if __name__ == "__main__":
         "--peer_num",
         type=int,
         help="The total peer number of the test",
-        default=8,
+        default=1,
     )
     parser.add_argument(
         "-t",
