@@ -74,7 +74,7 @@ def main(args):
             args.init_time,
         )
         end = time.time()
-        cmd = "sleep_until {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {}".format(
+        cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {}".format(
             sleep_until_time,
             peer_id,
             args.total_pub_peers,
