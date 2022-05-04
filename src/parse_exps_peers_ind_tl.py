@@ -29,7 +29,7 @@ def sort_file(filename1, filename2):
 sort_file_key = cmp_to_key(sort_file)
 
 
-def plot(exp_dict, output_dir):
+def plot(exp_dict, args):
     fig, ax = plt.subplots()
     peer_list = []
     throughput_list = []
@@ -80,7 +80,7 @@ def main(args):
             if not exp_key in exp_dict.keys():
                 exp_dict[exp_key] = {}
             exp_dict[exp_key][peer_id] = data
-    plot(exp_dict, args.output_dir)
+    plot(exp_dict, args)
 
 
 if __name__ == "__main__":

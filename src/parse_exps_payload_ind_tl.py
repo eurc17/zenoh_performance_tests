@@ -38,7 +38,7 @@ def sort_file(filename1, filename2):
 sort_file_key = cmp_to_key(sort_file)
 
 
-def plot(exp_dict, output_dir):
+def plot(exp_dict, args):
     fig, ax = plt.subplots()
     peer_list = []
     throughput_list = []
@@ -60,7 +60,8 @@ def plot(exp_dict, output_dir):
     ax1.set_ylabel("throughput (msgs/s)", color=color, fontweight="bold")
     ax1.plot(peer_list, throughput_list, color=color)
     ax1.tick_params(axis="y", labelcolor=color)
-    ax1.set_xscale("log")
+    if args.log_range:
+        ax1.set_xscale("log")
 
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
@@ -92,7 +93,7 @@ def main(args):
             if not exp_key in exp_dict.keys():
                 exp_dict[exp_key] = {}
             exp_dict[exp_key][payload_size] = data
-    plot(exp_dict, args.output_dir)
+    plot(exp_dict, args)
 
 
 if __name__ == "__main__":
@@ -112,6 +113,11 @@ if __name__ == "__main__":
         type=str,
         help="The directory where the logs are stored",
         required=True,
+    )
+    parser.add_argument(
+        "--log_range",
+        action="store_true",
+        help="Step the payload size in log scale",
     )
 
     args = parser.parse_args()
