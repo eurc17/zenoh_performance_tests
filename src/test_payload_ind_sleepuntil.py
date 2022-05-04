@@ -29,7 +29,7 @@ def main(args):
     # payload_size = args.payload_size
     peer_num = args.peer_num
     round_timeout = args.round_timeout  # ms
-    startup_delay = max((10 * args.peer_num_end) / 1000, 2)
+    startup_delay = max((10 * args.peer_num) / 1000, 2)
     program_timeout = (
         get_sleep() + round_timeout + 10 + (args.init_time) / 1000 + startup_delay
     )  # s
