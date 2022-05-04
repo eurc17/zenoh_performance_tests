@@ -1,0 +1,24 @@
+[package]
+name = "output-config"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+zenoh = "0.6.0-dev.0"
+async-std = "1.10.0"
+futures = "0.3.17"
+derivative = "2.2.0"
+serde = "1.0.131"
+serde_json = "1.0.73"
+anyhow = "1.0.51"
+rayon = "1.5.1"
+log = "0.4.14"
+clap = {version = "3.1.6", features = [ "derive" ]}
+num_cpus = "1.13.1"
+pretty_env_logger = "0.4.0"
+tokio = "1.15.0"
+flume = "0.10.9"
+datetime = "0.5.2"
+uhlc = "0.4.1"
