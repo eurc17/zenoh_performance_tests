@@ -4,6 +4,7 @@ import glob
 import argparse
 import time
 import subprocess
+import numpy
 
 
 def get_sleep():
@@ -46,43 +47,67 @@ def main(args):
         disable_string = "--sub_disable"
     else:
         disable_string = ""
-    for payload_size in range(
-        args.payload_size_start, args.payload_size_end + 1, args.payload_size_step
-    ):
-        if sleep_until == "" or True:
-            actual_program_timeout = program_timeout + get_sleep()
-        else:
-            actual_program_timeout = program_timeout + get_sleep()
-        # file_name = "{}-{}-{}-{}-{}-{}".format(
-        #     peer_num,
-        #     peer_num,
-        #     num_msgs_per_peer,
-        #     payload_size,
-        #     round_timeout,
-        #     args.init_time,
-        # )
-        cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {}".format(
-            peer_num,
-            num_msgs_per_peer,
-            payload_size,
-            round_timeout,
-            args.output_dir,
-            args.init_time,
-            disable_string,
-            args.peer_id_start,
-            args.locators,
-        )
-        # print(cmd)
-        # os.system(cmd)
-        proc = subprocess.Popen(
-            cmd,
-            shell=True,
-        )
-        # sleep for 10 seconds before running new tests
-        print(actual_program_timeout)
-        time.sleep(actual_program_timeout)
-        os.system("pkill pub-sub-worker")
-        time.sleep(1)
+    if args.log_range:
+        payload_size = args.payload_size_start
+        while payload_size < args.payload_size_end + 1:
+            if sleep_until == "" or True:
+                actual_program_timeout = program_timeout + get_sleep()
+            else:
+                actual_program_timeout = program_timeout + get_sleep()
+            cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {}".format(
+                peer_num,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+                disable_string,
+                args.peer_id_start,
+                args.locators,
+            )
+            # print(cmd)
+            # os.system(cmd)
+            proc = subprocess.Popen(
+                cmd,
+                shell=True,
+            )
+            # sleep for 10 seconds before running new tests
+            print(actual_program_timeout)
+            time.sleep(actual_program_timeout)
+            os.system("pkill pub-sub-worker")
+            time.sleep(1)
+            payload_size *= args.payload_size_step
+    else:
+
+        for payload_size in range(
+            args.payload_size_start, args.payload_size_end + 1, args.payload_size_step
+        ):
+            if sleep_until == "" or True:
+                actual_program_timeout = program_timeout + get_sleep()
+            else:
+                actual_program_timeout = program_timeout + get_sleep()
+            cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {}".format(
+                peer_num,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+                disable_string,
+                args.peer_id_start,
+                args.locators,
+            )
+            # print(cmd)
+            # os.system(cmd)
+            proc = subprocess.Popen(
+                cmd,
+                shell=True,
+            )
+            # sleep for 10 seconds before running new tests
+            print(actual_program_timeout)
+            time.sleep(actual_program_timeout)
+            os.system("pkill pub-sub-worker")
+            time.sleep(1)
 
 
 if __name__ == "__main__":
@@ -166,6 +191,11 @@ if __name__ == "__main__":
         type=str,
         help="Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).",
         default="",
+    )
+    parser.add_argument(
+        "--log_range",
+        action="store_true",
+        help="Step the payload size in log scale",
     )
 
     args = parser.parse_args()
