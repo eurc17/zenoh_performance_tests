@@ -62,7 +62,8 @@ def main(args):
     else:
         disable_string = ""
 
-    for peer_id in range(args.total_pub_peers):
+    for peer_id_raw in range(args.total_pub_peers):
+        peer_id = args.peer_id_start + peer_id_raw
         file_name = "{}_{}-{}-{}-{}-{}-{}".format(
             peer_id,
             args.total_pub_peers,
@@ -149,6 +150,12 @@ if __name__ == "__main__":
     )
     parser.add_argument("--pub_disable", action="store_true")
     parser.add_argument("--sub_disable", action="store_true")
+    parser.add_argument(
+        "--peer_id_start",
+        type=int,
+        help="The starting number of the Peer ID",
+        default=0,
+    )
 
     args = parser.parse_args()
     main(args)

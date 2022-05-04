@@ -58,7 +58,7 @@ def main(args):
         #     round_timeout,
         #     args.init_time,
         # )
-        cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {}".format(
+        cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {}".format(
             peer_num,
             num_msgs_per_peer,
             payload_size,
@@ -66,6 +66,7 @@ def main(args):
             args.output_dir,
             args.init_time,
             disable_string,
+            args.peer_id_start,
         )
         # print(cmd)
         # os.system(cmd)
@@ -132,8 +133,22 @@ if __name__ == "__main__":
         help="The initialization time (in ms) before the first round",
         default=3000,
     )
-    parser.add_argument("--pub_disable", action="store_true")
-    parser.add_argument("--sub_disable", action="store_true")
+    parser.add_argument(
+        "--pub_disable",
+        action="store_true",
+        help="Disable publisher in all peers spawned by this script",
+    )
+    parser.add_argument(
+        "--sub_disable",
+        action="store_true",
+        help="Disable subscriber in all peers spawned by this script",
+    )
+    parser.add_argument(
+        "--peer_id_start",
+        type=int,
+        help="The starting number of the Peer ID",
+        default=0,
+    )
 
     args = parser.parse_args()
     main(args)
