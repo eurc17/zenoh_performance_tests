@@ -126,7 +126,7 @@ pub async fn publish_worker(
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
             zenoh_new
-                .put("/demo/example/hello", msg_payload.clone())
+                .put(format!("/demo/example/{}", peer_id), msg_payload.clone())
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
@@ -146,12 +146,8 @@ pub async fn publish_worker(
         start_sending = Instant::now() - start;
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
-            let hlc_timestamp = zenoh.hlc().unwrap().new_timestamp(); //hlc.new_timestamp();
-            let hlc_timestamp_string = serde_json::to_string(&hlc_timestamp)?;
-            let hlc_timestamp_value = serde_json::to_value(hlc_timestamp)?;
-            dbg!(hlc_timestamp_string.len());
             zenoh
-                .put("/demo/example/hello", hlc_timestamp_value)
+                .put(format!("/demo/example/{}", peer_id), msg_payload.clone())
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
