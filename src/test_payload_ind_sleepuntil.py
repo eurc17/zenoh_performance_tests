@@ -142,8 +142,16 @@ if __name__ == "__main__":
         help="The initialization time (in ms) before the first round",
         default=3000,
     )
-    parser.add_argument("--pub_disable", action="store_true")
-    parser.add_argument("--sub_disable", action="store_true")
+    parser.add_argument(
+        "--pub_disable",
+        action="store_true",
+        help="Disable publisher in all peers spawned by this script",
+    )
+    parser.add_argument(
+        "--sub_disable",
+        action="store_true",
+        help="Disable subscriber in all peers spawned by this script",
+    )
 
     args = parser.parse_args()
     main(args)
