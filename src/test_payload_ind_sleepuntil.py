@@ -4,7 +4,6 @@ import glob
 import argparse
 import time
 import subprocess
-import numpy
 
 
 def get_sleep():
