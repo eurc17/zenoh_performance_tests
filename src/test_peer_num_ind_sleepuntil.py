@@ -38,11 +38,11 @@ def main(args):
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     if args.pub_disable:
-        disable_string = "--pub-disable"
+        disable_string = "--pub_disable"
         if args.sub_disable:
             print("Cannot specify pub_disable and sub_disable at the same time")
     elif args.sub_disable:
-        disable_string = "--sub-disable"
+        disable_string = "--sub_disable"
     else:
         disable_string = ""
     for peer_num in range(args.peer_num_start, args.peer_num_end + 1):
