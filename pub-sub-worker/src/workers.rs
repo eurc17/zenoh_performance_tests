@@ -5,11 +5,10 @@ use crate::{
     },
     Cli,
 };
-use itermore::Itermore;
 use std::io::Write;
 use std::path::PathBuf;
 use std::{collections::HashMap, fs::OpenOptions};
-use uhlc::{Timestamp, HLC};
+use uhlc::HLC;
 
 use super::common::*;
 
@@ -101,7 +100,7 @@ pub async fn publish_worker(
     start: Instant,
     session_start_time: Option<Instant>,
     pub_sub_worker_start: Option<Instant>,
-    hlc: Arc<HLC>,
+    _hlc: Arc<HLC>,
 ) -> Result<()> {
     let start_worker = Instant::now() - start;
     let zenoh_new;
