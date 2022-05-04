@@ -1,11 +1,14 @@
 use crate::{
-    utils::{PeerResult, PubTimeStatus, ShortConfig, SubTimeStatus, TestResult},
+    utils::{
+        PeerResult, PubPeerResult, PubPeerStatistics, PubTimeStatus, ShortConfig, SubTimeStatus,
+        TestResult,
+    },
     Cli,
 };
 use itermore::Itermore;
-use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
+use std::{collections::HashMap, fs::OpenOptions};
 use uhlc::{Timestamp, HLC};
 
 use super::common::*;
@@ -47,6 +50,7 @@ pub async fn _demonstration_worker(
                 receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
                 recvd_msg_num: change_vec.len(),
                 expected_msg_num: total_msg_num,
+                result_vec: vec![],
             }
         })
         .collect::<Vec<_>>();
@@ -323,15 +327,44 @@ pub async fn subscribe_worker(
         after_receiving = Instant::now() - start;
         // tx.send_async((peer_id, change_vec)).await.unwrap();
     }
+    let mut result_map: HashMap<String, PubPeerStatistics> = HashMap::new();
     for change in change_vec.iter() {
         let tagged_timestamp = change.0.timestamp.clone().unwrap();
         let time_diff_sub_pub = change.1.get_diff_duration(&tagged_timestamp);
         dbg!(time_diff_sub_pub);
+        dbg!(&change.0.key_expr);
+        let key_expr_string = change.0.key_expr.to_string();
+        if result_map.get_mut(&key_expr_string).is_some() {
+            let pub_peer_stat = result_map.get_mut(&key_expr_string).unwrap();
+            pub_peer_stat.msg_cnt += 1;
+            pub_peer_stat.latency_vec.push(time_diff_sub_pub);
+        } else {
+            let mut pub_peer_stat = PubPeerStatistics::new();
+            pub_peer_stat.msg_cnt = 1;
+            pub_peer_stat.latency_vec.push(time_diff_sub_pub);
+            result_map.insert(key_expr_string, pub_peer_stat);
+        }
     }
-    for [prev_change, next_change] in change_vec.iter().array_windows() {
-        let time_diff_sub = next_change.1.get_diff_duration(&prev_change.1);
-        dbg!(time_diff_sub);
-    }
+    let result_vec = result_map
+        .into_iter()
+        .map(|(key_expr, pub_peer_stat)| {
+            let throughput =
+                (pub_peer_stat.msg_cnt as f64) / (after_receiving - start_receiving).as_secs_f64();
+            let latency_vec_ms = pub_peer_stat
+                .latency_vec
+                .iter()
+                .map(|dur| (dur.as_micros() as f64) / 1000.0)
+                .collect::<Vec<_>>();
+            let average_latency_ms =
+                latency_vec_ms.iter().sum::<f64>() / (latency_vec_ms.len() as f64);
+            PubPeerResult {
+                key_expr,
+                throughput,
+                average_latency_ms,
+            }
+        })
+        .collect::<Vec<_>>();
+    dbg!(&result_vec);
     let short_config = ShortConfig {
         peer_id,
         total_put_number: args.total_put_number,
@@ -346,6 +379,7 @@ pub async fn subscribe_worker(
         receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
         recvd_msg_num: change_vec.len(),
         expected_msg_num: total_msg_num,
+        result_vec,
     };
     let file_path = args.output_dir.join(format!(
         "exp_sub_{}_{}-{}-{}-{}-{}-{}.json",

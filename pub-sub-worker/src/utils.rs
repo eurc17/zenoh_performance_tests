@@ -33,14 +33,36 @@ pub struct SubTimeStatus {
     pub start_receiving: u128,
     pub after_receiving: u128,
 }
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PubPeerResult {
+    pub key_expr: String,
+    pub throughput: f64,
+    pub average_latency_ms: f64,
+}
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PubPeerStatistics {
+    pub msg_cnt: usize,
+    pub latency_vec: Vec<Duration>,
+}
+
+impl PubPeerStatistics {
+    pub fn new() -> Self {
+        PubPeerStatistics {
+            msg_cnt: 0,
+            latency_vec: vec![],
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PeerResult {
     pub short_config: Option<ShortConfig>,
     pub peer_id: usize,
     pub receive_rate: f64,
     pub recvd_msg_num: usize,
     pub expected_msg_num: usize,
+    pub result_vec: Vec<PubPeerResult>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
