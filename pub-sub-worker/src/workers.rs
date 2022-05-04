@@ -151,7 +151,7 @@ pub async fn publish_worker(
             let hlc_timestamp_value = serde_json::to_value(hlc_timestamp)?;
             dbg!(hlc_timestamp_string.len());
             zenoh
-                .put("/demo/example/hello", msg_payload.clone())
+                .put("/demo/example/hello", hlc_timestamp_value)
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
@@ -332,7 +332,9 @@ pub async fn subscribe_worker(
         let timestamp_in_msg: Timestamp = serde_json::from_value(json_value)?;
         let tagged_timestamp = change.0.timestamp.clone().unwrap();
         let time_diff = tagged_timestamp.get_diff_duration(&timestamp_in_msg);
+        let time_diff_sub_pub = change.1.get_diff_duration(&tagged_timestamp);
         dbg!(time_diff);
+        dbg!(time_diff_sub_pub);
     }
     for [prev_change, next_change] in change_vec.iter().array_windows() {
         let time_diff_sub = next_change.1.get_diff_duration(&prev_change.1);
