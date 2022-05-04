@@ -74,7 +74,7 @@ def main(args):
             args.init_time,
         )
         end = time.time()
-        cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {}".format(
+        cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {} -r {}".format(
             sleep_until_time,
             peer_id,
             args.total_pub_peers,
@@ -86,6 +86,7 @@ def main(args):
             int(round((end - start) * 1000)),
             disable_string,
             args.locators,
+            args.remote_pub_peers,
         )
         # print(cmd)
         proc = subprocess.Popen(
@@ -162,6 +163,13 @@ if __name__ == "__main__":
         type=str,
         help="Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).",
         default="",
+    )
+    parser.add_argument(
+        "-r",
+        "--remote_pub_peers",
+        type=int,
+        help="The total number of remote publisher peers",
+        default=0,
     )
 
     args = parser.parse_args()

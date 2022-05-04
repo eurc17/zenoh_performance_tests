@@ -58,7 +58,7 @@ def main(args):
         #     round_timeout,
         #     args.init_time,
         # )
-        cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {}".format(
+        cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {} -r {}".format(
             peer_num,
             num_msgs_per_peer,
             payload_size,
@@ -68,6 +68,7 @@ def main(args):
             disable_string,
             args.peer_id_start,
             args.locators,
+            args.remote_pub_peers,
         )
         # print(cmd)
         # os.system(cmd)
@@ -155,6 +156,13 @@ if __name__ == "__main__":
         type=str,
         help="Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).",
         default="",
+    )
+    parser.add_argument(
+        "-r",
+        "--remote_pub_peers",
+        type=int,
+        help="The total number of remote publisher peers",
+        default=0,
     )
 
     args = parser.parse_args()
