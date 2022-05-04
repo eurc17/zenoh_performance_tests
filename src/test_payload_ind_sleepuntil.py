@@ -79,6 +79,7 @@ def main(args):
             shell=True,
         )
         # sleep for 10 seconds before running new tests
+        print(actual_program_timeout)
         time.sleep(actual_program_timeout)
         os.system("pkill pub-sub-worker")
         time.sleep(1)
