@@ -331,8 +331,8 @@ pub async fn subscribe_worker(
     for change in change_vec.iter() {
         let tagged_timestamp = change.0.timestamp.clone().unwrap();
         let time_diff_sub_pub = change.1.get_diff_duration(&tagged_timestamp);
-        dbg!(time_diff_sub_pub);
-        dbg!(&change.0.key_expr);
+        // dbg!(time_diff_sub_pub);
+        // dbg!(&change.0.key_expr);
         let key_expr_string = change.0.key_expr.to_string();
         if result_map.get_mut(&key_expr_string).is_some() {
             let pub_peer_stat = result_map.get_mut(&key_expr_string).unwrap();
@@ -364,7 +364,6 @@ pub async fn subscribe_worker(
             }
         })
         .collect::<Vec<_>>();
-    dbg!(&result_vec);
     let short_config = ShortConfig {
         peer_id,
         total_put_number: args.total_put_number,
