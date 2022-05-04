@@ -58,7 +58,7 @@ def main(args):
         #     round_timeout,
         #     args.init_time,
         # )
-        cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {}".format(
+        cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {}".format(
             peer_num,
             num_msgs_per_peer,
             payload_size,
@@ -67,6 +67,7 @@ def main(args):
             args.init_time,
             disable_string,
             args.peer_id_start,
+            args.locators,
         )
         # print(cmd)
         # os.system(cmd)
@@ -148,6 +149,12 @@ if __name__ == "__main__":
         type=int,
         help="The starting number of the Peer ID",
         default=0,
+    )
+    parser.add_argument(
+        "--locators",
+        type=str,
+        help="Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).",
+        default="",
     )
 
     args = parser.parse_args()

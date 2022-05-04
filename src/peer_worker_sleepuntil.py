@@ -74,7 +74,7 @@ def main(args):
             args.init_time,
         )
         end = time.time()
-        cmd = "sleep_until {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {}".format(
+        cmd = "sleep_until {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {}".format(
             sleep_until_time,
             peer_id,
             args.total_pub_peers,
@@ -85,6 +85,7 @@ def main(args):
             args.init_time,
             int(round((end - start) * 1000)),
             disable_string,
+            args.locators,
         )
         # print(cmd)
         proc = subprocess.Popen(
@@ -155,6 +156,12 @@ if __name__ == "__main__":
         type=int,
         help="The starting number of the Peer ID",
         default=0,
+    )
+    parser.add_argument(
+        "--locators",
+        type=str,
+        help="Specifies locators for each peer to connect to (example format: tcp/x.x.x.x:7447).",
+        default="",
     )
 
     args = parser.parse_args()
