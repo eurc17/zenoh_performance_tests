@@ -2,6 +2,7 @@ use crate::{
     utils::{PeerResult, PubTimeStatus, ShortConfig, SubTimeStatus, TestResult},
     Cli,
 };
+use itermore::Itermore;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
@@ -272,6 +273,13 @@ pub async fn subscribe_worker(
             let stream = subscriber.receiver();
             start_receiving = Instant::now() - start;
             change_vec = stream
+                .then(|change| async {
+                    if let Some(timestamp) = &change.timestamp {
+                        hlc.update_with_timestamp(timestamp).unwrap();
+                    }
+                    let hlc_timestamp = hlc.new_timestamp();
+                    (change, hlc_timestamp)
+                })
                 .take(total_msg_num)
                 .take_until({
                     async move {
@@ -283,7 +291,7 @@ pub async fn subscribe_worker(
                         }
                     }
                 })
-                .collect::<Vec<Sample>>()
+                .collect::<Vec<(Sample, _)>>()
                 .await;
             after_receiving = Instant::now() - start;
             // tx.send_async((peer_id, change_vec)).await.unwrap();
@@ -295,6 +303,13 @@ pub async fn subscribe_worker(
         let stream = subscriber.receiver();
         start_receiving = Instant::now() - start;
         change_vec = stream
+            .then(|change| async {
+                if let Some(timestamp) = &change.timestamp {
+                    hlc.update_with_timestamp(timestamp).unwrap();
+                }
+                let hlc_timestamp = hlc.new_timestamp();
+                (change, hlc_timestamp)
+            })
             .take(total_msg_num)
             .take_until({
                 async move {
@@ -306,17 +321,21 @@ pub async fn subscribe_worker(
                     }
                 }
             })
-            .collect::<Vec<Sample>>()
+            .collect::<Vec<(Sample, _)>>()
             .await;
         after_receiving = Instant::now() - start;
         // tx.send_async((peer_id, change_vec)).await.unwrap();
     }
     for change in change_vec.iter() {
-        let json_value = change.value.clone().as_json().unwrap();
+        let json_value = change.0.value.clone().as_json().unwrap();
         let timestamp_in_msg: Timestamp = serde_json::from_value(json_value)?;
-        let tagged_timestamp = change.timestamp.clone().unwrap();
+        let tagged_timestamp = change.0.timestamp.clone().unwrap();
         let time_diff = tagged_timestamp.get_diff_duration(&timestamp_in_msg);
         dbg!(time_diff);
+    }
+    for [prev_change, next_change] in change_vec.iter().array_windows() {
+        let time_diff_sub = next_change.1.get_diff_duration(&prev_change.1);
+        dbg!(time_diff_sub);
     }
     let short_config = ShortConfig {
         peer_id,
