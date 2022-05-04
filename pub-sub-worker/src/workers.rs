@@ -324,12 +324,8 @@ pub async fn subscribe_worker(
         // tx.send_async((peer_id, change_vec)).await.unwrap();
     }
     for change in change_vec.iter() {
-        let json_value = change.0.value.clone().as_json().unwrap();
-        let timestamp_in_msg: Timestamp = serde_json::from_value(json_value)?;
         let tagged_timestamp = change.0.timestamp.clone().unwrap();
-        let time_diff = tagged_timestamp.get_diff_duration(&timestamp_in_msg);
         let time_diff_sub_pub = change.1.get_diff_duration(&tagged_timestamp);
-        dbg!(time_diff);
         dbg!(time_diff_sub_pub);
     }
     for [prev_change, next_change] in change_vec.iter().array_windows() {
