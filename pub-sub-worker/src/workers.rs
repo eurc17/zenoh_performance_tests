@@ -480,7 +480,18 @@ pub async fn pub_and_sub_worker(
         process_start,
         hlc,
     );
-    futures::try_join!(pub_future, sub_future)?;
+    if args.pub_disable {
+        if args.sub_disable {
+            println!("Cannot disable both publisher and subscriber. Will only disable publisher.");
+        }
+        futures::try_join!(sub_future)?;
+        drop(pub_future);
+    } else if args.sub_disable {
+        futures::try_join!(pub_future)?;
+        drop(sub_future);
+    } else {
+        futures::try_join!(pub_future, sub_future)?;
+    }
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
     zenoh.close().await.unwrap();
 

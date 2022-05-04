@@ -50,7 +50,17 @@ pub struct Cli {
     /// Note that the num_msgs_per_peer needs to be the same on both remote and local machines
     remote_pub_peers: usize,
     #[clap(short = 'd', long, default_value = "0")]
+    /// The time interval before starting the zenoh session, clipped by min(2000 milliseconds, 10ms * total_put_number). (Unit: ms)
     delay_startup: u64,
+    #[clap(long, default_value = "0")]
+    /// The interval between the messages published by publisher. (Unit: ms)
+    pub_interval: u64,
+    #[clap(long)]
+    /// The flag that disables the publisher
+    pub_disable: bool,
+    #[clap(long)]
+    /// The flag that disables the subscriber
+    sub_disable: bool,
 }
 
 #[async_std::main]
