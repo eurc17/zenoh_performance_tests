@@ -1,9 +1,6 @@
-use crate::{
-    utils::{
-        PeerResult, PubPeerResult, PubPeerStatistics, PubTimeStatus, ShortConfig, SubTimeStatus,
-        TestResult,
-    },
-    Cli,
+use output_config::{
+    Cli, PeerResult, PubPeerResult, PubPeerStatistics, PubTimeStatus, ShortConfig, SubTimeStatus,
+    TestResult,
 };
 use std::io::Write;
 use std::path::PathBuf;
