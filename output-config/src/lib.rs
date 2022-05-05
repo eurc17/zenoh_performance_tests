@@ -39,7 +39,7 @@ pub struct Cli {
     /// If you'd like to connect to several addresses, separate them with a comma (example: tcp/x.x.x.x:7447,tcp/y.y.y.y:7447)
     pub locators: Vec<Locator>,
     #[clap(short = 'r', long, default_value = "0")]
-    /// Number of remote subscriber peers.
+    /// Number of remote publisher peers.
     /// Used to notify subscribers to receive messages from remote peers.
     /// Note that the num_msgs_per_peer needs to be the same on both remote and local machines
     pub remote_pub_peers: usize,
