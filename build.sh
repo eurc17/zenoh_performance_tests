@@ -17,8 +17,9 @@ export CC="$script_dir/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf
 # setup rust
 rustup target add armv7-unknown-linux-musleabihf
 
-if ! grep -q armv7l-linux-musleabihf-gcc ~/.cargo/config.toml >/dev/null 2>&1; then
-    cat >> ~/.cargo/config.toml <<EOF
+if ! grep -q armv7l-linux-musleabihf-gcc .cargo/config.toml >/dev/null 2>&1; then
+    mkdir -p .cargo
+    cat >> .cargo/config.toml <<EOF
 [target.armv7-unknown-linux-musleabihf]
 linker = "$script_dir/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf-gcc"
 EOF
