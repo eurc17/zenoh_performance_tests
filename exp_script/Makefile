@@ -18,12 +18,12 @@ sync_zpt_binary: build_arm
 	ssh -p 44004 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
 	ssh -p 44005 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
 	ssh -p 44006 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
-	rsync -aPz -e "ssh -p 44001" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44002" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44003" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44004" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44005" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44006" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44001" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44002" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44003" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44004" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44005" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44006" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release/
 
 
 # For Zenoh-3
@@ -39,12 +39,12 @@ sync_zpt_binary: build_arm
 	ssh -p 44004 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
 	ssh -p 44005 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
 	ssh -p 44006 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
-	rsync -aPz -e "ssh -p 44001" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44002" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44003" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44004" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44005" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
-	rsync -aPz -e "ssh -p 44006" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44001" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44002" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44003" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44004" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44005" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release/
+	rsync -aPz -e "ssh -p 44006" ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release/
 
 clean_zpt_binary:
 # For Zenoh-2
