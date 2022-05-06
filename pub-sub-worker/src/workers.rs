@@ -145,11 +145,12 @@ pub async fn publish_worker(
         }
         start_sending = Instant::now() - start;
         info!("start sending messages");
-        for _ in 0..num_msgs_per_peer {
+        for msg_id in 0..num_msgs_per_peer {
             zenoh
                 .put(format!("/demo/example/{}", peer_id), msg_payload.clone())
                 .await
                 .unwrap();
+            dbg!(msg_id);
             if timeout <= Instant::now() {
                 timeout_flag = true;
                 warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
