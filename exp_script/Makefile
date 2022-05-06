@@ -20,6 +20,25 @@ sync_zpt_binary: build_arm
 	rsync -aPz -e "ssh -p 44005" ../../zenoh_performance_tests pi@192.168.1.103:~/
 #	rsync -aPz -e "ssh -p 44006" ../../zenoh_performance_tests pi@192.168.1.103:~/
 
+clean_zpt_binary:
+# For Zenoh-2
+	ssh -p 44001 pi@192.168.1.102 rm -r zenoh_performance_tests
+#	ssh -p 44002 pi@192.168.1.102 rm -r zenoh_performance_tests
+#	ssh -p 44003 pi@192.168.1.102 rm -r zenoh_performance_tests
+#	ssh -p 44004 pi@192.168.1.102 rm -r zenoh_performance_tests
+	ssh -p 44005 pi@192.168.1.102 rm -r zenoh_performance_tests
+#	ssh -p 44006 pi@192.168.1.102 rm -r zenoh_performance_tests
+# For Zenoh-3
+	ssh -p 44001 pi@192.168.1.103 rm -r zenoh_performance_tests
+	ssh -p 44002 pi@192.168.1.103 rm -r zenoh_performance_tests
+	ssh -p 44003 pi@192.168.1.103 rm -r zenoh_performance_tests
+	ssh -p 44004 pi@192.168.1.103 rm -r zenoh_performance_tests
+	ssh -p 44005 pi@192.168.1.103 rm -r zenoh_performance_tests
+#	ssh -p 44006 pi@192.168.1.103 rm -r zenoh_performance_tests
+
+
+
+
 sync_zenohd_binary: build_zenohd_arm
 	rsync -aPz ./zenoh/target/armv7-unknown-linux-gnueabihf/release/zenohd pi@192.168.1.121:~/
 
