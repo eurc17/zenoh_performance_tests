@@ -37,14 +37,11 @@ clean_zpt_binary:
 #	ssh -p 44006 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 
 
+run_zenohd:
+	ssh pi@192.168.1.121 "RUST_LOG=info zenohd"
 
-
-sync_zenohd_binary: build_zenohd_arm
-	rsync -aPz ./zenoh/target/armv7-unknown-linux-gnueabihf/release/zenohd pi@192.168.1.121:~/
-
-
-build_zenohd_arm: .clone_zenoh_repo
-	cd zenoh && cargo build --target armv7-unknown-linux-gnueabihf --release --all
+stop_zenohd:
+	ssh pi@192.168.1.121 "pkill zenohd"
 
 build_arm: .setup_repo
 	cd ../pub-sub-worker && cargo build --target armv7-unknown-linux-gnueabihf --release --all
