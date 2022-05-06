@@ -22,19 +22,19 @@ sync_zpt_binary: build_arm
 
 clean_zpt_binary:
 # For Zenoh-2
-	ssh -p 44001 pi@192.168.1.102 rm -r zenoh_performance_tests
-#	ssh -p 44002 pi@192.168.1.102 rm -r zenoh_performance_tests
-#	ssh -p 44003 pi@192.168.1.102 rm -r zenoh_performance_tests
-#	ssh -p 44004 pi@192.168.1.102 rm -r zenoh_performance_tests
-	ssh -p 44005 pi@192.168.1.102 rm -r zenoh_performance_tests
-#	ssh -p 44006 pi@192.168.1.102 rm -r zenoh_performance_tests
+	ssh -p 44001 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+#	ssh -p 44002 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+#	ssh -p 44003 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+#	ssh -p 44004 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+	ssh -p 44005 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+#	ssh -p 44006 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
 # For Zenoh-3
-	ssh -p 44001 pi@192.168.1.103 rm -r zenoh_performance_tests
-	ssh -p 44002 pi@192.168.1.103 rm -r zenoh_performance_tests
-	ssh -p 44003 pi@192.168.1.103 rm -r zenoh_performance_tests
-	ssh -p 44004 pi@192.168.1.103 rm -r zenoh_performance_tests
-	ssh -p 44005 pi@192.168.1.103 rm -r zenoh_performance_tests
-#	ssh -p 44006 pi@192.168.1.103 rm -r zenoh_performance_tests
+	ssh -p 44001 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
+	ssh -p 44002 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
+	ssh -p 44003 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
+	ssh -p 44004 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
+	ssh -p 44005 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
+#	ssh -p 44006 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 
 
 
