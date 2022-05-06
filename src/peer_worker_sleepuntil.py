@@ -74,20 +74,35 @@ def main(args):
             args.init_time,
         )
         end = time.time()
-        cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {} -r {}".format(
-            sleep_until_time,
-            peer_id,
-            args.total_pub_peers,
-            num_msgs_per_peer,
-            payload_size,
-            round_timeout,
-            args.output_dir,
-            args.init_time,
-            int(round((end - start) * 1000)),
-            disable_string,
-            args.locators,
-            args.remote_pub_peers,
-        )
+        if args.locators != "":
+            cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {} -r {}".format(
+                sleep_until_time,
+                peer_id,
+                args.total_pub_peers,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+                int(round((end - start) * 1000)),
+                disable_string,
+                args.locators,
+                args.remote_pub_peers,
+            )
+        else:
+            cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} -r {}".format(
+                sleep_until_time,
+                peer_id,
+                args.total_pub_peers,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+                int(round((end - start) * 1000)),
+                disable_string,
+                args.remote_pub_peers,
+            )
         # print(cmd)
         proc = subprocess.Popen(
             cmd,
