@@ -49,7 +49,7 @@ build_arm:
 	--env CARGO_HOME=/home/rust/src/cargo_home \
 	-v "$(shell realpath ../)":/home/rust/src eurc17/rpi-cross \
 	cargo build --target=armv7-unknown-linux-gnueabihf --release --all
-	cd ../ && chown -R ${USER}:${USER} ./target/
+	cd ../ && sudo chown -R ${USER}:${USER} ./target/
 
 build_arm_local: .setup_repo
 	cd ../pub-sub-worker && cargo build --target armv7-unknown-linux-gnueabihf --release
