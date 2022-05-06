@@ -46,7 +46,7 @@ pub struct Cli {
     #[clap(short = 'd', long, default_value = "0")]
     /// The time interval before starting the zenoh session, clipped by min(2000 milliseconds, 10ms * total_put_number). (Unit: ms)
     pub delay_startup: u64,
-    #[clap(long, default_value = "0")]
+    #[clap(long, default_value = "1")]
     /// The interval between the messages published by publisher. (Unit: ms)
     pub pub_interval: u64,
     #[clap(long)]
