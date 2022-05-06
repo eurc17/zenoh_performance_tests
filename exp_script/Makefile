@@ -71,7 +71,7 @@ build_sync_remove_zenohd:
 
 
 run_zenohd:
-	file_exist = $(sh -c 'ssh -q pi@192.168.1.121 [[ -f /home/pi/zenohd ]] && echo "File exists" || echo "";')
+	file_exist := $(sh -c 'ssh -q pi@192.168.1.121 [[ -f /home/pi/zenohd ]] && echo "File exists" || echo "";')
 	ifeq ($(file_exist), "File exists")
 		echo $(file_exist)
 	endif
