@@ -75,7 +75,7 @@ def main(args):
         )
         end = time.time()
         if args.locators != "":
-            cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {} -r {}".format(
+            cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} --locators {} -r {} --pub-interval {}".format(
                 sleep_until_time,
                 peer_id,
                 args.total_pub_peers,
@@ -88,9 +88,10 @@ def main(args):
                 disable_string,
                 args.locators,
                 args.remote_pub_peers,
+                args.pub_interval,
             )
         else:
-            cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} -r {}".format(
+            cmd = "sleepuntil {} && ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} {} -r {} --pub-interval {}".format(
                 sleep_until_time,
                 peer_id,
                 args.total_pub_peers,
@@ -102,6 +103,7 @@ def main(args):
                 int(round((end - start) * 1000)),
                 disable_string,
                 args.remote_pub_peers,
+                args.pub_interval,
             )
         # print(cmd)
         proc = subprocess.Popen(
@@ -185,6 +187,12 @@ if __name__ == "__main__":
         type=int,
         help="The total number of remote publisher peers",
         default=0,
+    )
+    parser.add_argument(
+        "--pub_interval",
+        type=int,
+        help="The interval between publishing messages Unit: ms",
+        default=1,
     )
 
     args = parser.parse_args()

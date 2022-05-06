@@ -87,7 +87,7 @@ def main(args):
             else:
                 actual_program_timeout = program_timeout + get_sleep()
             if args.locators != "":
-                cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {} -r {}".format(
+                cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {} -r {} --pub_interval {}".format(
                     peer_num,
                     num_msgs_per_peer,
                     payload_size,
@@ -98,9 +98,10 @@ def main(args):
                     args.peer_id_start,
                     args.locators,
                     args.remote_pub_peers,
+                    args.pub_interval,
                 )
             else:
-                cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} -r {}".format(
+                cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} -r {} --pub_interval {}".format(
                     peer_num,
                     num_msgs_per_peer,
                     payload_size,
@@ -110,6 +111,7 @@ def main(args):
                     disable_string,
                     args.peer_id_start,
                     args.remote_pub_peers,
+                    args.pub_interval,
                 )
             # print(cmd)
             # os.system(cmd)
@@ -217,6 +219,12 @@ if __name__ == "__main__":
         type=int,
         help="The total number of remote publisher peers",
         default=0,
+    )
+    parser.add_argument(
+        "--pub_interval",
+        type=int,
+        help="The interval between publishing messages Unit: ms",
+        default=1,
     )
 
     args = parser.parse_args()
