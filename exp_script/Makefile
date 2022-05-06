@@ -64,7 +64,7 @@ clean_zpt_binary:
 
 
 run_zenohd:
-	ssh pi@192.168.1.121 "RUST_LOG=info zenohd"
+	ssh pi@192.168.1.121 "RUST_LOG=info zenohd" &
 
 stop_zenohd:
 	ssh pi@192.168.1.121 "pkill zenohd"
