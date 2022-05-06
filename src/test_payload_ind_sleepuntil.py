@@ -86,18 +86,31 @@ def main(args):
                 actual_program_timeout = program_timeout + get_sleep()
             else:
                 actual_program_timeout = program_timeout + get_sleep()
-            cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {} -r {}".format(
-                peer_num,
-                num_msgs_per_peer,
-                payload_size,
-                round_timeout,
-                args.output_dir,
-                args.init_time,
-                disable_string,
-                args.peer_id_start,
-                args.locators,
-                args.remote_pub_peers,
-            )
+            if args.locators != "":
+                cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {} -r {}".format(
+                    peer_num,
+                    num_msgs_per_peer,
+                    payload_size,
+                    round_timeout,
+                    args.output_dir,
+                    args.init_time,
+                    disable_string,
+                    args.peer_id_start,
+                    args.locators,
+                    args.remote_pub_peers,
+                )
+            else:
+                cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} -r {}".format(
+                    peer_num,
+                    num_msgs_per_peer,
+                    payload_size,
+                    round_timeout,
+                    args.output_dir,
+                    args.init_time,
+                    disable_string,
+                    args.peer_id_start,
+                    args.remote_pub_peers,
+                )
             # print(cmd)
             # os.system(cmd)
             proc = subprocess.Popen(
