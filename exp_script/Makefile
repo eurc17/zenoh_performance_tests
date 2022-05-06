@@ -6,35 +6,61 @@ all: sync_zpt_binary
 
 sync_zpt_binary: build_arm
 # For Zenoh-2
-	rsync -aPz -e "ssh -p 44001" ../../zenoh_performance_tests pi@192.168.1.102:~/
-#	rsync -aPz -e "ssh -p 44002" ../../zenoh_performance_tests pi@192.168.1.102:~/
-#	rsync -aPz -e "ssh -p 44003" ../../zenoh_performance_tests pi@192.168.1.102:~/
-#	rsync -aPz -e "ssh -p 44004" ../../zenoh_performance_tests pi@192.168.1.102:~/
-	rsync -aPz -e "ssh -p 44005" ../../zenoh_performance_tests pi@192.168.1.102:~/
-#	rsync -aPz -e "ssh -p 44006" ../../zenoh_performance_tests pi@192.168.1.102:~/
+	rsync -aPz -e "ssh -p 44001" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.102:~/
+	rsync -aPz -e "ssh -p 44002" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.102:~/
+	rsync -aPz -e "ssh -p 44003" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.102:~/
+	rsync -aPz -e "ssh -p 44004" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.102:~/
+	rsync -aPz -e "ssh -p 44005" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.102:~/
+	rsync -aPz -e "ssh -p 44006" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.102:~/
+	ssh -p 44001 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44002 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44003 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44004 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44005 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44006 pi@192.168.1.102 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	rsync -aPz -e "ssh -p 44001" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44002" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44003" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44004" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44005" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44006" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.102:~/zenoh_performance_tests/target/release
+
+
 # For Zenoh-3
-	rsync -aPz -e "ssh -p 44001" ../../zenoh_performance_tests pi@192.168.1.103:~/
-	rsync -aPz -e "ssh -p 44002" ../../zenoh_performance_tests pi@192.168.1.103:~/
-	rsync -aPz -e "ssh -p 44003" ../../zenoh_performance_tests pi@192.168.1.103:~/
-	rsync -aPz -e "ssh -p 44004" ../../zenoh_performance_tests pi@192.168.1.103:~/
-	rsync -aPz -e "ssh -p 44005" ../../zenoh_performance_tests pi@192.168.1.103:~/
-#	rsync -aPz -e "ssh -p 44006" ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44001" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44002" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44003" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44004" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44005" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44006" --exclude 'cargo_home' --exclude 'target' --exclude 'armv7l-linux-musleabihf-cross' --exclude 'armv7l-linux-musleabihf-cross.tgz' ../../zenoh_performance_tests pi@192.168.1.103:~/
+	ssh -p 44001 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44002 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44003 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44004 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44005 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	ssh -p 44006 pi@192.168.1.103 "cd ~/zenoh_performance_tests && mkdir -p target/release"
+	rsync -aPz -e "ssh -p 44001" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44002" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44003" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44004" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44005" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
+	rsync -aPz -e "ssh -p 44006" --exclude ../../zenoh_performance_tests/target/armv7-unknown-linux-musleabihf/release/pub-sub-worker pi@192.168.1.103:~/zenoh_performance_tests/target/release
 
 clean_zpt_binary:
 # For Zenoh-2
 	ssh -p 44001 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
-#	ssh -p 44002 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
-#	ssh -p 44003 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
-#	ssh -p 44004 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+	ssh -p 44002 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+	ssh -p 44003 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+	ssh -p 44004 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
 	ssh -p 44005 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
-#	ssh -p 44006 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
+	ssh -p 44006 pi@192.168.1.102 "rm -r zenoh_performance_tests || true"
 # For Zenoh-3
 	ssh -p 44001 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 	ssh -p 44002 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 	ssh -p 44003 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 	ssh -p 44004 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 	ssh -p 44005 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
-#	ssh -p 44006 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
+	ssh -p 44006 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 
 
 run_zenohd:
