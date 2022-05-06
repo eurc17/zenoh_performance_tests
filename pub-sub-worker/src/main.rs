@@ -30,7 +30,7 @@ async fn main() {
         timeout,
         args.peer_id,
         args.num_msgs_per_peer,
-        get_msg_payload(args.payload_size, args.peer_id),
+        get_msg_payload(args.payload_size, args.peer_id as u64),
         (args.total_put_number + args.remote_pub_peers) * args.num_msgs_per_peer,
         args.locators.clone(),
         args.output_dir.clone(),

@@ -18,7 +18,7 @@ pub async fn _demonstration_worker(
     payload_size: usize,
     round_timeout: u64,
     args: Cli,
-) -> () {
+) {
     let mut vector_data = vec![];
     while let Ok(data) = rx.recv_async().await {
         vector_data.push(data);
@@ -87,7 +87,7 @@ pub async fn publish_worker(
     timeout: Instant,
     peer_id: usize,
     num_msgs_per_peer: usize,
-    msg_payload: String,
+    msg_payload: Arc<[u8]>,
     multipeer_mode: bool,
     locators: Vec<Locator>,
     output_dir: PathBuf,
@@ -126,7 +126,7 @@ pub async fn publish_worker(
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
             zenoh_new
-                .put(format!("/demo/example/{}", peer_id), msg_payload.clone())
+                .put(format!("/demo/example/{}", peer_id), &*msg_payload)
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
@@ -147,7 +147,7 @@ pub async fn publish_worker(
         info!("start sending messages");
         for _msg_id in 0..num_msgs_per_peer {
             zenoh
-                .put(format!("/demo/example/{}", peer_id), msg_payload.clone())
+                .put(format!("/demo/example/{}", peer_id), &*msg_payload)
                 .await
                 .unwrap();
             // dbg!(msg_id);
@@ -451,7 +451,7 @@ pub async fn pub_and_sub_worker(
     timeout: Instant,
     peer_id: usize,
     num_msgs_per_peer: usize,
-    msg_payload: String,
+    msg_payload: Arc<[u8]>,
     total_msg_num: usize,
     locators: Vec<Locator>,
     output_dir: PathBuf,
