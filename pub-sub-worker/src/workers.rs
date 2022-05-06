@@ -156,7 +156,7 @@ pub async fn publish_worker(
                 warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
                 break;
             }
-            async_std::task::sleep(Duration::from_millis(args.pub_interval)).await;
+            // async_std::task::sleep(Duration::from_millis(args.pub_interval)).await;
         }
         after_sending = Instant::now() - start;
     }
