@@ -1,6 +1,6 @@
 .PHONY: build clean list
 
-EMPTY_TARGETS = .clone_repo .clone_zenoh_repo
+EMPTY_TARGETS = .setup_repo .clone_zenoh_repo
 
 all: sync_zpt_binary
 
@@ -24,13 +24,12 @@ sync_zpt_binary: build_arm
 build_zenohd_arm: .clone_zenoh_repo
 	cd zenoh && cargo build --target armv7-unknown-linux-gnueabihf --release --all
 
-build_arm: .clone_repo
-	cd zenoh_performance_tests && cargo build --target armv7-unknown-linux-gnueabihf --release --all
+build_arm: .setup_repo
+	cd ../ && cargo build --target armv7-unknown-linux-gnueabihf --release --all
 
-.clone_repo:
-	git clone git@github.com:eurc17/zenoh_performance_tests.git
-	cd zenoh_performance_tests && git checkout thoughput-latency
-	touch .clone_repo
+.setup_repo:
+	cd ../ && git checkout thoughput-latency
+	touch .setup_repo
 
 .clone_zenoh_repo:
 	git clone https://github.com/eclipse-zenoh/zenoh.git
@@ -38,7 +37,6 @@ build_arm: .clone_repo
 	touch .clone_zenoh_repo
 
 clean:
-	rm -rf zenoh_performance_tests
 	rm -rf zenoh
 	rm -rf $(EMPTY_TARGETS)
 
