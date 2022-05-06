@@ -521,6 +521,7 @@ pub async fn pub_and_sub_worker(
     }
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
     zenoh.close().await.unwrap();
+    println!("Program finished!");
 
     Ok(())
 }
