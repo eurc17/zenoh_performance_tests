@@ -71,11 +71,11 @@ build_sync_remove_zenohd:
 
 
 run_zenohd:
-	file_exist := $(sh -c 'ssh -q pi@192.168.1.121 [[ -f /home/pi/zenohd ]] && echo "File exists" || echo "";')
-	ifeq ($(file_exist), "File exists")
-		echo $(file_exist)
+	$(eval TMP := $(shell ssh -q pi@192.168.1.121 [[ -f /home/pi/zenohd ]] && echo "File exists" || echo "";))
+	ifeq ($(TMP), "File exists")
+		echo $(TMP)
 	endif
-	ssh pi@192.168.1.121 "RUST_LOG=debug bash /home/pi/zenohd" &
+#	ssh pi@192.168.1.121 "RUST_LOG=debug bash /home/pi/zenohd" &
 
 stop_zenohd:
 	ssh pi@192.168.1.121 "pkill zenohd"
