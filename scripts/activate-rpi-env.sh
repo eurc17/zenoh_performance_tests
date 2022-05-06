@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-set -e  # exit when failing
+echo 'Run the script by `source scripts/activate-rpi-env.sh`. If not, please try again.'
 
 script_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-
 
 # download MUSL toolchain
 pushd "$script_dir"
@@ -23,7 +22,7 @@ export CC="$script_dir/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf
 rustup target add armv7-unknown-linux-musleabihf
 
 if ! grep -q armv7l-linux-musleabihf-gcc .config/config.toml >/dev/null 2>&1; then
-    echo "Creating .cargo/config.toml"
+    # echo "Creating .cargo/config.toml"
     mkdir -p .config
     cat >> .config/config.tml <<EOF
 [target.armv7-unknown-linux-musleabihf]
@@ -31,5 +30,5 @@ linker = "$script_dir/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf-
 EOF
 fi
 
-# Build
-cargo build --target armv7-unknown-linux-musleabihf --release
+echo 'Add `--target armv7-unknown-linux-musleabihf` to cross compile your program. For example,'
+echo 'cargo build --target armv7-unknown-linux-musleabihf'
