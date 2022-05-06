@@ -65,7 +65,7 @@ clean_zpt_binary:
 build_sync_remove_zenohd:
 	git clone https://github.com/eclipse-zenoh/zenoh.git
 	cd zenoh && git checkout 90539129b1a7c9e8c7d7daaa84138d093f71fedf
-	cd zenoh/zenohd && cp ../../../build_pub_sub_worker.sh ./ && ./build_pub_sub_worker
+	cd zenoh/zenohd && cp ../../../build_pub_sub_worker.sh ./ && ./build_pub_sub_worker.sh
 
 
 run_zenohd:
