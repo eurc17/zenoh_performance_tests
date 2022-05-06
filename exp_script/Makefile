@@ -6,19 +6,22 @@ all: sync_zpt_binary
 
 sync_zpt_binary: build_arm
 # For Zenoh-2
-	rsync -aPz -e "ssh -p 44001" ./zenoh_performance_tests:pi@192.168.1.102:~/
-#	rsync -aPz -e "ssh -p 44002" ./zenoh_performance_tests:pi@192.168.1.102:~/
-#	rsync -aPz -e "ssh -p 44003" ./zenoh_performance_tests:pi@192.168.1.102:~/
-#	rsync -aPz -e "ssh -p 44004" ./zenoh_performance_tests:pi@192.168.1.102:~/
-	rsync -aPz -e "ssh -p 44005" ./zenoh_performance_tests:pi@192.168.1.102:~/
-#	rsync -aPz -e "ssh -p 44006" ./zenoh_performance_tests:pi@192.168.1.102:~/
+	rsync -aPz -e "ssh -p 44001" ../../zenoh_performance_tests pi@192.168.1.102:~/
+#	rsync -aPz -e "ssh -p 44002" ../../zenoh_performance_tests pi@192.168.1.102:~/
+#	rsync -aPz -e "ssh -p 44003" ../../zenoh_performance_tests pi@192.168.1.102:~/
+#	rsync -aPz -e "ssh -p 44004" ../../zenoh_performance_tests pi@192.168.1.102:~/
+	rsync -aPz -e "ssh -p 44005" ../../zenoh_performance_tests pi@192.168.1.102:~/
+#	rsync -aPz -e "ssh -p 44006" ../../zenoh_performance_tests pi@192.168.1.102:~/
 # For Zenoh-3
-	rsync -aPz -e "ssh -p 44001" ./zenoh_performance_tests:pi@192.168.1.103:~/
-	rsync -aPz -e "ssh -p 44002" ./zenoh_performance_tests:pi@192.168.1.103:~/
-	rsync -aPz -e "ssh -p 44003" ./zenoh_performance_tests:pi@192.168.1.103:~/
-	rsync -aPz -e "ssh -p 44004" ./zenoh_performance_tests:pi@192.168.1.103:~/
-	rsync -aPz -e "ssh -p 44005" ./zenoh_performance_tests:pi@192.168.1.103:~/
-#	rsync -aPz -e "ssh -p 44006" ./zenoh_performance_tests:pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44001" ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44002" ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44003" ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44004" ../../zenoh_performance_tests pi@192.168.1.103:~/
+	rsync -aPz -e "ssh -p 44005" ../../zenoh_performance_tests pi@192.168.1.103:~/
+#	rsync -aPz -e "ssh -p 44006" ../../zenoh_performance_tests pi@192.168.1.103:~/
+
+sync_zenohd_binary: build_zenohd_arm
+	rsync -aPz ./zenoh/target/armv7-unknown-linux-gnueabihf/release/zenohd pi@192.168.1.121:~/
 
 
 build_zenohd_arm: .clone_zenoh_repo
