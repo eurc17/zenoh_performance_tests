@@ -44,7 +44,7 @@ stop_zenohd:
 	ssh pi@192.168.1.121 "pkill zenohd"
 
 build_arm: .setup_repo
-	cd ../pub-sub-worker && cargo build --target armv7-unknown-linux-gnueabihf --release --all
+	cd ../pub-sub-worker && cargo build --target armv7-unknown-linux-gnueabihf --release
 
 .setup_repo:
 	cd ../ && git checkout thoughput-latency
