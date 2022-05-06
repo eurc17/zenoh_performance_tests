@@ -43,7 +43,15 @@ run_zenohd:
 stop_zenohd:
 	ssh pi@192.168.1.121 "pkill zenohd"
 
-build_arm: .setup_repo
+build_arm:
+	cd ../ && docker run --rm -it \
+	--env BINDGEN_EXTRA_CLANG_ARGS="--sysroot=/usr/arm-linux-gnueabihf -D__ARM_PCS_VFP -mfpu=vfp -mfloat-abi=hard" \
+	--env CARGO_HOME=/home/rust/src/cargo_home \
+	-v "$(pwd)":/home/rust/src eurc17/rpi-cross \
+	cargo build --target=armv7-unknown-linux-gnueabihf --release --all
+	cd ../ && chown -R ${USER}:${USER} ./target/
+
+build_arm_local: .setup_repo
 	cd ../pub-sub-worker && cargo build --target armv7-unknown-linux-gnueabihf --release
 
 .setup_repo:
