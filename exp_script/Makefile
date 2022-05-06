@@ -47,7 +47,7 @@ build_zenohd_arm: .clone_zenoh_repo
 	cd zenoh && cargo build --target armv7-unknown-linux-gnueabihf --release --all
 
 build_arm: .setup_repo
-	cd ../ && cargo build --target armv7-unknown-linux-gnueabihf --release --all
+	cd ../pub-sub-worker && cargo build --target armv7-unknown-linux-gnueabihf --release --all
 
 .setup_repo:
 	cd ../ && git checkout thoughput-latency
