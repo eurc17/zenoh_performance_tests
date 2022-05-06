@@ -62,6 +62,11 @@ clean_zpt_binary:
 	ssh -p 44005 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 	ssh -p 44006 pi@192.168.1.103 "rm -r zenoh_performance_tests || true"
 
+build_sync_remove_zenohd:
+	git clone https://github.com/eclipse-zenoh/zenoh.git
+	cd zenoh && git checkout 90539129b1a7c9e8c7d7daaa84138d093f71fedf
+	cd zenoh/zenohd && cp ../build_pub_sub_worker ./ && ./build_pub_sub_worker
+
 
 run_zenohd:
 	ssh pi@192.168.1.121 "RUST_LOG=info zenohd" &
