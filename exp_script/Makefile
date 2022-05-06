@@ -71,11 +71,13 @@ build_sync_remove_zenohd:
 
 
 run_zenohd:
+	$(eval GT := $(shell echo "File_exists"))
 	$(eval TMP := $(shell ssh -q pi@192.168.1.121 [[ -f /home/pi/zenohd ]] && echo "File_exists" || echo "";))
-ifeq ($(TMP), File_exists)
+ifeq ($(TMP), $(GT))
 	echo $(TMP)
 else
 	echo "Not exists"
+	@make build_sync_remove_zenohd
 endif
 #	ssh pi@192.168.1.121 "RUST_LOG=debug bash /home/pi/zenohd" &
 
