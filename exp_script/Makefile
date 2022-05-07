@@ -99,8 +99,8 @@ execute_exp_small_cross_net: run_zenohd
 	$(eval LOG_TXT_NAME = log_exp_$(LOG_TIME).txt)
 	$(eval LOG_DIR_NAME = log_exp_$(LOG_TIME))
 
-	ssh -p 44001 pi@192.168.1.102 "cd zenoh_performance_tests && RUST_LOG=debug python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 0 -r 1 --locators tcp/192.168.1.121:7447 --pub_interval 40 >> $(LOG_TXT_NAME) 2>&1" &
-	ssh -p 44001 pi@192.168.1.103 "cd zenoh_performance_tests && RUST_LOG=debug python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 1 -r 1 --locators tcp/192.168.1.121:7447 --pub_interval 40 >> $(LOG_TXT_NAME) 2>&1"
+	ssh -p 44001 pi@192.168.1.102 "cd zenoh_performance_tests && RUST_LOG=debug python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 0 -r 1 --locators tcp/192.168.1.121:7447 --pub_interval 50 >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44001 pi@192.168.1.103 "cd zenoh_performance_tests && RUST_LOG=debug python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 1 -r 1 --locators tcp/192.168.1.121:7447 --pub_interval 50 >> $(LOG_TXT_NAME) 2>&1"
 	@echo "Experiment finished, killing zenohd in 5 seconds..."
 	sleep 5
 	ssh pi@192.168.1.121 "pkill zenohd"
