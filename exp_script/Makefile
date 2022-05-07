@@ -212,6 +212,85 @@ execute_exp_full_cross_net: run_zenohd
 
 	@echo "Finished syncing results from pis"
 
+execute_exp_full_cross_net_no_rust_log: run_zenohd
+	sleep 5
+	$(eval LOG_TIME = $(shell date +"%Y-%m-%d-%T" ))
+	$(eval LOG_TXT_NAME = log_exp_$(LOG_TIME).txt)
+	$(eval LOG_DIR_NAME = log_exp_$(LOG_TIME))
+
+	ssh -p 44001 pi@192.168.1.102 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 0 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44002 pi@192.168.1.102 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 1 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44003 pi@192.168.1.102 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 2 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44004 pi@192.168.1.102 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 3 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44005 pi@192.168.1.102 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 4 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44006 pi@192.168.1.102 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 5 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+
+
+	ssh -p 44001 pi@192.168.1.103 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 6 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44002 pi@192.168.1.103 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 7 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44003 pi@192.168.1.103 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 8 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44004 pi@192.168.1.103 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 9 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44005 pi@192.168.1.103 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 10 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1" &
+	ssh -p 44006 pi@192.168.1.103 "cd zenoh_performance_tests && RUST_LOG='' python3 ./src/test_payload_ind_sleepuntil.py -o ./test/payload/$(LOG_DIR_NAME)/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 11 -r 11 --locators tcp/192.168.1.121:7447 --pub_interval 50 --payload_config ./scripts/exp_payload_list.txt >> $(LOG_TXT_NAME) 2>&1"
+	@echo "Experiment finished, killing zenohd in 5 seconds..."
+	sleep 5
+	ssh pi@192.168.1.121 "pkill zenohd"
+	@echo "Killed zenohd on zenoh router."
+
+# Create directory to store experiment results
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-2-1/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44001" pi@192.168.1.102:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44001" pi@192.168.1.102:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-2-2/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44002" pi@192.168.1.102:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44002" pi@192.168.1.102:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-2-3/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44003" pi@192.168.1.102:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44003" pi@192.168.1.102:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-2-4/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44004" pi@192.168.1.102:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44004" pi@192.168.1.102:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-2-5/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44005" pi@192.168.1.102:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44005" pi@192.168.1.102:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-2-6/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44006" pi@192.168.1.102:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44006" pi@192.168.1.102:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+
+
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-3-1/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44001" pi@192.168.1.103:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44001" pi@192.168.1.103:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-3-2/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44002" pi@192.168.1.103:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44002" pi@192.168.1.103:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-3-3/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44003" pi@192.168.1.103:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44003" pi@192.168.1.103:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-3-4/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44004" pi@192.168.1.103:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44004" pi@192.168.1.103:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-3-5/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44005" pi@192.168.1.103:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44005" pi@192.168.1.103:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+	$(eval LOCAL_DIR_NAME = ./exp_logs/zenoh-3-6/$(LOG_DIR_NAME))
+	mkdir -p $(LOCAL_DIR_NAME)
+	rsync -aPz -e "ssh -p 44006" pi@192.168.1.103:~/zenoh_performance_tests/test $(LOCAL_DIR_NAME)/
+	rsync -aPz -e "ssh -p 44006" pi@192.168.1.103:~/zenoh_performance_tests/$(LOG_TXT_NAME) $(LOCAL_DIR_NAME)/
+
+	@echo "Finished syncing results from pis"
+
 
 
 build_arm: .setup_repo
