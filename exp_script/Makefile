@@ -77,6 +77,22 @@ run_zenohd:
 stop_zenohd:
 	ssh pi@192.168.1.121 "pkill zenohd"
 
+install_sleepuntil_on_pis:
+# For Zenoh-2
+	ssh -p 44001 pi@192.168.1.102 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44002 pi@192.168.1.102 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44003 pi@192.168.1.102 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44004 pi@192.168.1.102 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44005 pi@192.168.1.102 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44006 pi@192.168.1.102 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+# For Zenoh-3
+	ssh -p 44001 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44002 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44003 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44004 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44005 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	ssh -p 44006 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
+	
 execute_exp_small_cross_net: run_zenohd
 	sleep 5
 	$(eval LOG_TIME = $(shell date +"%Y-%m-%d-%T" ))
