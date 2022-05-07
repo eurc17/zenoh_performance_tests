@@ -1,4 +1,4 @@
-.PHONY: build clean list
+.PHONY: build clean list sync_zpt_binary clean_zpt_binary build_sync_remove_zenohd run_zenohd stop_zenohd build_arm
 
 EMPTY_TARGETS = .setup_repo .clone_zenoh_repo
 
