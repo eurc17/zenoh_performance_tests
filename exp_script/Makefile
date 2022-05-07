@@ -106,6 +106,16 @@ execute_exp_small_cross_net: run_zenohd
 	ssh pi@192.168.1.121 "pkill zenohd"
 	@echo "Killed zenohd on zenoh router."
 
+# Create directory to store experiment results
+	mkdir -p ./exp_logs/zenoh-2-1/$(LOG_DIR_NAME)
+	rsync -aPz "ssh -p 44001" pi@192.168.1.102:~/zenoh_performance_tests/test ./exp_logs/zenoh-2-1/$(LOG_DIR_NAME)
+	rsync -aPz "ssh -p 44001" pi@192.168.1.102:~/zenoh_performance_tests/$(LOG_TXT_NAME) ./exp_logs/zenoh-2-1/$(LOG_DIR_NAME)
+	mkdir -p ./exp_logs/zenoh-3-1/$(LOG_DIR_NAME)
+	rsync -aPz "ssh -p 44001" pi@192.168.1.103:~/zenoh_performance_tests/test ./exp_logs/zenoh-3-1/$(LOG_DIR_NAME)
+	rsync -aPz "ssh -p 44001" pi@192.168.1.103:~/zenoh_performance_tests/$(LOG_TXT_NAME) ./exp_logs/zenoh-3-1/$(LOG_DIR_NAME)
+	@echo "Finished syncing results from pis"
+
+
 
 build_arm: .setup_repo
 	../build_pub_sub_worker.sh
