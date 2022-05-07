@@ -9,7 +9,7 @@ pub use pretty_env_logger;
 pub use rayon::prelude::*;
 pub use serde::{Deserialize, Serialize};
 pub use std::convert::TryInto;
-pub use std::{sync::*, time::*};
+pub use std::{cmp::Ordering::*, iter, sync::*, time::*};
 pub use tokio;
 pub use zenoh::config::*;
 pub use zenoh::net::link::EndPoint;
