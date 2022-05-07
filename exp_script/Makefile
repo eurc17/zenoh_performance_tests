@@ -92,7 +92,7 @@ install_sleepuntil_on_pis:
 	ssh -p 44004 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
 	ssh -p 44005 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
 	ssh -p 44006 pi@192.168.1.103 "sh -c 'rm -rf sleepuntil && git clone https://github.com/tamentis/sleepuntil.git && cd sleepuntil && ./configure && make && sudo make install'"
-	
+
 execute_exp_small_cross_net: run_zenohd
 	sleep 5
 	$(eval LOG_TIME = $(shell date +"%Y-%m-%d-%T" ))
