@@ -71,7 +71,7 @@ build_sync_remove_zenohd:
 
 
 run_zenohd:
-	$(eval LOG_TIME = log_exp_$(shell date +"%D-%T" ).txt)
+	$(eval LOG_TIME = log_exp_$(shell date +"%Y-%m-%d-%T" ).txt)
 	ssh pi@192.168.1.121 "RUST_LOG=debug /home/pi/zenohd >> $(LOG_TIME) 2>&1" &
 
 stop_zenohd:
@@ -79,7 +79,7 @@ stop_zenohd:
 
 execute_exp_small_cross_net: run_zenohd
 	sleep 5
-	$(eval LOG_TIME = log_exp_$(shell date +"%D-%T" ).txt)
+	$(eval LOG_TIME = log_exp_$(shell date +"%Y-%m-%d-%T" ).txt)
 	ssh -p 44001 pi@192.168.1.102 "RUST_LOG=debug python3 ./zenoh_performance_tests/src/test_payload_ind_sleepuntil.py -o ./test/payload/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 0 -r 1 --locators tcp/192.168.1.121:7447 >> $(LOG_TIME) 2>&1" &
 	ssh -p 44001 pi@192.168.1.103 "RUST_LOG=debug python3 ./zenoh_performance_tests/src/test_payload_ind_sleepuntil.py -o ./test/payload/ -a 8 -e 8 -s 10 -m 1000000 -n 1 -t 5000 -i 5000 --peer_id_start 1 -r 1 --locators tcp/192.168.1.121:7447 >> $(LOG_TIME) 2>&1"
 	@echo "Experiment finished, killing zenohd in 5 seconds..."
