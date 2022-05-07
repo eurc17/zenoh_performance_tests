@@ -76,6 +76,10 @@ run_zenohd:
 stop_zenohd:
 	ssh pi@192.168.1.121 "pkill zenohd"
 
+run_exp_small_cross_net:
+	$(eval LOG_TIME = log_exp_$(shell date +"%D-%T" ).txt)
+	ssh -p 44001 pi@192.168.1.102 sh -c "python3 ./zenoh_performance_tests/src/test_payload_ind_sleepuntil.py -h 2>&1 $(LOG_TIME) &"
+
 
 build_arm: .setup_repo
 	../build_pub_sub_worker.sh
