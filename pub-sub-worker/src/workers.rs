@@ -145,7 +145,7 @@ pub async fn publish_worker(
         }
         start_sending = Instant::now() - start;
         info!("start sending messages");
-        for _msg_id in 0..num_msgs_per_peer {
+        for msg_id in 0..num_msgs_per_peer {
             zenoh
                 .put(format!("/demo/example/{}", peer_id), &*msg_payload)
                 .await
@@ -156,7 +156,9 @@ pub async fn publish_worker(
                 warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
                 break;
             }
-            async_std::task::sleep(Duration::from_millis(args.pub_interval)).await;
+            if msg_id % 200 == 0 {
+                async_std::task::sleep(Duration::from_millis(args.pub_interval)).await;
+            }
         }
         after_sending = Instant::now() - start;
     }
