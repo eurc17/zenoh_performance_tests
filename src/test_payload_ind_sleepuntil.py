@@ -46,7 +46,7 @@ def main(args):
         disable_string = "--sub_disable"
     else:
         disable_string = ""
-    if args.log_range:
+    if args.log_range and args.payload_config == "":
         payload_size = args.payload_size_start
         while payload_size < args.payload_size_end + 1:
             if sleep_until == "" or True:
@@ -78,10 +78,19 @@ def main(args):
             time.sleep(1)
             payload_size *= args.payload_size_step
     else:
-
-        for payload_size in range(
+        payload_sizes = range(
             args.payload_size_start, args.payload_size_end + 1, args.payload_size_step
-        ):
+        )
+        if args.payload_config:
+            if os.path.exists(args.payload_config) and os.path.isfile(
+                args.payload_config
+            ):
+                with open(args.payload_config) as f:
+                    lines = f.readlines()
+                    payload_sizes = list(map(lambda x: int(x), lines[0].split(" ")))
+                    print("payload_sizes = ", payload_sizes)
+
+        for payload_size in payload_sizes:
             if sleep_until == "" or True:
                 actual_program_timeout = program_timeout + get_sleep()
             else:
@@ -225,6 +234,12 @@ if __name__ == "__main__":
         type=int,
         help="The interval between publishing messages Unit: ms",
         default=1,
+    )
+    parser.add_argument(
+        "--payload_config",
+        type=str,
+        help="Path to the txt file that specifies payload sizes to try. It will override the payload size specified in python args.",
+        default="",
     )
 
     args = parser.parse_args()
