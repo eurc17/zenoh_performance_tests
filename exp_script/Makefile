@@ -71,7 +71,8 @@ build_sync_remove_zenohd:
 
 
 run_zenohd:
-	ssh pi@192.168.1.121 "RUST_LOG=debug /home/pi/zenohd" &
+	$(eval LOG_TIME = log_exp_$(shell date +"%D-%T" ).txt)
+	ssh pi@192.168.1.121 "RUST_LOG=debug /home/pi/zenohd >> $(LOG_TIME) 2>&1" &
 
 stop_zenohd:
 	ssh pi@192.168.1.121 "pkill zenohd"
