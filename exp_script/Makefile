@@ -78,7 +78,7 @@ stop_zenohd:
 
 run_exp_small_cross_net:
 	$(eval LOG_TIME = log_exp_$(shell date +"%D-%T" ).txt)
-	ssh -p 44001 pi@192.168.1.102 "python3 ./zenoh_performance_tests/src/test_payload_ind_sleepuntil.py -h >> $(LOG_TIME) 2>&1 &"
+	ssh -p 44001 pi@192.168.1.102 "python3 ./zenoh_performance_tests/src/test_payload_ind_sleepuntil.py -h >> $(LOG_TIME) 2>&1" &
 
 
 build_arm: .setup_repo
