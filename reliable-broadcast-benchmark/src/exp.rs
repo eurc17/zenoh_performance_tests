@@ -10,7 +10,6 @@ const KEY: &str = "/demo/example";
 
 pub async fn run(config: &Cli) -> Result<PeerResult, Error> {
     assert!(!config.pub_sub_separate, "pub_sub_separate must be false");
-    let start_time = config.start_time_from_now();
 
     let session = {
         let mut zn_config = zn::config::default();
@@ -38,6 +37,7 @@ pub async fn run(config: &Cli) -> Result<PeerResult, Error> {
     .build(session.clone(), KEY)
     .await?;
 
+    let start_time = config.start_time_from_now();
     let producer_future = producer(config, start_time, sender);
     let consumer_future = consumer(config, start_time, stream);
     let ((), report) = futures::try_join!(producer_future, consumer_future)?;
@@ -56,6 +56,7 @@ async fn producer(config: &Cli, start_time: Instant, sender: rb::Sender<Msg>) ->
         ..
     } = *config;
     let publish_interval = config.publish_interval();
+    let test_timeout = config.test_timeout();
     let msg = {
         let payload = get_msg_payload(payload_size, peer_id as u64);
         Msg(payload)
@@ -65,6 +66,12 @@ async fn producer(config: &Cli, start_time: Instant, sender: rb::Sender<Msg>) ->
 
     stream::once(future::ready(()))
         .chain(interval(publish_interval))
+        .take_until({
+            async move {
+                sleep(test_timeout).await;
+                // debug!("peer {} timeout", config.peer_id);
+            }
+        })
         .take(num_msgs_per_peer)
         .enumerate()
         .map(ZOk)
@@ -78,6 +85,8 @@ async fn producer(config: &Cli, start_time: Instant, sender: rb::Sender<Msg>) ->
             }
         })
         .await?;
+
+    debug!("peer {} producer finished", peer_id);
 
     Ok(())
 }
@@ -105,8 +114,8 @@ async fn consumer(
     let mut stream = stream
         .take_until({
             async move {
-                sleep(test_timeout).await;
-                debug!("peer {} timeout", config.peer_id);
+                sleep_until(start_time + test_timeout).await;
+                // debug!("peer {} timeout", config.peer_id);
             }
         })
         .boxed();
@@ -174,6 +183,8 @@ async fn consumer(
             }
         })
         .collect();
+
+    debug!("peer {} consumer finished", config.peer_id);
 
     Ok(PeerResult {
         short_config: Some(config.into()),

@@ -21,11 +21,11 @@ do
         
 
         # the command executed on remote
-        cmd_file="$remote_dir/rb_${log_time}_${psize}.cmd"
         stdout_file="$remote_dir/rb_${log_time}_${psize}.stdout"
         stderr_file="$remote_dir/rb_${log_time}_${psize}.stderr"
         
         cmd="$remote_dir/rb_bench_script/sleep_until.py $start_time && \
+             export RUST_LOG=reliable_broadcast=debug,reliable_broadcast_benchmark=debug && \
              $program $args > $stdout_file 2> $stderr_file"
         
         # run command on remote
