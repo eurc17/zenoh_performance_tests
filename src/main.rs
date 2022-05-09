@@ -56,6 +56,13 @@ pub struct Cli {
     /// Used to notify subscribers to receive messages from remote peers.
     /// Note that the num_msgs_per_peer needs to be the same on both remote and local machines
     remote_pub_peers: usize,
+    #[clap(long, default_value = "1")]
+    /// The interval between the messages published by publisher. (Unit: ms)
+    pub pub_interval: u64,
+    #[clap(long, default_value = "0")]
+    /// The frequency to add the pub_interval. (Unit: messages/times)
+    /// If not specified, it is turned off. (Not pub_interval will be used)
+    pub pub_interval_freq: usize,
 }
 #[async_std::main]
 async fn main() {
