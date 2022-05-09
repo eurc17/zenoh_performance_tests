@@ -51,6 +51,13 @@ pub struct Cli {
     remote_pub_peers: usize,
     #[clap(short = 'd', long, default_value = "0")]
     delay_startup: u64,
+    #[clap(long, default_value = "1")]
+    /// The interval between the messages published by publisher. (Unit: ms)
+    pub pub_interval: u64,
+    #[clap(long, default_value = "0")]
+    /// The frequency to add the pub_interval. (Unit: messages/times)
+    /// If not specified, it is turned off. (Not pub_interval will be used)
+    pub pub_interval_freq: usize,
 }
 
 #[async_std::main]
