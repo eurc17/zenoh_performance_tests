@@ -1,3 +1,6 @@
+mod common;
+
+use common::*;
 use std::{iter, path::PathBuf};
 
 #[derive(Debug, Parser, Serialize, Deserialize, Clone)]
@@ -55,11 +58,56 @@ pub struct Cli {
     #[clap(long)]
     /// The flag that disables the subscriber
     pub sub_disable: bool,
+
+    // params for Reliable Broadcast
+    #[clap(long)]
+    /// Subscription mode for Zenoh
+    pub sub_mode: Option<SubMode>,
+    #[clap(long)]
+    /// Reliability QoS for Zenoh
+    pub reliability: Option<Reliability>,
+    #[clap(long)]
+    /// Congestion control QoS for Zenoh
+    pub congestion_control: Option<CongestionControl>,
+    #[clap(long)]
+    /// The waiting time to publish batched echo in milliseconds for RB
+    pub echo_interval: Option<u64>,
+    #[clap(long)]
+    /// The waiting time per round for RB
+    pub round_interval: Option<u64>,
+    #[clap(long)]
+    /// Max # of RB rounds
+    pub max_rounds: Option<usize>,
+    #[clap(long)]
+    /// # of extra rounds for RB
+    pub extra_rounds: Option<usize>,
 }
 
-mod common;
+impl Cli {
+    pub fn test_timeout(&self) -> Duration {
+        Duration::from_millis(self.round_timeout)
+    }
 
-use common::*;
+    pub fn round_interval(&self) -> Duration {
+        Duration::from_millis(self.round_interval.unwrap())
+    }
+
+    pub fn echo_interval(&self) -> Duration {
+        Duration::from_millis(self.echo_interval.unwrap())
+    }
+
+    pub fn publish_interval(&self) -> Duration {
+        (self.round_interval() * self.max_rounds.unwrap() as u32) + Duration::from_millis(50)
+    }
+
+    pub fn start_time_from_now(&self) -> Instant {
+        Instant::now() + Duration::from_millis(self.init_time)
+    }
+
+    pub fn total_msg_num(&self) -> usize {
+        (self.total_put_number + self.remote_pub_peers) * self.num_msgs_per_peer
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct PubTimeStatus {
@@ -79,6 +127,25 @@ pub struct ShortConfig {
     pub payload_size: usize,
     pub round_timeout: u64,
     pub init_time: u64,
+}
+
+impl<'a> From<&'a Cli> for ShortConfig {
+    fn from(cli: &'a Cli) -> Self {
+        Self {
+            peer_id: cli.peer_id,
+            total_put_number: cli.total_put_number,
+            num_msgs_per_peer: cli.num_msgs_per_peer,
+            payload_size: cli.payload_size,
+            round_timeout: cli.round_timeout,
+            init_time: cli.init_time,
+        }
+    }
+}
+
+impl From<Cli> for ShortConfig {
+    fn from(cli: Cli) -> Self {
+        (&cli).into()
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
@@ -138,11 +205,72 @@ pub struct TestResult {
     pub per_peer_result: Vec<PeerResult>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, strum::EnumString)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+pub enum CongestionControl {
+    Block,
+    Drop,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, strum::EnumString)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+pub enum SubMode {
+    Push,
+    Pull,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, strum::EnumString)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+pub enum Reliability {
+    BestEffort,
+    Reliable,
+}
+
+impl From<CongestionControl> for zenoh::publication::CongestionControl {
+    fn from(from: CongestionControl) -> Self {
+        type F = CongestionControl;
+
+        match from {
+            F::Block => Self::Block,
+            F::Drop => Self::Drop,
+        }
+    }
+}
+
+impl From<SubMode> for zenoh::subscriber::SubMode {
+    fn from(from: SubMode) -> Self {
+        type F = SubMode;
+
+        match from {
+            F::Push => Self::Push,
+            F::Pull => Self::Pull,
+        }
+    }
+}
+
+impl From<Reliability> for zenoh::subscriber::Reliability {
+    fn from(from: Reliability) -> Self {
+        type F = Reliability;
+
+        match from {
+            F::BestEffort => Self::BestEffort,
+            F::Reliable => Self::Reliable,
+        }
+    }
+}
+
 pub fn get_msg_payload(len: usize, peer_id: u64) -> Arc<[u8]> {
     iter::repeat(peer_id.to_le_bytes())
         .flatten()
         .take(len)
         .collect()
+}
+
+pub fn peer_id_from_payload(payload: &[u8]) -> u64 {
+    u64::from_le_bytes(payload[0..8].try_into().unwrap())
 }
 
 #[cfg(test)]
