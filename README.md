@@ -1,7 +1,7 @@
 # Zenoh Performance Tests
 
 This is a repository that contains the codes to test the performance of [Zenoh](https://zenoh.io/).  
-Currently (2022/03/14), the Zenoh version tested is 0.6.0-dev, rev="1b71ef9345629682e9eae125bd4a95c55794afe5".
+Currently (2022/05/09), the Zenoh version tested is 0.6.0-dev, rev="90539129b1a7c9e8c7d7daaa84138d093f71fedf".
 
 We use [psrecord](https://github.com/astrofrog/psrecord) to record the CPU and memory usage of the test program.
 
