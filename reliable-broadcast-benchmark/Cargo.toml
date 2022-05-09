@@ -1,0 +1,22 @@
+[package]
+name = "reliable-broadcast-benchmark"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.57"
+async-std = { version = "1.11.0", features = ["attributes"] }
+collected = "0.4.0"
+futures = "0.3.21"
+itertools = "0.10.3"
+pretty_env_logger = "0.4.0"
+serde = { version = "1.0.137", features = ["derive"] }
+serde_json = "1.0.81"
+zenoh = "0.6.0-dev.0"
+# output-config = { git = "https://github.com/jerry73204/zenoh_performance_tests.git", branch = "aeon/2022-05-05/unify-config" }
+output-config = { git = "https://github.com/eurc17/zenoh_performance_tests.git", branch = "thoughput-latency" }
+clap = "3.1.15"
+reliable-broadcast = { version = "0.1.0", path = "../reliable-broadcast" }
+rand = { version = "0.8.5", features = ["getrandom"] }
