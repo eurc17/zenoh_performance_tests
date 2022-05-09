@@ -279,7 +279,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Parse the result of running multiple zenoh-performance-test with increasing peer numbers. RUST_LOG=info must be set"
+        description="Parse the result of running multiple zenoh-performance-test with increasing payload_size."
     )
     parser.add_argument(
         "-o",
