@@ -10,10 +10,10 @@
 --payload-size PAYLOAD_SIZE \
 --output-dir OUTPUT_DIR \
 \
---round-interval 100 \
+--round-interval 40 \
 --echo-interval 20 \
 --max-rounds 3 \
 --extra-rounds 1 \
 --reliability reliable \
 --sub-mode push \
---congestion-control block
+--congestion-control drop
