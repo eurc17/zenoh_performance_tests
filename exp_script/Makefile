@@ -296,6 +296,9 @@ execute_exp_full_cross_net_no_rust_log: run_zenohd
 build_arm: .setup_repo
 	../build_pub_sub_worker.sh
 
+plot_results:
+	./plot_results.sh
+
 .setup_repo:
 	cd ../ && git checkout thoughput-latency
 	touch .setup_repo

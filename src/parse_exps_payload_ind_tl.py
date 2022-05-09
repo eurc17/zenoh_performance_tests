@@ -140,7 +140,7 @@ def plot(exp_dict, args):
             go.Scatter(
                 x=payload_list,
                 y=zenoh_total_throughput,
-                name="zenoh-3-average",
+                name="zenoh-total-average",
             )
         )
 
@@ -194,7 +194,7 @@ def plot(exp_dict, args):
             go.Scatter(
                 x=payload_list,
                 y=zenoh_total_latency,
-                name="zenoh-3-average",
+                name="zenoh-total-average",
             )
         )
         # Update layout
