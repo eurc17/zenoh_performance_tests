@@ -1,6 +1,8 @@
+use uhlc::HLC;
+
 use crate::{common::*, sender::Sender, state::State, stream::Event};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 /// Defines the structure of the config file.
 pub struct Config {
     /// The maximum number of rounds to run the reliable broadcast.
@@ -11,9 +13,9 @@ pub struct Config {
     pub round_timeout: Duration,
     /// The interval that publishes echo messages.
     pub echo_interval: Duration,
-    pub sub_mode: SubMode,
-    pub reliability: Reliability,
-    pub congestion_control: CongestionControl,
+    pub sub_mode: zenoh::subscriber::SubMode,
+    pub reliability: zenoh::subscriber::Reliability,
+    pub congestion_control: zenoh::publication::CongestionControl,
 }
 
 impl Config {
@@ -41,6 +43,10 @@ impl Config {
         }
 
         let key = key.into().to_owned();
+        if key.has_suffix() {
+            return Err(anyhow!("`key` must ends to '/'").into());
+        }
+
         let (commit_tx, commit_rx) = flume::unbounded();
 
         let state = Arc::new(State::<T> {
@@ -57,9 +63,10 @@ impl Config {
             round_timeout: self.round_timeout,
             echo_interval: self.echo_interval,
             commit_tx,
-            congestion_control: self.congestion_control.into(),
-            sub_mode: self.sub_mode.into(),
-            reliability: self.reliability.into(),
+            congestion_control: self.congestion_control,
+            sub_mode: self.sub_mode,
+            reliability: self.reliability,
+            hlc: HLC::default(),
         });
         let receiving_worker = state.clone().run_receiving_worker();
         let echo_worker = state.clone().run_echo_worker();
@@ -93,62 +100,5 @@ impl Config {
         };
 
         Ok((sender, stream))
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, strum::EnumString)]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
-pub enum CongestionControl {
-    Block,
-    Drop,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, strum::EnumString)]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
-pub enum SubMode {
-    Push,
-    Pull,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, strum::EnumString)]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
-pub enum Reliability {
-    BestEffort,
-    Reliable,
-}
-
-impl From<CongestionControl> for zn::publication::CongestionControl {
-    fn from(from: CongestionControl) -> Self {
-        type F = CongestionControl;
-
-        match from {
-            F::Block => Self::Block,
-            F::Drop => Self::Drop,
-        }
-    }
-}
-
-impl From<SubMode> for zn::subscriber::SubMode {
-    fn from(from: SubMode) -> Self {
-        type F = SubMode;
-
-        match from {
-            F::Push => Self::Push,
-            F::Pull => Self::Pull,
-        }
-    }
-}
-
-impl From<Reliability> for zn::subscriber::Reliability {
-    fn from(from: Reliability) -> Self {
-        type F = Reliability;
-
-        match from {
-            F::BestEffort => Self::BestEffort,
-            F::Reliable => Self::Reliable,
-        }
     }
 }

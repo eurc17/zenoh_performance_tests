@@ -4,6 +4,7 @@ use crate::{common::*, message::BroadcastId};
 pub struct Event<T> {
     pub result: Result<T, ConsensusError>,
     pub broadcast_id: BroadcastId,
+    pub latency: Duration,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
