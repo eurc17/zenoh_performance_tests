@@ -42,8 +42,8 @@ pub async fn run(config: &Cli) -> Result<PeerResult, Error> {
     let consumer_future = consumer(config, start_time, stream);
     let ((), report) = futures::try_join!(producer_future, consumer_future)?;
 
-    let session = Arc::try_unwrap(session).expect("please report bug");
-    session.close().await?;
+    // let session = Arc::try_unwrap(session).expect("please report bug");
+    // session.close().await?;
 
     Ok(report)
 }
@@ -68,11 +68,11 @@ async fn producer(config: &Cli, start_time: Instant, sender: rb::Sender<Msg>) ->
         .take(num_msgs_per_peer)
         .enumerate()
         .map(ZOk)
-        .try_fold(sender, move |sender, (_seq, ())| {
+        .try_fold(sender, move |sender, (seq, ())| {
             let msg = msg.clone();
 
             async move {
-                // eprintln!("{} sends seq={}", peer_id, seq);
+                debug!("peer {} sends seq={}", peer_id, seq);
                 sender.send(msg).await?;
                 ZOk(sender)
             }
@@ -106,7 +106,7 @@ async fn consumer(
         .take_until({
             async move {
                 sleep(test_timeout).await;
-                // eprintln!("{} timeout", peer_id);
+                debug!("peer {} timeout", config.peer_id);
             }
         })
         .boxed();
@@ -120,7 +120,7 @@ async fn consumer(
         }
     };
 
-    sleep_until(start_time).await;
+    // sleep_until(start_time).await;
 
     while let Some(event) = stream.try_next().await? {
         let rb::Event {

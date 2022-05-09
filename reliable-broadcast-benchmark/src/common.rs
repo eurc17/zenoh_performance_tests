@@ -10,6 +10,7 @@ pub use std::{
     time::{Duration, Instant},
 };
 pub use zenoh as zn;
+pub use log::debug;
 
 use std::error::Error as StdError;
 
