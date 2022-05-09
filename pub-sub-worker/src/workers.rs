@@ -109,8 +109,8 @@ pub async fn publish_worker(
             .into_iter()
             .map(|locator| EndPoint::from(locator))
             .collect::<Vec<_>>();
-        let listerner_config = ListenConfig { endpoints };
-        config.set_listen(listerner_config).unwrap();
+        let connect_config = ConnectConfig { endpoints };
+        config.set_connect(connect_config).unwrap();
         zenoh_new = zenoh::open(config).await.unwrap();
         session_start = Some(Instant::now());
         let curr_time = Instant::now();
@@ -251,8 +251,8 @@ pub async fn subscribe_worker(
             .into_iter()
             .map(|locator| EndPoint::from(locator))
             .collect::<Vec<_>>();
-        let listerner_config = ListenConfig { endpoints };
-        config.set_listen(listerner_config).unwrap();
+        let connect_config = ConnectConfig { endpoints };
+        config.set_connect(connect_config).unwrap();
         zenoh_new = zenoh::open(config).await.unwrap();
         session_start = Some(Instant::now());
         {
@@ -403,8 +403,8 @@ pub async fn pub_and_sub_worker(
         .into_iter()
         .map(|locator| EndPoint::from(locator))
         .collect::<Vec<_>>();
-    let listerner_config = ListenConfig { endpoints };
-    config.set_listen(listerner_config).unwrap();
+    let connect_config = ConnectConfig { endpoints };
+    config.set_connect(connect_config).unwrap();
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
     let pub_future = publish_worker(
