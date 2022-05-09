@@ -43,10 +43,6 @@ impl Config {
         }
 
         let key = key.into().to_owned();
-        if key.has_suffix() {
-            return Err(anyhow!("`key` must ends to '/'").into());
-        }
-
         let (commit_tx, commit_rx) = flume::unbounded();
 
         let state = Arc::new(State::<T> {

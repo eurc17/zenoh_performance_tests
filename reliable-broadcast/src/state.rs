@@ -55,7 +55,7 @@ where
         .into();
         let value: Value = serde_json::to_value(&msg)?.into();
         self.session
-            .put(self.key.clone().with_suffix(&self.my_id.to_string()), value)
+            .put(format!("{}/{}", self.key, self.my_id), value)
             .congestion_control(self.congestion_control)
             .kind(SampleKind::Put)
             .encoding(Encoding::TEXT_PLAIN)
@@ -168,7 +168,7 @@ where
     /// Start a worker that consumes input messages and handle each message accordingly.
     pub async fn run_receiving_worker(self: Arc<Self>) -> Result<(), Error> {
         let me = self.clone();
-        let subscriber_builder = me.session.subscribe(self.key.clone().with_suffix("**"));
+        let subscriber_builder = me.session.subscribe(format!("{}/**", self.key));
         let mut subscriber = subscriber_builder
             .reliability(self.reliability)
             .mode(self.sub_mode)

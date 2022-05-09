@@ -6,7 +6,7 @@ use output_config::{get_msg_payload, Cli, PeerResult, PubPeerResult};
 use reliable_broadcast as rb;
 use zn::config::{ConnectConfig, EndPoint};
 
-const KEY: &str = "/demo/example/";
+const KEY: &str = "/demo/example";
 
 pub async fn run(config: &Cli) -> Result<PeerResult, Error> {
     assert!(!config.pub_sub_separate, "pub_sub_separate must be false");
