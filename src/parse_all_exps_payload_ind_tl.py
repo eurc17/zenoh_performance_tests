@@ -10,7 +10,7 @@ def main(args):
         log_range_str = ""
     for zenoh_device_dir in sorted(glob.glob(args.input_dir + "/*/")):
         # print(zenoh_device_dir)
-        for exp_dir in sorted(glob.glob(zenoh_device_dir + "/*/test/payload/*/")):
+        for exp_dir in sorted(glob.glob(zenoh_device_dir + "/*/test/*/*/")):
             os.system(
                 "python3 ./src/parse_exps_payload_ind_tl.py -i "
                 + exp_dir
