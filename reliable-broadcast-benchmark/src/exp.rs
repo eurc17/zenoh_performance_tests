@@ -4,7 +4,7 @@ use crate::{common::*, msg::Msg, utils::sleep_until};
 use async_std::{stream::interval, task::sleep};
 use output_config::{get_msg_payload, Cli, PeerResult, PubPeerResult};
 use reliable_broadcast as rb;
-use zn::config::{EndPoint, ListenConfig};
+use zn::config::{ConnectConfig, EndPoint};
 
 const KEY: &str = "/demo/example/";
 
@@ -20,8 +20,7 @@ pub async fn run(config: &Cli) -> Result<PeerResult, Error> {
             .cloned()
             .map(EndPoint::from)
             .collect();
-        let listerner_config = ListenConfig { endpoints };
-        zn_config.set_listen(listerner_config).unwrap();
+        zn_config.set_connect(ConnectConfig { endpoints }).unwrap();
         zn_config.set_add_timestamp(Some(true)).unwrap();
         let session = zn::open(zn_config).await?;
         Arc::new(session)
