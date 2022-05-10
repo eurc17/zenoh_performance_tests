@@ -366,8 +366,8 @@ where
                 // error before max_roudns
                 Some((_, Err(err))) => {
                     debug!(
-                        "{} rejects the msg for broadcast_id {}",
-                        self.my_id, broadcast_id
+                        "{} rejects the msg for broadcast_id {} due to {:?}",
+                        self.my_id, broadcast_id, err
                     );
 
                     let event = Event {
@@ -381,7 +381,7 @@ where
                 // not accepted when reaching max_rounds
                 None => {
                     debug!(
-                        "{} rejects the msg for broadcast_id {}",
+                        "{} rejects the msg for broadcast_id {} due to reach max_round",
                         self.my_id, broadcast_id
                     );
 

@@ -7,6 +7,3 @@ ssh -p "$port" "pi@$addr" "mkdir -p ~/rb_exp"
 rsync -aPz -e "ssh -p $port" \
       "$script_dir/files/zenohd" \
       "pi@$addr:~/rb_exp/zenohd"
-
-# make sure zenohd is ready
-sleep 5
