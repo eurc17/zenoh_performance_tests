@@ -1,4 +1,5 @@
 #!/bin/false "This script should be sourced in a shell, not executed directly"
+set -e
 
 sleep_for='5 seconds'
 
@@ -7,7 +8,7 @@ do
     echo "Running test for payload_size=$psize"
     start_time=$(date --date="$sleep_for" +%s)
     
-    while read addr port peer_id
+    while read addr port peer_id name
     do
         # the binary program
         program="$remote_dir/target/release/$binary_name"

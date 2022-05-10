@@ -1,8 +1,8 @@
 #!/bin/false "This script should be sourced in a shell, not executed directly"
 set -e
 
-
-while read addr port peer_id; do
+while read addr port peer_id name
+do
     {
         # Remove remote dir
         # ssh -p "$port" "pi@$addr" "rm -rf $remote_dir"

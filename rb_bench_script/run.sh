@@ -15,5 +15,6 @@ source "$script_dir/steps/02_deploy_files.sh"
 source "$script_dir/steps/04_run_zenohd.sh"
 source "$script_dir/steps/06_run_test.sh"
 source "$script_dir/steps/05_kill_zenohd.sh"
+source "$script_dir/steps/07_download_logs.sh"
 
 popd

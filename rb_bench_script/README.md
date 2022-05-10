@@ -124,3 +124,11 @@ ssh -p 44001 pi@192.168.1.102 \
   'cd ~/rb-exp && cat $(ls rb_*_128.stderr | sort -r | head -n1)' | \
   grep -e accepts -e rejects
 ```
+
+## Troubleshooting
+
+If you encounter issues, try to use the following scripts to reset the
+environment on RPi.
+
+- `./kill_remote.sh` kills zenohd and orphan process on RPis.
+- `./clean_remote.sh` files on RPi devices, including log files.
