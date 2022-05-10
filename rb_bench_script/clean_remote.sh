@@ -6,5 +6,6 @@ source "$script_dir/steps/00_config.sh"
 
 while read addr port peer_id name
 do
-    ssh -p "$port" "pi@$addr" "rm -rf $remote_dir" </dev/null
+    ssh -p "$port" "pi@$addr" "rm -rf $remote_dir" </dev/null || \
+        echo "unable to connect to $addr:$ip"
 done < "$script_dir/config/rpi_addrs.txt"

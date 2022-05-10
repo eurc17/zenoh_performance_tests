@@ -3,9 +3,20 @@ set -e
 
 sleep_for='5 seconds'
 
+read router_addr router_port < "$script_dir/config/router_addr.txt"
+
+
 for psize in $payload_sizes
 do
     echo "Running test for payload_size=$psize"
+
+    # restart zenohd
+    zenohd_log_file="~/rb_exp/zenohd_${log_time}-${psize}.txt"
+    ssh -p "$router_port" "pi@$router_addr" "pkill zenohd || true"
+    ssh -p "$router_port" "pi@$router_addr" \
+        "bash -c 'env RUST_LOG=debug ~/rb_exp/zenohd --no-timestamp > ${zenohd_log_file} 2>&1 &'"
+
+    
     start_time=$(date --date="$sleep_for" +%s)
     
     while read addr port peer_id name
@@ -35,5 +46,4 @@ do
     done < "$script_dir/config/rpi_addrs.txt"
 
     wait
-    sleep 10
 done
