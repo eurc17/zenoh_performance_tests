@@ -9,7 +9,7 @@ do
         
         mkdir -p "$local_dir"
         rsync -aPz -e "ssh -p $port" \
-              "pi@$addr:$remote_output_dir" \
+              "pi@$addr:$remote_output_dir/" \
               "$local_dir"
     } &
 done < "$script_dir/config/rpi_addrs.txt"
