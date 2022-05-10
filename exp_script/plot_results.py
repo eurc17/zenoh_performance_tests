@@ -54,11 +54,10 @@ def parse_data(exp_json: Path):
 
 info_list = []
 data_list = []
-for log_dir in input_dir.glob('**/test/payload/*'):
-    for exp_json in log_dir.glob('exp_sub_*.json'):
-        info, data = parse_data(exp_json)
-        info_list.append(info)
-        data_list.append(data)
+for exp_json in input_dir.glob('**/test/payload/*/exp_sub_*.json'):
+    info, data = parse_data(exp_json)
+    info_list.append(info)
+    data_list.append(data)
 
 info_df = pd.concat(info_list, axis=0).sort_values(by=['payload', 'id'])
 data_df = pd.concat(data_list, axis=0)
