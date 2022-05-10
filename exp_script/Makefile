@@ -297,7 +297,7 @@ build_arm: .setup_repo
 	../build_pub_sub_worker.sh
 
 plot_results:
-	./plot_results.sh
+	./plot_results.py
 
 .setup_repo:
 	cd ../ && git checkout thoughput-latency
