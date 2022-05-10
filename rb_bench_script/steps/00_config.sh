@@ -19,8 +19,8 @@ zenoh_git_url="https://github.com/eclipse-zenoh/zenoh.git"
 zenoh_git_commit="90539129b1a7c9e8c7d7daaa84138d093f71fedf"
 
 ## Space-delimited payload sizes
-payload_sizes=$(cat "$script_dir/../scripts/exp_payload_list.txt")
-# payload_sizes="4096"
+# payload_sizes=$(cat "$script_dir/../scripts/exp_payload_list.txt")
+payload_sizes="128 256 512 1024 2048 4096 8192 16384"
 
 ## The RUST_LOG env set on RPi. It is intended for debug purpose.
 remote_rust_log=""
