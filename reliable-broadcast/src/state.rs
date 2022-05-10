@@ -64,12 +64,7 @@ where
     }
 
     /// Process an input broadcast.
-    fn handle_broadcast(
-        self: Arc<Self>,
-        sample: Sample,
-        tagged_timestamp: uhlc::Timestamp,
-        msg: Broadcast<T>,
-    ) {
+    fn handle_broadcast(self: Arc<Self>, sample: Sample, msg: Broadcast<T>) {
         // TODO: check timestamp
         // let peer_id = sample.source_info.source_id.unwrap();
         // let seq = sample.source_info.source_sn.unwrap();
@@ -102,7 +97,6 @@ where
                     broadcast_id,
                     acked_peers.clone(),
                     sample,
-                    tagged_timestamp,
                     msg.data,
                 ));
 
@@ -202,21 +196,8 @@ where
                 let me = self.clone();
 
                 async move {
-                    let sample_timestamp = sample.timestamp.ok_or_else(|| {
-                        Error::from(anyhow!("HLC feature must be enabled for Zenoh"))
-                    })?;
-                    let tagged_timestamp = {
-                        let ok = me.hlc.update_with_timestamp(&sample_timestamp).is_ok();
-                        if !ok {
-                            return Err(anyhow!("timestamp drifts too much").into());
-                        }
-                        me.hlc.new_timestamp()
-                    };
-
                     match msg {
-                        Message::Broadcast(msg) => {
-                            me.handle_broadcast(sample, tagged_timestamp, msg)
-                        }
+                        Message::Broadcast(msg) => me.handle_broadcast(sample, msg),
                         Message::Present(msg) => me.handle_present(sample, msg),
                         Message::Echo(msg) => me.handle_echo(sample, msg),
                     }
@@ -272,10 +253,20 @@ where
         broadcast_id: BroadcastId,
         acked_peers: Arc<DashSet<Uuid>>,
         sample: Sample,
-        tagged_timestamp: uhlc::Timestamp,
         data: T,
     ) {
         spawn(async move {
+            let get_latency = || {
+                let sample_timestamp = sample
+                    .timestamp
+                    .unwrap_or_else(|| panic!("HLC feature must be enabled for Zenoh"));
+
+                let ok = self.hlc.update_with_timestamp(&sample_timestamp).is_ok();
+                assert!(ok, "timestamp drifts too much");
+                let tagged_timestamp = self.hlc.new_timestamp();
+                tagged_timestamp.get_diff_duration(sample.timestamp.as_ref().unwrap())
+            };
+
             // TODO: determine start time from timestamp in broadcast message
             let mut interval = async_std::stream::interval(self.round_timeout);
 
@@ -336,8 +327,7 @@ where
                     let event = Event {
                         result: Ok(data),
                         broadcast_id,
-                        latency: tagged_timestamp
-                            .get_diff_duration(sample.timestamp.as_ref().unwrap()),
+                        latency: get_latency(),
                     };
                     let _ = self.commit_tx.send_async(event).await;
 
@@ -373,8 +363,7 @@ where
                     let event = Event {
                         result: Err(err),
                         broadcast_id,
-                        latency: tagged_timestamp
-                            .get_diff_duration(sample.timestamp.as_ref().unwrap()),
+                        latency: get_latency(),
                     };
                     let _ = self.commit_tx.send_async(event).await;
                 }
@@ -388,8 +377,7 @@ where
                     let event = Event {
                         result: Err(ConsensusError::ConsensusLost),
                         broadcast_id,
-                        latency: tagged_timestamp
-                            .get_diff_duration(sample.timestamp.as_ref().unwrap()),
+                        latency: get_latency(),
                     };
                     let _ = self.commit_tx.send_async(event).await;
                 }
