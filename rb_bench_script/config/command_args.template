@@ -2,15 +2,15 @@
 --remote-pub-peers 11 \
 --locators tcp/192.168.1.121:7447 \
 --init-time 5000 \
---num-msgs-per-peer 1000000 \
---round-timeout 5000 \
+--num-msgs-per-peer 30 \
+--round-timeout 10000 \
 --pub-interval 50 \
 \
 --peer-id PEER_ID \
 --payload-size PAYLOAD_SIZE \
 --output-dir OUTPUT_DIR \
 \
---round-interval 40 \
+--round-interval 50 \
 --echo-interval 20 \
 --max-rounds 3 \
 --extra-rounds 1 \
