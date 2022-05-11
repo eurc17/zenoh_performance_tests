@@ -38,7 +38,7 @@ do
 
         cmd="$remote_dir/rb_bench_script/sleep_until.py $start_time && \
              export RUST_LOG=${remote_rust_log} && \
-             $program $args > $stdout_file 2> $stderr_file"
+             timeout -s KILL $remote_timeout $program $args > $stdout_file 2> $stderr_file"
         
         # run command on remote
         ssh -p "$port" "pi@$addr" "sh -c \"$cmd\"" &
