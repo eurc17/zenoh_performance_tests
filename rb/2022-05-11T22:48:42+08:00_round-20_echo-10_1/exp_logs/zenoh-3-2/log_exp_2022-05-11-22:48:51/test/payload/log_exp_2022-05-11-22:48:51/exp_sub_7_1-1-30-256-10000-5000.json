@@ -1,0 +1,29 @@
+{
+  "short_config": {
+    "peer_id": 7,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 256,
+    "round_timeout": 10000,
+    "init_time": 5000
+  },
+  "peer_id": 7,
+  "receive_rate": 0.025,
+  "recvd_msg_num": 9,
+  "average_rb_rounds": 1.3333333333333333,
+  "expected_msg_num": 360,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 0.49498599756088885,
+      "average_latency_ms": 1206.5060270000001,
+      "average_rb_rounds": 1.2
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.39598879804871107,
+      "average_latency_ms": 1838.614781,
+      "average_rb_rounds": 1.5
+    }
+  ]
+}
