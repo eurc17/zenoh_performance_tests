@@ -46,6 +46,7 @@ pub async fn _demonstration_worker(
                 receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
                 recvd_msg_num: change_vec.len(),
                 expected_msg_num: total_msg_num,
+                average_rb_rounds: None,
                 result_vec: vec![],
             }
         })
@@ -363,6 +364,7 @@ pub async fn subscribe_worker(
                 key_expr,
                 throughput,
                 average_latency_ms,
+                average_rb_rounds: None,
             }
         })
         .collect::<Vec<_>>();
@@ -380,6 +382,7 @@ pub async fn subscribe_worker(
         receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
         recvd_msg_num: change_vec.len(),
         expected_msg_num: total_msg_num,
+        average_rb_rounds: None,
         result_vec,
     };
     let file_path = args.output_dir.join(format!(

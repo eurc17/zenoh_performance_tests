@@ -328,6 +328,7 @@ where
                         result: Ok(data),
                         broadcast_id,
                         latency: get_latency(),
+                        num_rounds: last_round + 1,
                     };
                     let _ = self.commit_tx.send_async(event).await;
 
@@ -354,7 +355,7 @@ where
                         .await;
                 }
                 // error before max_roudns
-                Some((_, Err(err))) => {
+                Some((last_round, Err(err))) => {
                     debug!(
                         "{} rejects the msg for broadcast_id {} due to {:?}",
                         self.my_id, broadcast_id, err
@@ -364,6 +365,7 @@ where
                         result: Err(err),
                         broadcast_id,
                         latency: get_latency(),
+                        num_rounds: last_round + 1,
                     };
                     let _ = self.commit_tx.send_async(event).await;
                 }
@@ -378,6 +380,7 @@ where
                         result: Err(ConsensusError::ConsensusLost),
                         broadcast_id,
                         latency: get_latency(),
+                        num_rounds: self.max_rounds,
                     };
                     let _ = self.commit_tx.send_async(event).await;
                 }

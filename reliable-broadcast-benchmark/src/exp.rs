@@ -105,6 +105,7 @@ async fn consumer(
     #[derive(Clone)]
     struct BroadcasterStat {
         pub num_msgs: usize,
+        pub total_rounds: usize,
         pub latencies: Vec<Duration>,
     }
 
@@ -133,7 +134,10 @@ async fn consumer(
 
     while let Some(event) = stream.try_next().await? {
         let rb::Event {
-            result, latency, ..
+            result,
+            latency,
+            num_rounds,
+            ..
         } = event;
 
         let msg = match result {
@@ -155,11 +159,13 @@ async fn consumer(
             E::Vacant(entry) => entry.insert(BroadcasterStat {
                 num_msgs: 0,
                 latencies: vec![],
+                total_rounds: 0,
             }),
         };
 
         peer_stat.num_msgs += 1;
         peer_stat.latencies.push(latency);
+        peer_stat.total_rounds += num_rounds;
 
         if stat.num_accepted == num_expected {
             break;
@@ -167,6 +173,12 @@ async fn consumer(
     }
 
     let elapsed_seconds = start_time.elapsed().as_secs_f64();
+    let average_rb_rounds = stat
+        .broadcasters
+        .values()
+        .map(|peer_stat| peer_stat.total_rounds)
+        .sum::<usize>() as f64
+        / stat.num_accepted as f64;
     let result_vec = stat
         .broadcasters
         .iter()
@@ -180,6 +192,7 @@ async fn consumer(
                 key_expr,
                 throughput,
                 average_latency_ms: average_latency.as_secs_f64() * 1000.0,
+                average_rb_rounds: Some(peer_stat.total_rounds as f64 / peer_stat.num_msgs as f64),
             }
         })
         .collect();
@@ -192,6 +205,7 @@ async fn consumer(
         receive_rate: stat.num_accepted as f64 / num_expected as f64,
         recvd_msg_num: stat.num_accepted,
         expected_msg_num: num_expected,
+        average_rb_rounds: Some(average_rb_rounds),
         result_vec,
     })
 }

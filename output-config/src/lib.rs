@@ -164,6 +164,7 @@ pub struct PubPeerResult {
     pub key_expr: String,
     pub throughput: f64,
     pub average_latency_ms: f64,
+    pub average_rb_rounds: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -193,6 +194,7 @@ pub struct PeerResult {
     pub peer_id: usize,
     pub receive_rate: f64,
     pub recvd_msg_num: usize,
+    pub average_rb_rounds: Option<f64>,
     pub expected_msg_num: usize,
     pub result_vec: Vec<PubPeerResult>,
 }
