@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 0,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 8192,
+    "round_timeout": 10000,
+    "init_time": 5000
+  },
+  "peer_id": 0,
+  "receive_rate": 0.99,
+  "recvd_msg_num": 297,
+  "average_rb_rounds": 1.0303030303030303,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 93.502742,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 100.704016,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 89.107519,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 88.849466,
+      "average_rb_rounds": 1.0333333333333334
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 100.422367,
+      "average_rb_rounds": 1.1333333333333333
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 2.699957537227821,
+      "average_latency_ms": 79.835813,
+      "average_rb_rounds": 1.1111111111111112
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 88.064016,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 98.820797,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 91.270113,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 2.999952819142023,
+      "average_latency_ms": 95.848659,
+      "average_rb_rounds": 1.0333333333333334
+    }
+  ]
+}
