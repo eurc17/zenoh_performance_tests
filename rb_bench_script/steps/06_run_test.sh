@@ -1,7 +1,7 @@
 #!/bin/false "This script should be sourced in a shell, not executed directly"
 set -e
 
-sleep_for='5 seconds'
+sleep_for='3 seconds'
 
 read router_addr router_port < "$script_dir/config/router_addr.txt"
 
@@ -12,11 +12,9 @@ do
 
     # restart zenohd
     zenohd_log_file="~/rb_exp/zenohd_${log_time}-${psize}.txt"
-    ssh -p "$router_port" "pi@$router_addr" "pkill zenohd || true"
     ssh -p "$router_port" "pi@$router_addr" \
         "bash -c 'env RUST_LOG=debug ~/rb_exp/zenohd --no-timestamp > ${zenohd_log_file} 2>&1 &'"
 
-    
     start_time=$(date --date="$sleep_for" +%s)
     
     while read addr port peer_id name
@@ -37,11 +35,11 @@ do
         stderr_file="$remote_dir/rb_${log_time}_${psize}.stderr"
 
         cmd="$remote_dir/rb_bench_script/sleep_until.py $start_time && \
-             export RUST_LOG=${remote_rust_log} && \
-             timeout -s KILL $remote_timeout $program $args > $stdout_file 2> $stderr_file"
+             export RUST_LOG='${remote_rust_log}' && \
+             timeout -s KILL '$remote_timeout' '$program' $args > '$stdout_file' 2> '$stderr_file'"
         
         # run command on remote
-        ssh -p "$port" "pi@$addr" "sh -c \"$cmd\"" &
+        timeout "$remote_timeout" ssh -p "$port" "pi@$addr" "$cmd" || echo "test failed on $addr:$port" &
         
     done < "$script_dir/config/rpi_addrs.txt"
 
