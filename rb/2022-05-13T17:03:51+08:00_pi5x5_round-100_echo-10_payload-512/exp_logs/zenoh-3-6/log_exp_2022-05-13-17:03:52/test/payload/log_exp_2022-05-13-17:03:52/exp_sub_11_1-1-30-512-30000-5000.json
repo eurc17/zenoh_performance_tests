@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 11,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 512,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 11,
+  "receive_rate": 0.9933333333333333,
+  "recvd_msg_num": 298,
+  "average_rb_rounds": 1.0100671140939597,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 484.799245,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 474.76865499999997,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 104.765625,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 104.623198,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 468.55118600000003,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 460.095967,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 484.207924,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 488.06998600000003,
+      "average_rb_rounds": 1.0333333333333334
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.99999620834771,
+      "average_latency_ms": 466.404222,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 0.9333297944578627,
+      "average_latency_ms": 172.45548499999998,
+      "average_rb_rounds": 1.0714285714285714
+    }
+  ]
+}

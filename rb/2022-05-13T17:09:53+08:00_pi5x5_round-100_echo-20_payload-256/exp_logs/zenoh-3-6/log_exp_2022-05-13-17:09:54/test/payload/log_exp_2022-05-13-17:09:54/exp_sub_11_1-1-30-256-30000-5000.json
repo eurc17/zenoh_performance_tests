@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 11,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 256,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 11,
+  "receive_rate": 0.9866666666666667,
+  "recvd_msg_num": 296,
+  "average_rb_rounds": 1.027027027027027,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.9999941737006126,
+      "average_latency_ms": 606.6278430000001,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.9999941737006126,
+      "average_latency_ms": 3333.771735,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.9999941737006126,
+      "average_latency_ms": 3321.933955,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.9999941737006126,
+      "average_latency_ms": 3278.9568999999997,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.9999941737006126,
+      "average_latency_ms": 3281.606062,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.9999941737006126,
+      "average_latency_ms": 3238.238365,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 0.9333278954539052,
+      "average_latency_ms": 402.084574,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.9666610345772589,
+      "average_latency_ms": 3070.3012049999998,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.9999941737006126,
+      "average_latency_ms": 3257.415986,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.9666610345772589,
+      "average_latency_ms": 3087.897118,
+      "average_rb_rounds": 1.2758620689655173
+    }
+  ]
+}

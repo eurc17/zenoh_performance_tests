@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 11,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 256,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 11,
+  "receive_rate": 0.9266666666666666,
+  "recvd_msg_num": 278,
+  "average_rb_rounds": 1.0215827338129497,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.9999951698233307,
+      "average_latency_ms": 341.20246199999997,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.9999951698233307,
+      "average_latency_ms": 347.249035,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.833329308186109,
+      "average_latency_ms": 185.856334,
+      "average_rb_rounds": 1.08
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.9999951698233307,
+      "average_latency_ms": 333.184951,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.9999951698233307,
+      "average_latency_ms": 363.668143,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.8666624805135533,
+      "average_latency_ms": 232.755965,
+      "average_rb_rounds": 1.0769230769230769
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.9999951698233307,
+      "average_latency_ms": 338.285071,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 0.8999956528409977,
+      "average_latency_ms": 21.736254,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.833329308186109,
+      "average_latency_ms": 186.913306,
+      "average_rb_rounds": 1.04
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.833329308186109,
+      "average_latency_ms": 185.77306900000002,
+      "average_rb_rounds": 1.04
+    }
+  ]
+}

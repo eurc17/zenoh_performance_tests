@@ -1,0 +1,71 @@
+{
+  "short_config": {
+    "peer_id": 10,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 4096,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 10,
+  "receive_rate": 0.6433333333333333,
+  "recvd_msg_num": 193,
+  "average_rb_rounds": 1.0414507772020725,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.9999950087249129,
+      "average_latency_ms": 37.458207,
+      "average_rb_rounds": 1.1
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.9999950087249129,
+      "average_latency_ms": 39.448642,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.9999950087249129,
+      "average_latency_ms": 39.330864,
+      "average_rb_rounds": 1.0666666666666667
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.36666483653246806,
+      "average_latency_ms": 33.069271,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.36666483653246806,
+      "average_latency_ms": 32.863505,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.9666618417674158,
+      "average_latency_ms": 36.530471,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.9999950087249129,
+      "average_latency_ms": 413.204409,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.36666483653246806,
+      "average_latency_ms": 34.399516,
+      "average_rb_rounds": 1.0909090909090908
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.36666483653246806,
+      "average_latency_ms": 33.712634,
+      "average_rb_rounds": 1.1818181818181819
+    }
+  ]
+}

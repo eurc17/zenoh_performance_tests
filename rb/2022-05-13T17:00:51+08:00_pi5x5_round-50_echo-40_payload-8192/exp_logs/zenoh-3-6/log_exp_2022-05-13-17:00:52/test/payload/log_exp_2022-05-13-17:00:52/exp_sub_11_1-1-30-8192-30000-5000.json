@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 11,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 8192,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 11,
+  "receive_rate": 0.9966666666666667,
+  "recvd_msg_num": 299,
+  "average_rb_rounds": 1.0735785953177257,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 543.935117,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 549.138038,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 562.859731,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 549.352412,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 515.806613,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.9666629410188036,
+      "average_latency_ms": 476.411276,
+      "average_rb_rounds": 1.2413793103448276
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 569.740129,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 574.918555,
+      "average_rb_rounds": 1.4
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 179.84563500000002,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 0.999996145881521,
+      "average_latency_ms": 79.10427200000001,
+      "average_rb_rounds": 1.1
+    }
+  ]
+}
