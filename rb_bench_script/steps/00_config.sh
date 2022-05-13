@@ -8,7 +8,7 @@ binary_name="reliable-broadcast-benchmark"
 log_time="$(date +'%Y-%m-%d-%T')"
 
 # Timeout for each test in seconds
-remote_timeout=30
+remote_timeout=40
 
 ## Base directory on RPi
 remote_dir="/home/pi/rb-exp"
