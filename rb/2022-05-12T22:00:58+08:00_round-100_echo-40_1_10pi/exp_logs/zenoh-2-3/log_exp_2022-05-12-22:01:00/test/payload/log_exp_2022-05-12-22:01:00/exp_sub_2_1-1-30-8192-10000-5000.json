@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 2,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 8192,
+    "round_timeout": 10000,
+    "init_time": 5000
+  },
+  "peer_id": 2,
+  "receive_rate": 0.9966666666666667,
+  "recvd_msg_num": 299,
+  "average_rb_rounds": 1.137123745819398,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 75.665308,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 2.8999677053796393,
+      "average_latency_ms": 108.362827,
+      "average_rb_rounds": 1.896551724137931
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 85.627795,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 65.78672200000001,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 78.776669,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 90.809609,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 80.687719,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 84.27444000000001,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 87.490557,
+      "average_rb_rounds": 1.2
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 2.999966591772041,
+      "average_latency_ms": 87.970685,
+      "average_rb_rounds": 1.3
+    }
+  ]
+}
