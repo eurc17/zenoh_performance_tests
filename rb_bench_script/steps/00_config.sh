@@ -23,8 +23,25 @@ zenoh_git_commit="90539129b1a7c9e8c7d7daaa84138d093f71fedf"
 
 ## Space-delimited payload sizes
 # payload_sizes=$(cat "$script_dir/../scripts/exp_payload_list.txt")
-payload_sizes="128 256 512 1024 2048 4096 8192"
+# payload_sizes="128 256 512 1024 2048 4096 8192"
+if [ -z "$psize" ]
+then
+    echo "'psize' is not set"
+    exit 1
+fi
+
+if [ -z "$rsize" ]
+then
+    echo "'rsize' is not set"
+    exit 1
+fi
+
+if [ -z "$esize" ]
+then
+    echo "'esize' is not set"
+    exit 1
+fi
 
 ## The RUST_LOG env set on RPi. It is intended for debug purpose.
-remote_rust_log=""
-# remote_rust_log="reliable_broadcast=debug,reliable_broadcast_benchmark=debug"
+# remote_rust_log=""
+remote_rust_log="reliable_broadcast=debug,reliable_broadcast_benchmark=debug"

@@ -19,7 +19,7 @@ do
               "$repo_dir/" \
               "pi@$addr:$remote_dir" 
 
-        ssh -p "$port" "pi@$addr" "cd $remote_dir && mkdir -p target/release"
+        ssh -p "$port" "pi@$addr" "cd $remote_dir && mkdir -p target/release" </dev/null
         
         rsync -aPz -e "ssh -p $port" \
               "$repo_dir/target/armv7-unknown-linux-musleabihf/release/$binary_name" \
