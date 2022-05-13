@@ -7,8 +7,10 @@ import json
 import os
 
 
-INPUT_DIR_FOR_THROUGHPUT = './baseline/exp_logs_05-10-16-57'
-INPUT_DIR_FOR_LATENCY = './baseline/exp_logs_200ms_sleep'
+#  INPUT_DIR_FOR_THROUGHPUT = './baseline/exp_logs_05-10-16-57'
+#  INPUT_DIR_FOR_LATENCY = './baseline/exp_logs_200ms_sleep'
+INPUT_DIR_FOR_THROUGHPUT = './baseline/exp_logs_baseline_5_5_best_throughput'
+INPUT_DIR_FOR_LATENCY = './baseline/exp_logs_baseline_5_5_best_latency'
 OUTPUT_DIR = 'analysis_baseline'
 png_dir = Path(OUTPUT_DIR) / 'png'
 svg_dir = Path(OUTPUT_DIR) / 'svg'
@@ -43,6 +45,9 @@ def load_data(exp_dir: str):
 
     #  convert throughput in MiB / sec
     df['throughput'] *= df['payload'] / 1024. / 1024.
+
+    # pick cases of payload size <= 8192
+    df = df[df['payload'] <= 8192]
 
     #  # convert latency in second
     #  df['latency'] /= 1000.
