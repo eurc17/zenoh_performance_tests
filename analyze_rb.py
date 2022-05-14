@@ -9,10 +9,73 @@ import os
 
 
 DIR_LIST = [
-    './rb/2022-05-11 16:52:16+08:00_round-50_echo-1',
+    #  './rb/2022-05-11 16:52:16+08:00_round-50_echo-1',
     #  './rb/2022-05-11 16:36:54+08:00_round-50_echo-20',
-    './rb/2022-05-11 16:57:56+08:00_round-100_echo-40',
-    './rb/2022-05-11 21:42:43+08:00_round-50_echo-20_1',
+    #  './rb/2022-05-11 16:57:56+08:00_round-100_echo-40',
+    #  './rb/2022-05-11 21:42:43+08:00_round-50_echo-20_1',
+    #  './rb/2022-05-12T19:24:29+08:00_round-20_echo-1_1',
+    #  './rb/2022-05-12T19:52:21+08:00_round-50_echo-20_1_10pi',
+    #  './rb/2022-05-12T19:55:09+08:00_round-50_echo-40_1_10pi',
+    #  './rb/2022-05-12T19:57:30+08:00_round-100_echo-20_1_10pi',
+    #  './rb/2022-05-12T22:00:58+08:00_round-100_echo-40_1_10pi',
+    #  './rb/2022-05-12T22:03:02+08:00_round-100_echo-50_1_10pi',
+    #  './rb/2022-05-12T22:05:18+08:00_round-30_echo-20_1_10pi',
+
+    './rb/2022-05-13T16:15:11+08:00_pi5x5_round-20_echo-10_payload-256',
+    './rb/2022-05-13T16:16:09+08:00_pi5x5_round-20_echo-10_payload-512',
+    './rb/2022-05-13T16:17:07+08:00_pi5x5_round-20_echo-10_payload-1024',
+    './rb/2022-05-13T16:18:04+08:00_pi5x5_round-20_echo-10_payload-2048',
+    './rb/2022-05-13T16:19:01+08:00_pi5x5_round-20_echo-10_payload-4096',
+    './rb/2022-05-13T16:20:59+08:00_pi5x5_round-30_echo-10_payload-128',
+    './rb/2022-05-13T16:21:56+08:00_pi5x5_round-30_echo-10_payload-256',
+    './rb/2022-05-13T16:23:29+08:00_pi5x5_round-30_echo-10_payload-1024',
+    './rb/2022-05-13T16:27:57+08:00_pi5x5_round-30_echo-20_payload-128',
+    './rb/2022-05-13T16:28:55+08:00_pi5x5_round-30_echo-20_payload-256',
+    './rb/2022-05-13T16:31:43+08:00_pi5x5_round-30_echo-20_payload-2048',
+    './rb/2022-05-13T16:32:55+08:00_pi5x5_round-30_echo-20_payload-4096',
+    './rb/2022-05-13T16:33:56+08:00_pi5x5_round-30_echo-20_payload-8192',
+    './rb/2022-05-13T16:34:54+08:00_pi5x5_round-50_echo-10_payload-128',
+    './rb/2022-05-13T16:35:55+08:00_pi5x5_round-50_echo-10_payload-256',
+    './rb/2022-05-13T16:36:53+08:00_pi5x5_round-50_echo-10_payload-512',
+    './rb/2022-05-13T16:37:52+08:00_pi5x5_round-50_echo-10_payload-1024',
+    './rb/2022-05-13T16:39:53+08:00_pi5x5_round-50_echo-10_payload-4096',
+    './rb/2022-05-13T16:40:53+08:00_pi5x5_round-50_echo-10_payload-8192',
+    './rb/2022-05-13T16:41:51+08:00_pi5x5_round-50_echo-20_payload-128',
+    './rb/2022-05-13T16:42:49+08:00_pi5x5_round-50_echo-20_payload-256',
+    './rb/2022-05-13T16:44:47+08:00_pi5x5_round-50_echo-20_payload-1024',
+    './rb/2022-05-13T16:46:20+08:00_pi5x5_round-50_echo-20_payload-4096',
+    './rb/2022-05-13T16:52:23+08:00_pi5x5_round-50_echo-30_payload-2048',
+    './rb/2022-05-13T16:53:00+08:00_pi5x5_round-50_echo-30_payload-4096',
+    './rb/2022-05-13T16:56:55+08:00_pi5x5_round-50_echo-40_payload-512',
+    './rb/2022-05-13T16:57:53+08:00_pi5x5_round-50_echo-40_payload-1024',
+    './rb/2022-05-13T16:58:52+08:00_pi5x5_round-50_echo-40_payload-2048',
+    './rb/2022-05-13T16:59:54+08:00_pi5x5_round-50_echo-40_payload-4096',
+    './rb/2022-05-13T17:00:51+08:00_pi5x5_round-50_echo-40_payload-8192',
+    './rb/2022-05-13T17:01:49+08:00_pi5x5_round-100_echo-10_payload-128',
+    './rb/2022-05-13T17:03:51+08:00_pi5x5_round-100_echo-10_payload-512',
+    './rb/2022-05-13T17:05:48+08:00_pi5x5_round-100_echo-10_payload-2048',
+    './rb/2022-05-13T17:07:54+08:00_pi5x5_round-100_echo-10_payload-8192',
+    './rb/2022-05-13T17:09:53+08:00_pi5x5_round-100_echo-20_payload-256',
+    './rb/2022-05-13T17:10:51+08:00_pi5x5_round-100_echo-20_payload-512',
+    './rb/2022-05-13T17:11:49+08:00_pi5x5_round-100_echo-20_payload-1024',
+    './rb/2022-05-13T17:12:46+08:00_pi5x5_round-100_echo-20_payload-2048',
+    './rb/2022-05-13T17:16:56+08:00_pi5x5_round-100_echo-30_payload-256',
+    './rb/2022-05-13T17:17:55+08:00_pi5x5_round-100_echo-30_payload-512',
+    './rb/2022-05-13T17:18:53+08:00_pi5x5_round-100_echo-30_payload-1024',
+    './rb/2022-05-13T17:19:51+08:00_pi5x5_round-100_echo-30_payload-2048',
+    './rb/2022-05-13T17:20:40+08:00_pi5x5_round-100_echo-30_payload-4096',
+    './rb/2022-05-13T17:22:38+08:00_pi5x5_round-100_echo-40_payload-128',
+    './rb/2022-05-13T17:23:36+08:00_pi5x5_round-100_echo-40_payload-256',
+    './rb/2022-05-13T17:24:36+08:00_pi5x5_round-100_echo-40_payload-512',
+    './rb/2022-05-13T17:28:23+08:00_pi5x5_round-100_echo-40_payload-8192',
+    './rb/2022-05-13T17:59:09+08:00_round-50_pi5x5_echo-5_payload-128',
+    './rb/2022-05-13T18:01:14+08:00_round-50_pi5x5_echo-5_payload-128',
+    './rb/2022-05-13T18:02:13+08:00_round-50_pi5x5_echo-5_payload-256',
+    './rb/2022-05-13T18:03:10+08:00_round-50_pi5x5_echo-5_payload-512',
+    './rb/2022-05-13T18:04:08+08:00_round-50_pi5x5_echo-5_payload-1024',
+    './rb/2022-05-13T18:06:08+08:00_round-50_pi5x5_echo-5_payload-4096',
+    './rb/2022-05-13T18:07:06+08:00_round-50_pi5x5_echo-5_payload-8192',
+    './rb/2022-05-13T18:08:34+08:00_round-50_pi5x5_echo-5_payload-2048',
 ]
 OUTPUT_DIR = 'analysis_rb'
 png_dir = Path(OUTPUT_DIR) / 'png'
@@ -68,11 +131,17 @@ def load_data(exp_dir: str):
 
 
 df = pd.concat([load_data(dir) for dir in DIR_LIST], axis=0).reset_index(drop=True)
-#  df = df.fillna(10.)
-df = df.dropna()
-assert df is not None
+
+df['throughput'] = df['throughput'].fillna(0.)
+df['latency'] = df['latency'].fillna(100.)
+df['rb_rounds'] = df['rb_rounds'].fillna(100.)
+df['receive_rate'] = df['receive_rate'].fillna(0.)
+
+#  df = df.dropna()
+#  assert df is not None
+
 df['exp'] = df.apply(lambda row: '%d-%d' % (row['round_interval'], row['batched_echo_interval']), axis=1)
-print(df)
+#  print(df)
 
 payloads = list(df['payload'].unique())
 
@@ -85,6 +154,9 @@ group_df = df \
         'latency': ['mean', 'std'],
     })
 group_df.columns = [' '.join(col).strip() for col in group_df.columns.values]
+group_df['round'] = group_df['exp'].apply(lambda x: int(x.split('-')[0]))
+group_df['batched'] = group_df['exp'].apply(lambda x: int(x.split('-')[1]))
+group_df = group_df.sort_values(by=['round', 'batched', 'payload'])
 print(group_df)
 
 fig_dict = dict()
@@ -103,7 +175,6 @@ fig = px.line(
         'receive_rate mean': 'Receive rate (%)',
     },
     markers=True,
-    title=fig_title,
     log_x=True,
 )
 fig_dict[fig_title] = fig
@@ -122,7 +193,6 @@ fig = px.line(
         'rb_rounds mean': 'Number of rounds',
     },
     markers=True,
-    title=fig_title,
     log_x=True,
 )
 fig_dict[fig_title] = fig
@@ -142,10 +212,8 @@ fig = px.line(
         'latency mean': 'Latency (ms)',
     },
     markers=True,
-    title=fig_title,
     log_x=True,
 )
-fig.update_layout(yaxis = dict(dtick = 200))
 fig_dict[fig_title] = fig
 
 
@@ -163,18 +231,20 @@ fig = px.line(
         'throughput mean': 'Throughput (MiB/s)',
     },
     markers=True,
-    title=fig_title,
     log_x=True,
 )
 fig_dict[fig_title] = fig
 
 
 for title, fig in fig_dict.items():
-    fig.update_layout(xaxis = dict(
-        tickmode = 'array',
-        tickvals = payloads,
-        tickformat='d'
-    ))
+    fig.update_layout(
+        #  title = dict(text = title),
+        xaxis = dict(
+            tickmode = 'array',
+            tickvals = payloads,
+            tickformat='d'
+        )
+    )
     fig.write_image(png_dir / Path(title + '.png'))
     fig.write_image(svg_dir / Path(title + '.svg'))
     fig.show()
