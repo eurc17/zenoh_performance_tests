@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 2,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 8192,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 2,
+  "receive_rate": 1.0,
+  "recvd_msg_num": 300,
+  "average_rb_rounds": 1.05,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 57.310576000000005,
+      "average_rb_rounds": 1.3333333333333333
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 48.060598000000006,
+      "average_rb_rounds": 1.0333333333333334
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 40.191536,
+      "average_rb_rounds": 1.1
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 50.113302999999995,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 51.26406,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 37.668816,
+      "average_rb_rounds": 1.0333333333333334
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 35.755652,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 47.803478000000005,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 44.152241000000004,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 3.7698533819663,
+      "average_latency_ms": 37.743542,
+      "average_rb_rounds": 1.0
+    }
+  ]
+}
