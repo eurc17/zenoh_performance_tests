@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 4,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 4096,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 4,
+  "receive_rate": 0.83,
+  "recvd_msg_num": 249,
+  "average_rb_rounds": 1.0160642570281124,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.9999959151500194,
+      "average_latency_ms": 2090.755552,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.6999971406050136,
+      "average_latency_ms": 107.09176199999999,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.5999975490900117,
+      "average_latency_ms": 112.810499,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.6999971406050136,
+      "average_latency_ms": 108.948452,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.9999959151500194,
+      "average_latency_ms": 2407.418574,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.6999971406050136,
+      "average_latency_ms": 108.14889,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.9999959151500194,
+      "average_latency_ms": 2364.2733749999998,
+      "average_rb_rounds": 1.1333333333333333
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.9999959151500194,
+      "average_latency_ms": 2395.540333,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.633330746261679,
+      "average_latency_ms": 110.667879,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 0.9666627179783521,
+      "average_latency_ms": 2366.024052,
+      "average_rb_rounds": 1.0
+    }
+  ]
+}
