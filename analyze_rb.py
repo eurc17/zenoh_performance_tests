@@ -200,11 +200,13 @@ group_df.columns = [' '.join(col).strip() for col in group_df.columns.values]
 group_df['round'] = group_df['exp'].apply(lambda x: int(x.split('-')[0]))
 group_df['batched'] = group_df['exp'].apply(lambda x: int(x.split('-')[1]))
 group_df = group_df.sort_values(by=['round', 'batched', 'payload'])
+#  group_df = group_df[group_df['batched'] == 10]
+#  group_df = group_df[group_df['round'] == 50]
 print(group_df)
 
 fig_dict = dict()
 
-fig_title = 'Reliable Broadcast Receive Rate'
+fig_title = 'Reliable Broadcast Delivery Rate'
 fig = px.line(
     group_df,
     x='payload',
@@ -215,7 +217,7 @@ fig = px.line(
     labels={
         'exp': 'Experiment',
         'payload': 'Payload size (Byte)',
-        'receive_rate mean': 'Receive rate (%)',
+        'receive_rate mean': 'Delivery rate (%)',
     },
     markers=True,
     log_x=True,
@@ -280,6 +282,7 @@ fig_dict[fig_title] = fig
 
 
 for title, fig in fig_dict.items():
+    fig.update_traces(marker={'size': 11})
     fig.update_layout(
         #  title = dict(text = title),
         xaxis = dict(
