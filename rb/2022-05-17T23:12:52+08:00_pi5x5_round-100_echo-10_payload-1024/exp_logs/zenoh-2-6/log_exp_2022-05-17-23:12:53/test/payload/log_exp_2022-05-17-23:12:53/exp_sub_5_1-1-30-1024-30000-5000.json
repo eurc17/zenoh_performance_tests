@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 5,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 1024,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 5,
+  "receive_rate": 0.99,
+  "recvd_msg_num": 297,
+  "average_rb_rounds": 1.1313131313131313,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.999996762410482,
+      "average_latency_ms": 1582.627986,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.999996762410482,
+      "average_latency_ms": 1564.5022669999998,
+      "average_rb_rounds": 1.4333333333333333
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.999996762410482,
+      "average_latency_ms": 1593.296374,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.9333303115831165,
+      "average_latency_ms": 108.900017,
+      "average_rb_rounds": 1.0714285714285714
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.999996762410482,
+      "average_latency_ms": 1595.87334,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 0.9666635369967993,
+      "average_latency_ms": 1431.8582470000001,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.999996762410482,
+      "average_latency_ms": 1589.479339,
+      "average_rb_rounds": 1.4
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.999996762410482,
+      "average_latency_ms": 1584.92688,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.999996762410482,
+      "average_latency_ms": 1494.823015,
+      "average_rb_rounds": 1.4
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.999996762410482,
+      "average_latency_ms": 162.716004,
+      "average_rb_rounds": 1.0
+    }
+  ]
+}
