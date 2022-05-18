@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 4,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 1024,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 4,
+  "receive_rate": 0.57,
+  "recvd_msg_num": 171,
+  "average_rb_rounds": 1.0701754385964912,
+  "expected_msg_num": 300,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.9376374540174138,
+      "average_latency_ms": 18312.747563999998,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.12501832720232184,
+      "average_latency_ms": 21853.954917,
+      "average_rb_rounds": 1.75
+    },
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 0.9376374540174138,
+      "average_latency_ms": 18336.775699,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.1562729090029023,
+      "average_latency_ms": 96.886189,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.9376374540174138,
+      "average_latency_ms": 18311.762414,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/3",
+      "throughput": 0.12501832720232184,
+      "average_latency_ms": 21879.484457,
+      "average_rb_rounds": 1.75
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.12501832720232184,
+      "average_latency_ms": 21883.125134,
+      "average_rb_rounds": 1.75
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.9376374540174138,
+      "average_latency_ms": 18318.004636,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.12501832720232184,
+      "average_latency_ms": 21863.796482,
+      "average_rb_rounds": 1.75
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.9376374540174138,
+      "average_latency_ms": 18298.285428,
+      "average_rb_rounds": 1.0
+    }
+  ]
+}
