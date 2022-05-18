@@ -21,7 +21,7 @@ DIR_LIST = [
     #  './rb/2022-05-12T22:03:02+08:00_round-100_echo-50_1_10pi',
     #  './rb/2022-05-12T22:05:18+08:00_round-30_echo-20_1_10pi',
 
-    # './rb/2022-05-13T16:15:11+08:00_pi5x5_round-20_echo-10_payload-128',
+    './rb/2022-05-18T09:02:58+08:00_pi5x5_round-20_echo-10_payload-128',
     './rb/2022-05-13T16:15:11+08:00_pi5x5_round-20_echo-10_payload-256',
     './rb/2022-05-13T16:16:09+08:00_pi5x5_round-20_echo-10_payload-512',
     './rb/2022-05-13T16:17:07+08:00_pi5x5_round-20_echo-10_payload-1024',
@@ -57,7 +57,7 @@ DIR_LIST = [
     './rb/2022-05-13T16:42:49+08:00_pi5x5_round-50_echo-20_payload-256',
     './rb/2022-05-17T07:22:06+08:00_pi5x5_round-50_echo-20_payload-512',
     './rb/2022-05-13T16:44:47+08:00_pi5x5_round-50_echo-20_payload-1024',
-    # './rb/2022-05-13T16:44:47+08:00_pi5x5_round-50_echo-20_payload-2048',
+    './rb/2022-05-18T08:58:45+08:00_pi5x5_round-50_echo-20_payload-2048',
     './rb/2022-05-13T16:46:20+08:00_pi5x5_round-50_echo-20_payload-4096',
     './rb/2022-05-17T14:16:08+08:00_pi5x5_round-50_echo-20_payload-8192',
 
@@ -68,7 +68,7 @@ DIR_LIST = [
     './rb/2022-05-13T16:52:23+08:00_pi5x5_round-50_echo-30_payload-2048',
     './rb/2022-05-13T16:53:00+08:00_pi5x5_round-50_echo-30_payload-4096',
     './rb/2022-05-13T16:53:00+08:00_pi5x5_round-50_echo-30_payload-4096',
-    # './rb/2022-05-13T16:53:00+08:00_pi5x5_round-50_echo-30_payload-8192',
+    './rb/2022-05-18T08:43:41+08:00_pi5x5_round-50_echo-30_payload-8192',
 
     './rb/2022-05-17T14:21:01+08:00_pi5x5_round-50_echo-40_payload-128',
     './rb/2022-05-17T09:28:58+08:00_pi5x5_round-50_echo-40_payload-256',
@@ -81,7 +81,7 @@ DIR_LIST = [
     './rb/2022-05-13T17:01:49+08:00_pi5x5_round-100_echo-10_payload-128',
     './rb/2022-05-17T14:22:52+08:00_pi5x5_round-100_echo-10_payload-256',
     './rb/2022-05-13T17:03:51+08:00_pi5x5_round-100_echo-10_payload-512',
-    # './rb/2022-05-17T09:30:37+08:00_pi5x5_round-100_echo-10_payload-1024',
+    './rb/2022-05-18T09:05:24+08:00_pi5x5_round-100_echo-10_payload-1024',
     './rb/2022-05-13T17:05:48+08:00_pi5x5_round-100_echo-10_payload-2048',
     './rb/2022-05-17T14:24:43+08:00_pi5x5_round-100_echo-10_payload-4096',
     './rb/2022-05-13T17:07:54+08:00_pi5x5_round-100_echo-10_payload-8192',
@@ -94,7 +94,7 @@ DIR_LIST = [
     './rb/2022-05-16T19:33:26+08:00_pi5x5_round-100_echo-20_payload-4096',
     './rb/2022-05-16T21:22:04+08:00_pi5x5_round-100_echo-20_payload-8192',
 
-    # './rb/2022-05-13T17:16:56+08:00_pi5x5_round-100_echo-30_payload-128',
+    './rb/2022-05-18T09:06:26+08:00_pi5x5_round-100_echo-30_payload-128',
     './rb/2022-05-13T17:16:56+08:00_pi5x5_round-100_echo-30_payload-256',
     './rb/2022-05-13T17:17:55+08:00_pi5x5_round-100_echo-30_payload-512',
     './rb/2022-05-13T17:18:53+08:00_pi5x5_round-100_echo-30_payload-1024',
