@@ -28,12 +28,10 @@ do
 
             echo "Running experiment $name"
 
-            ./kill_remote.sh
             ./run.sh
 
-            mkdir -p "$name"
-            mv exp_logs "$name"
-            ./kill_remote.sh
+            # mkdir -p "$name"
+            # mv exp_logs "$name"
 
 #             sleep 10
 #         done

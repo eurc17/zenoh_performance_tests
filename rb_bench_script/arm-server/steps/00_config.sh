@@ -1,6 +1,8 @@
 #!/bin/false "This script should be sourced in a shell, not executed directly"
 set -e
 
+num_peers=12
+
 ## The binary to be executed
 binary_name="reliable-broadcast-benchmark"
 
@@ -11,7 +13,7 @@ log_time="$(date +'%Y-%m-%d-%T')"
 remote_timeout=40
 
 ## Base directory on RPi
-remote_dir="/home/pi/rb-exp"
+remote_dir="$script_dir/exp_logs"
 
 ## The directory to store program outputs on RPi
 output_dir_suffix="test/payload/log_exp_$log_time"

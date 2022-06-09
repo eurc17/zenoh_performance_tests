@@ -40,6 +40,7 @@ def parse_data(exp_json: Path):
         'payload': payload,
         'receive_rate': receive_rate
     }])
+    
     data = pd.DataFrame([
         {
             'to': peer_id,

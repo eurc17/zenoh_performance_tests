@@ -2,5 +2,5 @@
 set -e  # exit when failing
 
 pushd "$repo_dir/reliable-broadcast-benchmark"
-cargo build --release --bin "$binary"
+"$script_dir/build_rust_bin.sh" reliable-broadcast-benchmark
 popd

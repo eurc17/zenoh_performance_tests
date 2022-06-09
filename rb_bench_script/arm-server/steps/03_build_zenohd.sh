@@ -9,9 +9,9 @@ git clone "$zenoh_git_url" || true
 pushd zenoh/zenohd
 git checkout "$zenoh_git_commit"
 
-cargo build --profile fast --bin zenohd
+"$script_dir/cross_build_rust_bin.sh" zenohd
 rsync -aPz -e "ssh -p $port" \
-      ../target/fast/zenohd "pi@$addr:$remote_dir"
+      ../target/armv7-unknown-linux-musleabihf/release/zenohd "pi@$addr:$remote_dir"
 
 popd
 popd
