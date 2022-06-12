@@ -30,7 +30,9 @@ def main(args):
             args.init_time,
         )
         end = time.time()
-        cmd = "./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {}".format(
+        cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {}".format(
+            args.output_dir,
+            file_name,
             peer_id,
             args.total_pub_peers,
             num_msgs_per_peer,
@@ -45,15 +47,15 @@ def main(args):
             cmd,
             shell=True,
         )
-        cmd = "psrecord {} --plot {}/plot_{}.png --log {}/log_{}.txt --include-children --duration {} --interval 0.01 &".format(
-            proc.pid,
-            args.output_dir,
-            file_name,
-            args.output_dir,
-            file_name,
-            program_timeout,
-        )
-        os.system(cmd)
+        # cmd = "psrecord {} --plot {}/plot_{}.png --log {}/log_{}.txt --include-children --duration {} --interval 0.01 &".format(
+        #     proc.pid,
+        #     args.output_dir,
+        #     file_name,
+        #     args.output_dir,
+        #     file_name,
+        #     program_timeout,
+        # )
+        # os.system(cmd)
         # print(proc.pid)
     end = time.time()
     print("Elapsed time = ", end - start)
