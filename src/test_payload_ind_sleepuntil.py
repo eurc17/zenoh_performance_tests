@@ -31,7 +31,7 @@ def main(args):
     round_timeout = args.round_timeout  # ms
     startup_delay = max((10 * args.peer_num) / 1000, 2)
     program_timeout = (
-        round_timeout / 1000 + 10 + (args.init_time) / 1000 + startup_delay
+        round_timeout / 1000 + 30 + (args.init_time) / 1000 + startup_delay
     )  # s
     sleep_until = subprocess.run(
         ["which", "sleepuntil"], stdout=subprocess.PIPE
@@ -46,7 +46,7 @@ def main(args):
         disable_string = "--sub_disable"
     else:
         disable_string = ""
-    if args.log_range:
+    if args.log_range and args.payload_config == "":
         payload_size = args.payload_size_start
         while payload_size < args.payload_size_end + 1:
             if sleep_until == "" or True:
@@ -78,26 +78,50 @@ def main(args):
             time.sleep(1)
             payload_size *= args.payload_size_step
     else:
-
-        for payload_size in range(
+        payload_sizes = range(
             args.payload_size_start, args.payload_size_end + 1, args.payload_size_step
-        ):
+        )
+        if args.payload_config:
+            if os.path.exists(args.payload_config) and os.path.isfile(
+                args.payload_config
+            ):
+                with open(args.payload_config) as f:
+                    lines = f.readlines()
+                    payload_sizes = list(map(lambda x: int(x), lines[0].split(" ")))
+                    print("payload_sizes = ", payload_sizes)
+
+        for payload_size in payload_sizes:
             if sleep_until == "" or True:
                 actual_program_timeout = program_timeout + get_sleep()
             else:
                 actual_program_timeout = program_timeout + get_sleep()
-            cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {} -r {}".format(
-                peer_num,
-                num_msgs_per_peer,
-                payload_size,
-                round_timeout,
-                args.output_dir,
-                args.init_time,
-                disable_string,
-                args.peer_id_start,
-                args.locators,
-                args.remote_pub_peers,
-            )
+            if args.locators != "":
+                cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} --locators {} -r {} --pub_interval {}".format(
+                    peer_num,
+                    num_msgs_per_peer,
+                    payload_size,
+                    round_timeout,
+                    args.output_dir,
+                    args.init_time,
+                    disable_string,
+                    args.peer_id_start,
+                    args.locators,
+                    args.remote_pub_peers,
+                    args.pub_interval,
+                )
+            else:
+                cmd = "python3 ./src/peer_worker_sleepuntil.py -p {} -m {} -n {} -t {} -o {} -i {} {} --peer_id_start {} -r {} --pub_interval {}".format(
+                    peer_num,
+                    num_msgs_per_peer,
+                    payload_size,
+                    round_timeout,
+                    args.output_dir,
+                    args.init_time,
+                    disable_string,
+                    args.peer_id_start,
+                    args.remote_pub_peers,
+                    args.pub_interval,
+                )
             # print(cmd)
             # os.system(cmd)
             proc = subprocess.Popen(
@@ -204,6 +228,18 @@ if __name__ == "__main__":
         type=int,
         help="The total number of remote publisher peers",
         default=0,
+    )
+    parser.add_argument(
+        "--pub_interval",
+        type=int,
+        help="The interval between publishing messages Unit: ms",
+        default=1,
+    )
+    parser.add_argument(
+        "--payload_config",
+        type=str,
+        help="Path to the txt file that specifies payload sizes to try. It will override the payload size specified in python args.",
+        default="",
     )
 
     args = parser.parse_args()

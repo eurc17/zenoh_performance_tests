@@ -1,0 +1,19 @@
+--total-put-number 1 \
+--remote-pub-peers 11 \
+--locators tcp/192.168.1.121:7447 \
+--init-time 5000 \
+--num-msgs-per-peer 30 \
+--round-timeout 10000 \
+--pub-interval 50 \
+\
+--peer-id PEER_ID \
+--payload-size PAYLOAD_SIZE \
+--output-dir OUTPUT_DIR \
+\
+--round-interval 1000 \
+--echo-interval 100 \
+--max-rounds 3 \
+--extra-rounds 1 \
+--reliability reliable \
+--sub-mode push \
+--congestion-control drop

@@ -1,9 +1,6 @@
-use crate::{
-    utils::{
-        PeerResult, PubPeerResult, PubPeerStatistics, PubTimeStatus, ShortConfig, SubTimeStatus,
-        TestResult,
-    },
-    Cli,
+use output_config::{
+    Cli, PeerResult, PubPeerResult, PubPeerStatistics, PubTimeStatus, ShortConfig, SubTimeStatus,
+    TestResult,
 };
 use std::io::Write;
 use std::path::PathBuf;
@@ -21,7 +18,7 @@ pub async fn _demonstration_worker(
     payload_size: usize,
     round_timeout: u64,
     args: Cli,
-) -> () {
+) {
     let mut vector_data = vec![];
     while let Ok(data) = rx.recv_async().await {
         vector_data.push(data);
@@ -49,6 +46,7 @@ pub async fn _demonstration_worker(
                 receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
                 recvd_msg_num: change_vec.len(),
                 expected_msg_num: total_msg_num,
+                average_rb_rounds: None,
                 result_vec: vec![],
             }
         })
@@ -90,7 +88,7 @@ pub async fn publish_worker(
     timeout: Instant,
     peer_id: usize,
     num_msgs_per_peer: usize,
-    msg_payload: String,
+    msg_payload: Arc<[u8]>,
     multipeer_mode: bool,
     locators: Vec<Locator>,
     output_dir: PathBuf,
@@ -129,7 +127,7 @@ pub async fn publish_worker(
         info!("start sending messages");
         for _ in 0..num_msgs_per_peer {
             zenoh_new
-                .put(format!("/demo/example/{}", peer_id), msg_payload.clone())
+                .put(format!("/demo/example/{}", peer_id), &*msg_payload)
                 .await
                 .unwrap();
             if timeout <= Instant::now() {
@@ -148,17 +146,20 @@ pub async fn publish_worker(
         }
         start_sending = Instant::now() - start;
         info!("start sending messages");
-        for _ in 0..num_msgs_per_peer {
+        for msg_id in 0..num_msgs_per_peer {
             zenoh
-                .put(format!("/demo/example/{}", peer_id), msg_payload.clone())
+                .put(format!("/demo/example/{}", peer_id), &*msg_payload)
                 .await
                 .unwrap();
+            // dbg!(msg_id);
             if timeout <= Instant::now() {
                 timeout_flag = true;
                 warn!("publish worker sent message after timeout! Please reduce # of publishers or increase timeout.");
                 break;
             }
-            async_std::task::sleep(Duration::from_millis(args.pub_interval)).await;
+            if msg_id % 15 == 0 {
+                async_std::task::sleep(Duration::from_millis(args.pub_interval)).await;
+            }
         }
         after_sending = Instant::now() - start;
     }
@@ -363,6 +364,7 @@ pub async fn subscribe_worker(
                 key_expr,
                 throughput,
                 average_latency_ms,
+                average_rb_rounds: None,
             }
         })
         .collect::<Vec<_>>();
@@ -380,6 +382,7 @@ pub async fn subscribe_worker(
         receive_rate: (change_vec.len() as f64) / (total_msg_num as f64),
         recvd_msg_num: change_vec.len(),
         expected_msg_num: total_msg_num,
+        average_rb_rounds: None,
         result_vec,
     };
     let file_path = args.output_dir.join(format!(
@@ -453,7 +456,7 @@ pub async fn pub_and_sub_worker(
     timeout: Instant,
     peer_id: usize,
     num_msgs_per_peer: usize,
-    msg_payload: String,
+    msg_payload: Arc<[u8]>,
     total_msg_num: usize,
     locators: Vec<Locator>,
     output_dir: PathBuf,
@@ -524,6 +527,7 @@ pub async fn pub_and_sub_worker(
     }
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();
     zenoh.close().await.unwrap();
+    println!("Program finished!");
 
     Ok(())
 }

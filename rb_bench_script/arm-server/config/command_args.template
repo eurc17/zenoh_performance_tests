@@ -1,0 +1,18 @@
+--total-put-number 1
+--remote-pub-peers 11
+--init-time 5000
+--num-msgs-per-peer 30
+--round-timeout 30000
+--pub-interval 50
+
+--peer-id $PEER_ID
+--payload-size $PAYLOAD_SIZE
+--output-dir $OUTPUT_DIR
+
+--round-interval $ROUND_INTERVAL
+--echo-interval $ECHO_INTERVAL
+--max-rounds 3
+--extra-rounds 1
+--reliability reliable
+--sub-mode push
+--congestion-control block

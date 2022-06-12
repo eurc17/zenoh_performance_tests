@@ -1,0 +1,17 @@
+{
+    "num_peers": 4,
+    // "local_peer_id_start": 0,
+    // "local_peer_id_end": 5,
+    "num_msgs": 1,
+    "zenoh_key": "/reliable_broadcast",
+    "echo_interval": "20ms",
+    "round_timeout": "100ms",
+    "publisher_startup_delay": "50ms",
+    "max_rounds": 3,
+    "extra_rounds": 2,
+    // "remote_peer_locator": "tcp/140.112.31.243:7447",
+    // "initial_delay": 1000,
+    "reliability": "reliable",     // reliable or best_effort
+    "sub_mode": "push",            // push or pull
+    "congestion_control": "block", // drop or block
+}

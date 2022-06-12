@@ -4,24 +4,18 @@ version = "0.1.3"
 edition = "2021"
 
 [workspace]
-
 members = [
     "usage-parser",
     "session-test",
     "pub-sub-worker",
     "session-test-worker",
-    "output-config"
+    "output-config",
+    "reliable-broadcast",
+    "reliable-broadcast-benchmark",
 ]
-# exclude = [
-    
-# ]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 zenoh = "0.6.0-dev.0"
-# zenoh = {git = "https://github.com/eclipse-zenoh/zenoh.git", rev = "f7309d6af9aa8c5c6e55e744fc68ea4f6f18e8e9"}
-
 async-std = "1.10.0"
 futures = "0.3.17"
 derivative = "2.2.0"
