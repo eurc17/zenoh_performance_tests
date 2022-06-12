@@ -3,13 +3,11 @@ import os
 import glob
 import argparse
 import json
-from numpy import append
 import plotly.offline as pyo
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 from dataclasses import dataclass
-
-from pyrsistent import get_in
+from concurrent.futures import ProcessPoolExecutor
 
 
 @dataclass
@@ -96,6 +94,7 @@ def get_data_from_file(file_path: str) -> TimeLog:
     with open(file_path, "r") as open_file:
         line = open_file.readline()
         while line != "":
+            # print(line)
             if "User time (seconds)" in line:
                 user_time_sec = get_float_from_str(line)
             if "System time (seconds)" in line:
@@ -140,6 +139,7 @@ def get_data_from_file(file_path: str) -> TimeLog:
                 page_size_B = get_int_from_str(line)
             if "Exit status" in line:
                 exit_status = get_int_from_str(line)
+            line = open_file.readline()
         ret = TimeLog(
             user_time_sec,
             sys_time_sec,
@@ -167,65 +167,86 @@ def get_data_from_file(file_path: str) -> TimeLog:
     return ret
 
 
-def plot_usage(exp_dict, output_dir, dist=0.15):
+def plot_usage(exp_dict: dict, output_dir: str):
+    max_cpu_usage_list = list()
+    max_peak_mem_usage_list = list()
+    sum_cpu_usage_list = list()
+    sum_peak_mem_usage_list = list()
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
     for exp_key in exp_dict:
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
         # fig = go.Figure()
-        total_cpu_usage = []
-        total_mem_usage = []
-        time_diff_sum = 0
-        cnt = 0
+
+        max_cpu_usage = 0
+        sum_cpu_usage = 0
+        max_peak_mem_usage = 0
+        sum_peak_mem_usage = 0
         for peer_id in exp_dict[exp_key]:
             # up to pub_sub_worker_start
             data_peer = exp_dict[exp_key][peer_id]
-            for i, data_vec in enumerate(data_peer):
-                if i + 1 > len(total_cpu_usage):
-                    total_cpu_usage.append(data_vec[1])
-                else:
-                    total_cpu_usage[i] += data_vec[1]
-                if i + 1 > len(total_mem_usage):
-                    total_mem_usage.append(data_vec[2])
-                else:
-                    total_mem_usage[i] += data_vec[2]
-                if i != 0:
-                    cnt += 1
-                    time_diff_sum += data_peer[i][0] - data_peer[i - 1][0]
-        avg_time_diff = time_diff_sum / cnt
+            if data_peer.cpu_percent > max_cpu_usage:
+                max_cpu_usage = data_peer.cpu_percent
+            if data_peer.max_res_set_size_KiB > max_peak_mem_usage:
+                max_peak_mem_usage = data_peer.max_res_set_size_KiB * 1024
+            sum_cpu_usage += data_peer.cpu_percent
+            sum_peak_mem_usage += data_peer.max_res_set_size_KiB * 1024
+
+        max_cpu_usage_list.append(max_cpu_usage)
+        max_peak_mem_usage_list.append(max_peak_mem_usage)
+        sum_cpu_usage_list.append(sum_cpu_usage)
+        sum_peak_mem_usage_list.append(sum_peak_mem_usage)
 
         # Create figure with secondary y-axis
 
-        # Add traces
-        fig.add_trace(
-            go.Scatter(
-                x=[i * avg_time_diff for i in range(0, len(total_cpu_usage))],
-                y=total_cpu_usage,
-                name="CPU Usage",
-            ),
-            secondary_y=False,
-        )
+    # Add traces
+    fig.add_trace(
+        go.Scatter(
+            x=[i for i in range(0, len(exp_dict.keys()))],
+            y=max_cpu_usage_list,
+            name="Max CPU Usage",
+        ),
+        secondary_y=False,
+    )
 
-        fig.add_trace(
-            go.Scatter(
-                x=[i * avg_time_diff for i in range(0, len(total_mem_usage))],
-                y=total_mem_usage,
-                name="Mem Usage",
-            ),
-            secondary_y=True,
-        )
+    # fig.add_trace(
+    #     go.Scatter(
+    #         x=[i for i in range(0, len(exp_dict.keys()))],
+    #         y=sum_cpu_usage_list,
+    #         name="Sum of CPU Usage",
+    #     ),
+    #     secondary_y=False,
+    # )
 
-        # # Update layout
-        fig.update_layout(
-            title=exp_key,
-            xaxis_title="Time (s)",
-            legend_title="Utilization",
-            font=dict(family="arial, monospace", size=18, color="black"),
-        )
+    fig.add_trace(
+        go.Scatter(
+            x=[i for i in range(0, len(exp_dict.keys()))],
+            y=max_peak_mem_usage_list,
+            name="Max Peak Mem Usage",
+        ),
+        secondary_y=True,
+    )
 
-        fig.update_yaxes(title_text="CPU Usage (%)", secondary_y=False)
-        fig.update_yaxes(title_text="Memory Usage (MB)", secondary_y=True)
+    # fig.add_trace(
+    #     go.Scatter(
+    #         x=[i for i in range(0, len(exp_dict.keys()))],
+    #         y=sum_peak_mem_usage_list,
+    #         name="Sum of Peak Mem Usage",
+    #     ),
+    #     secondary_y=True,
+    # )
 
-        fig.write_image(output_dir + "/plot_usage_" + exp_key + ".png")
-        fig.write_html(output_dir + "/plot_usage_" + exp_key + ".html")
+    # # Update layout
+    fig.update_layout(
+        title=exp_key,
+        xaxis_title="Number of Peers",
+        legend_title="Utilization",
+        font=dict(family="arial, monospace", size=18, color="black"),
+    )
+
+    fig.update_yaxes(title_text="CPU Usage (%)", secondary_y=False)
+    fig.update_yaxes(title_text="Memory Usage (Bytes)", secondary_y=True)
+
+    fig.write_image(output_dir + "/plot_usage_" + exp_key + ".png")
+    fig.write_html(output_dir + "/plot_usage_" + exp_key + ".html")
 
 
 def main(args):
@@ -242,6 +263,7 @@ def main(args):
         if not exp_key in exp_dict.keys():
             exp_dict[exp_key] = {}
         exp_dict[exp_key][peer_id] = get_data_from_file(log_info_file)
+        # print(exp_key, peer_id)
     plot_usage(exp_dict, args.output_dir)
     # with open(put_info_file) as json_opened_file:
     #     data = json.load(json_opened_file)
