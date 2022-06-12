@@ -30,7 +30,7 @@ def main(args):
             args.init_time,
         )
         end = time.time()
-        cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {}".format(
+        cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} --rx-buffer-size {}".format(
             args.output_dir,
             file_name,
             peer_id,
@@ -41,6 +41,7 @@ def main(args):
             args.output_dir,
             args.init_time,
             int(round((end - start) * 1000)),
+            args.rx_buffer_size,
         )
         # print(cmd)
         proc = subprocess.Popen(
@@ -103,6 +104,13 @@ if __name__ == "__main__":
         type=int,
         help="The initialization time (ms) for starting up futures.",
         default=3000,
+    )
+    parser.add_argument(
+        "-r",
+        "--rx_buffer_size",
+        type=int,
+        help="The size (Bytes) of the transport link rx buffer",
+        default=16384,
     )
 
     args = parser.parse_args()

@@ -48,13 +48,14 @@ def main(args):
         #     round_timeout,
         #     args.init_time,
         # )
-        cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {}".format(
+        cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {} -r {}".format(
             peer_num,
             num_msgs_per_peer,
             payload_size,
             round_timeout,
             args.output_dir,
             args.init_time,
+            args.rx_buffer_size,
         )
         # print(cmd)
         # os.system(cmd)
@@ -120,6 +121,13 @@ if __name__ == "__main__":
         type=int,
         help="The initialization time (in ms) before the first round",
         default=1000,
+    )
+    parser.add_argument(
+        "-r",
+        "--rx_buffer_size",
+        type=int,
+        help="The size (Bytes) of the transport link rx buffer",
+        default=16384,
     )
 
     args = parser.parse_args()
