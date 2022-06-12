@@ -415,6 +415,14 @@ pub async fn pub_and_sub_worker(
         .collect::<Vec<_>>();
     let connect_config = ConnectConfig { endpoints };
     config.set_connect(connect_config).unwrap();
+    if let Some(rx_buffer_size) = args.rx_buffer_size {
+        config
+            .transport
+            .link
+            .rx
+            .set_buffer_size(Some(rx_buffer_size))
+            .unwrap();
+    }
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
     let pub_future = publish_worker(

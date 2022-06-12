@@ -58,6 +58,8 @@ pub struct Cli {
     /// The frequency to add the pub_interval. (Unit: messages/times)
     /// If not specified, it is turned off. (Not pub_interval will be used)
     pub pub_interval_freq: usize,
+    #[clap(long)]
+    pub rx_buffer_size: Option<usize>,
 }
 
 #[async_std::main]
