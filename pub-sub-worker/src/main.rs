@@ -67,11 +67,13 @@ pub struct Cli {
 
 #[async_std::main]
 async fn main() {
+    let args = Cli::parse();
+
+    let dhat_file_name = format!("dhat-heap-{}.json", args.peer_id);
     #[cfg(feature = "dhat-heap")]
-    let _profiler = dhat::Profiler::new_heap();
+    let _profiler = dhat::Profiler::builder().file_name(dhat_file_name).build();
     pretty_env_logger::init();
     // Get & parse arguments
-    let args = Cli::parse();
     let default_wait_time = (10 * args.total_put_number as u64).max(2000);
 
     async_std::task::sleep(Duration::from_millis(
