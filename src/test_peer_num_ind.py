@@ -29,7 +29,9 @@ def main(args):
     payload_size = args.payload_size
     round_timeout = args.round_timeout  # ms
     startup_delay = max((10 * args.peer_num_end) / 1000, 2)
-    program_timeout = 10 + (args.init_time) / 1000 + startup_delay  # s
+    program_timeout = (
+        10 + (args.init_time + args.round_timeout) / 1000 + startup_delay
+    )  # s
     sleep_until = subprocess.run(
         ["which", "sleepuntil"], stdout=subprocess.PIPE
     ).stdout.decode("utf-8")
