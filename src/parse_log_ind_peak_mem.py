@@ -180,6 +180,7 @@ def plot_usage(exp_dict: dict, output_dir: str):
         sum_cpu_usage = 0
         max_peak_mem_usage = 0
         sum_peak_mem_usage = 0
+        peak_mem_usage_list = list()
         for peer_id in exp_dict[exp_key]:
             # up to pub_sub_worker_start
             data_peer = exp_dict[exp_key][peer_id]
@@ -189,11 +190,22 @@ def plot_usage(exp_dict: dict, output_dir: str):
                 max_peak_mem_usage = data_peer.max_res_set_size_KiB * 1024
             sum_cpu_usage += data_peer.cpu_percent
             sum_peak_mem_usage += data_peer.max_res_set_size_KiB * 1024
+            peak_mem_usage_list.append(data_peer.max_res_set_size_KiB * 1024)
+
+        avg_peak_mem_usage = sum_peak_mem_usage / float(len(exp_dict[exp_key]))
 
         max_cpu_usage_list.append(max_cpu_usage)
         max_peak_mem_usage_list.append(max_peak_mem_usage)
         sum_cpu_usage_list.append(sum_cpu_usage)
         sum_peak_mem_usage_list.append(sum_peak_mem_usage)
+
+        print("Exp: ", exp_key)
+        print("avg_peak_mem_usage (KiBytes)= ", avg_peak_mem_usage / 1024.0)
+        print("max_peak_mem_usage (KiBytes)= ", max_peak_mem_usage / 1024.0)
+        peak_mem_usage_list.sort()
+        print("2nd to 5th largest peak mem usage:")
+        for i in range(2, 5):
+            print(peak_mem_usage_list[i] / 1024.0)
 
         # Create figure with secondary y-axis
 
