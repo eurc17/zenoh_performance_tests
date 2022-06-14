@@ -1,3 +1,6 @@
+#[cfg(feature = "dhat-heap")]
+#[global_allocator]
+static ALLOC: dhat::Alloc = dhat::Alloc;
 mod common;
 mod utils;
 mod workers;
@@ -64,6 +67,8 @@ pub struct Cli {
 
 #[async_std::main]
 async fn main() {
+    #[cfg(feature = "dhat-heap")]
+    let _profiler = dhat::Profiler::new_heap();
     pretty_env_logger::init();
     // Get & parse arguments
     let args = Cli::parse();
