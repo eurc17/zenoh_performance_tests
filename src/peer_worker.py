@@ -30,19 +30,33 @@ def main(args):
             args.init_time,
         )
         end = time.time()
-        cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} --rx-buffer-size {}".format(
-            args.output_dir,
-            file_name,
-            peer_id,
-            args.total_pub_peers,
-            num_msgs_per_peer,
-            payload_size,
-            round_timeout,
-            args.output_dir,
-            args.init_time,
-            int(round((end - start) * 1000)),
-            args.rx_buffer_size,
-        )
+        if args.rx_buffer_size is not None:
+            cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} --rx-buffer-size {}".format(
+                args.output_dir,
+                file_name,
+                peer_id,
+                args.total_pub_peers,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+                int(round((end - start) * 1000)),
+                args.rx_buffer_size,
+            )
+        else:
+            cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} ".format(
+                args.output_dir,
+                file_name,
+                peer_id,
+                args.total_pub_peers,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+                int(round((end - start) * 1000)),
+            )
         # print(cmd)
         proc = subprocess.Popen(
             cmd,
@@ -110,7 +124,6 @@ if __name__ == "__main__":
         "--rx_buffer_size",
         type=int,
         help="The size (Bytes) of the transport link rx buffer",
-        default=16384,
     )
 
     args = parser.parse_args()

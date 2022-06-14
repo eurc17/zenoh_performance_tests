@@ -50,15 +50,25 @@ def main(args):
         #     round_timeout,
         #     args.init_time,
         # )
-        cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {} -r {}".format(
-            peer_num,
-            num_msgs_per_peer,
-            payload_size,
-            round_timeout,
-            args.output_dir,
-            args.init_time,
-            args.rx_buffer_size,
-        )
+        if args.rx_buffer_size is not None:
+            cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {} -r {}".format(
+                peer_num,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+                args.rx_buffer_size,
+            )
+        else:
+            cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {}".format(
+                peer_num,
+                num_msgs_per_peer,
+                payload_size,
+                round_timeout,
+                args.output_dir,
+                args.init_time,
+            )
         # print(cmd)
         # os.system(cmd)
         proc = subprocess.Popen(
@@ -129,7 +139,6 @@ if __name__ == "__main__":
         "--rx_buffer_size",
         type=int,
         help="The size (Bytes) of the transport link rx buffer",
-        default=16384,
     )
 
     args = parser.parse_args()
