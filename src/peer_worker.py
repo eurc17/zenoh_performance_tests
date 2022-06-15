@@ -59,6 +59,8 @@ def main(args):
                 int(round((end - start) * 1000)),
                 args.subscriber_init_time,
             )
+        if args.client_mode:
+            cmd += " --client-mode"
         # print(cmd)
         proc = subprocess.Popen(
             cmd,
@@ -133,6 +135,11 @@ if __name__ == "__main__":
         type=int,
         help="The time in ms before the subscriber subscribes to the topic",
         default=0,
+    )
+    parser.add_argument(
+        "--client_mode",
+        action="store_true",
+        help="Use client mode instead of peer mode",
     )
 
     args = parser.parse_args()

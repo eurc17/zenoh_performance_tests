@@ -441,7 +441,7 @@ pub async fn pub_and_sub_worker(
             .set_buffer_size(Some(rx_buffer_size))
             .unwrap();
     }
-    if args.client_mode_flag {
+    if args.client_mode {
         if args.locators.len() == 0 {
             warn!("No locators set to listen to and the pub/sub workers are in client mode. Please check your configuration.");
         }

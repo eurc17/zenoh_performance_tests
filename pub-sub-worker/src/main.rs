@@ -67,7 +67,7 @@ pub struct Cli {
     /// The time to sleep (in ms) before allowing subscriber to subscribe to the topic. Must be smaller than init_time, or the program will panic.
     pub subscriber_init_time: Option<u64>,
     #[clap(long)]
-    pub client_mode_flag: bool,
+    pub client_mode: bool,
 }
 
 #[async_std::main]
