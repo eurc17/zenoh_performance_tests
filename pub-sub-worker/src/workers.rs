@@ -241,6 +241,7 @@ pub async fn subscribe_worker(
     session_start_time: Option<Instant>,
     pub_sub_worker_start: Option<Instant>,
     process_start: datetime::Instant,
+    subscriber_start_until: Option<Instant>,
 ) -> Result<()> {
     let start_worker = Instant::now() - start;
     let change_vec;
@@ -266,6 +267,14 @@ pub async fn subscribe_worker(
         zenoh_new = zenoh::open(config).await.unwrap();
         session_start = Some(Instant::now());
         {
+            if let Some(subscriber_start_until) = &subscriber_start_until {
+                let now = Instant::now();
+                if *subscriber_start_until >= now {
+                    async_std::task::sleep(*subscriber_start_until - Instant::now()).await;
+                } else {
+                    async_std::task::sleep(*subscriber_start_until - *subscriber_start_until).await;
+                }
+            }
             let mut subscriber = zenoh_new.subscribe("/demo/example/**").await.unwrap();
             after_subscribing = Instant::now() - start;
             let stream = subscriber.receiver();
@@ -289,6 +298,14 @@ pub async fn subscribe_worker(
         }
         zenoh_new.close().await.unwrap();
     } else {
+        if let Some(subscriber_start_until) = &subscriber_start_until {
+            let now = Instant::now();
+            if *subscriber_start_until >= now {
+                async_std::task::sleep(*subscriber_start_until - Instant::now()).await;
+            } else {
+                async_std::task::sleep(*subscriber_start_until - *subscriber_start_until).await;
+            }
+        }
         let mut subscriber = zenoh.subscribe("/demo/example/**").await.unwrap();
         after_subscribing = Instant::now() - start;
         let stream = subscriber.receiver();
@@ -405,6 +422,7 @@ pub async fn pub_and_sub_worker(
     args: Cli,
     start: Instant,
     process_start: datetime::Instant,
+    subscriber_start_until: Option<Instant>,
 ) -> Result<()> {
     let pub_sub_worker_start = Some(Instant::now());
     let mut config = config::default();
@@ -455,6 +473,7 @@ pub async fn pub_and_sub_worker(
         session_start_time,
         pub_sub_worker_start,
         process_start,
+        subscriber_start_until,
     );
     futures::try_join!(pub_future, sub_future)?;
     let zenoh = Arc::try_unwrap(zenoh).map_err(|_| ()).unwrap();

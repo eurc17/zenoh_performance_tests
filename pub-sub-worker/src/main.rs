@@ -63,6 +63,9 @@ pub struct Cli {
     pub pub_interval_freq: usize,
     #[clap(long)]
     pub rx_buffer_size: Option<usize>,
+    #[clap(short = 's', long)]
+    /// The time to sleep (in ms) before allowing subscriber to subscribe to the topic. Must be smaller than init_time, or the program will panic.
+    pub subscriber_init_time: Option<u64>,
 }
 
 #[async_std::main]
@@ -87,6 +90,16 @@ async fn main() {
     let process_start = datetime::Instant::now();
     let start_until = start + Duration::from_millis(args.init_time);
     let timeout = start_until + Duration::from_millis(args.round_timeout);
+    if let Some(subscriber_init_time) = &args.subscriber_init_time {
+        assert!(
+            *subscriber_init_time < args.init_time,
+            "The subscriber must subscribe before the initialization time ends"
+        );
+    }
+    let subscriber_start_until = match args.subscriber_init_time {
+        Some(subscriber_init_time) => Some(start + Duration::from_millis(subscriber_init_time)),
+        _ => None,
+    };
 
     // Start workers
     let pub_sub_fut = pub_and_sub_worker(
@@ -103,6 +116,7 @@ async fn main() {
         args.clone(),
         start,
         process_start,
+        subscriber_start_until,
     );
     let _result = futures::join!(pub_sub_fut);
 }
