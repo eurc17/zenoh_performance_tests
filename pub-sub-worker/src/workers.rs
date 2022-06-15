@@ -441,6 +441,12 @@ pub async fn pub_and_sub_worker(
             .set_buffer_size(Some(rx_buffer_size))
             .unwrap();
     }
+    if args.client_mode_flag {
+        if args.locators.len() == 0 {
+            warn!("No locators set to listen to and the pub/sub workers are in client mode. Please check your configuration.");
+        }
+        config.set_mode(Some(WhatAmI::Client)).unwrap();
+    }
     let zenoh = Arc::new(zenoh::open(config).await.unwrap());
     let session_start_time = Some(Instant::now());
     let pub_future = publish_worker(
