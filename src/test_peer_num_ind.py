@@ -73,6 +73,8 @@ def main(args):
             )
         if args.client_mode:
             cmd += " --client_mode"
+        if args.locators != None:
+            cmd += " --locators {}".format(args.locators)
         # print(cmd)
         # os.system(cmd)
         proc = subprocess.Popen(
@@ -155,6 +157,11 @@ if __name__ == "__main__":
         "--client_mode",
         action="store_true",
         help="Use client mode instead of peer mode",
+    )
+    parser.add_argument(
+        "--locators",
+        type=str,
+        help="The locators to connect to",
     )
 
     args = parser.parse_args()
