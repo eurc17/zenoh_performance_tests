@@ -31,7 +31,7 @@ def main(args):
         )
         end = time.time()
         if args.rx_buffer_size is not None:
-            cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} --rx-buffer-size {}".format(
+            cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} --rx-buffer-size {} -s {}".format(
                 args.output_dir,
                 file_name,
                 peer_id,
@@ -43,9 +43,10 @@ def main(args):
                 args.init_time,
                 int(round((end - start) * 1000)),
                 args.rx_buffer_size,
+                args.subscriber_init_time,
             )
         else:
-            cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} ".format(
+            cmd = "/usr/bin/time -v -o {}/log_{}.txt ./target/release/pub-sub-worker -p {} -a {} -m {} -n {} -t {} -o {} -i {} -d {} -s {} ".format(
                 args.output_dir,
                 file_name,
                 peer_id,
@@ -56,6 +57,7 @@ def main(args):
                 args.output_dir,
                 args.init_time,
                 int(round((end - start) * 1000)),
+                args.subscriber_init_time,
             )
         # print(cmd)
         proc = subprocess.Popen(
@@ -124,6 +126,13 @@ if __name__ == "__main__":
         "--rx_buffer_size",
         type=int,
         help="The size (Bytes) of the transport link rx buffer",
+    )
+    parser.add_argument(
+        "-s",
+        "--subscriber_init_time",
+        type=int,
+        help="The time in ms before the subscriber subscribes to the topic",
+        default=0,
     )
 
     args = parser.parse_args()

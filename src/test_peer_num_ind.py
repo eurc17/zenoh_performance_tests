@@ -51,7 +51,7 @@ def main(args):
         #     args.init_time,
         # )
         if args.rx_buffer_size is not None:
-            cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {} -r {}".format(
+            cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {} -r {} -s {}".format(
                 peer_num,
                 num_msgs_per_peer,
                 payload_size,
@@ -59,15 +59,17 @@ def main(args):
                 args.output_dir,
                 args.init_time,
                 args.rx_buffer_size,
+                args.subscriber_init_time,
             )
         else:
-            cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {}".format(
+            cmd = "python3 ./src/peer_worker.py -p {} -m {} -n {} -t {} -o {} -i {} -s {}".format(
                 peer_num,
                 num_msgs_per_peer,
                 payload_size,
                 round_timeout,
                 args.output_dir,
                 args.init_time,
+                args.subscriber_init_time,
             )
         # print(cmd)
         # os.system(cmd)
@@ -139,6 +141,13 @@ if __name__ == "__main__":
         "--rx_buffer_size",
         type=int,
         help="The size (Bytes) of the transport link rx buffer",
+    )
+    parser.add_argument(
+        "-s",
+        "--subscriber_init_time",
+        type=int,
+        help="The time in ms before the subscriber subscribes to the topic",
+        default=0,
     )
 
     args = parser.parse_args()
