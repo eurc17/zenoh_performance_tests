@@ -38,3 +38,4 @@ pub use zenoh::{
 };
 
 pub type Error = Box<dyn StdError + Send + Sync + 'static>;
+pub type Result<T, E = Error> = std::result::Result<T, E>;
