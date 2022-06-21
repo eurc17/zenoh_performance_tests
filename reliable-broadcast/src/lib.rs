@@ -1,10 +1,10 @@
 mod common;
-mod config;
+pub mod config;
+mod io;
 mod message;
 mod sender;
 mod state;
 mod stream;
-mod zenoh_io;
 
 pub use config::Config;
 pub use message::BroadcastId;

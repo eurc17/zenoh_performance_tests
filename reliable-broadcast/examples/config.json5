@@ -11,7 +11,5 @@
     "extra_rounds": 2,
     // "remote_peer_locator": "tcp/140.112.31.243:7447",
     // "initial_delay": 1000,
-    "reliability": "reliable",     // reliable or best_effort
-    "sub_mode": "push",            // push or pull
-    "congestion_control": "block", // drop or block
+    "io": "io.json5",
 }

@@ -30,12 +30,6 @@ pub use std::{
     time::Duration,
 };
 pub use uuid::Uuid;
-pub use zenoh::{
-    self as zn,
-    prelude::*,
-    publication::CongestionControl,
-    subscriber::{Reliability, SubMode},
-};
 
 pub type Error = Box<dyn StdError + Send + Sync + 'static>;
 pub type Result<T, E = Error> = std::result::Result<T, E>;

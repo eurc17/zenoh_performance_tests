@@ -1,12 +1,9 @@
-use crate::{
-    common::*,
-    message::*,
-    zenoh_io::{ZnReceiverConfig, ZnSender},
-    ConsensusError, Event,
-};
+use async_std::sync::Mutex;
+
+use crate::{common::*, config::IoConfig, io::Sender, message::*, ConsensusError, Event};
 use async_std::task::spawn;
 use uhlc::HLC;
-use zenoh::subscriber::{Reliability, SubMode};
+use zenoh::prelude::{Encoding, KeyExpr, Sample, SampleKind};
 
 const ENCODING: Encoding = Encoding::APP_JSON;
 
@@ -14,7 +11,7 @@ pub(crate) struct State<T>
 where
     T: 'static + Serialize + DeserializeOwned + Send + Sync,
 {
-    pub(crate) session: Arc<zn::Session>,
+    pub(crate) session: Arc<zenoh::Session>,
     pub(crate) my_id: Uuid,
     pub(crate) seq_number: AtomicUsize,
     pub(crate) key: KeyExpr<'static>,
@@ -30,11 +27,11 @@ where
     /// The timeout for each round. Must be larger than 2 * `recv_timeout`.
     pub(crate) round_timeout: Duration,
     pub(crate) echo_interval: Duration,
-    pub(crate) sub_mode: SubMode,
-    pub(crate) reliability: Reliability,
+    // pub(crate) sub_mode: SubMode,
+    // pub(crate) reliability: Reliability,
+    pub(crate) io_config: IoConfig,
     pub(crate) hlc: HLC,
-    pub(crate) zn_sender: ZnSender,
-    // pub(crate) zn_stream: ZnStream,
+    pub(crate) io_sender: Mutex<Sender<Message<T>>>,
 }
 
 impl<T> State<T>
@@ -56,7 +53,8 @@ where
             data,
         }
         .into();
-        self.zn_sender.send(&msg).await?;
+        let mut io_sender = self.io_sender.lock().await;
+        io_sender.send(msg).await?;
         Ok(())
     }
 
@@ -160,75 +158,69 @@ where
     pub async fn run_receiving_worker(self: Arc<Self>) -> Result<(), Error> {
         // The lifetime of subscriber must be longer than the stream.
         // Otherwise, the stream is unable to retrieve input message.
-        let (_subscriber, stream) = {
-            let me = self.clone();
-            let subscriber_builder = me.session.subscribe(format!("{}/**", self.key));
-            let mut subscriber = subscriber_builder
-                .reliability(self.reliability)
-                .mode(self.sub_mode)
-                .await?;
-            let receiver = subscriber.receiver().clone();
-            (subscriber, receiver)
-        };
 
-        // let me = self.clone();
-        // let key = format!("{}/**", self.key);
-        // let stream = ZnReceiverConfig {
-        //     reliability: self.reliability,
-        //     sub_mode: self.sub_mode,
-        // }
-        // .build(&me.session, key)
-        // .await?
-        // .into_stream();
+        let me = self.clone();
 
-        let future = stream
-            .filter_map(|mut sample| async move {
-                if sample.kind != SampleKind::Put {
-                    return None;
-                }
+        match &me.io_config {
+            IoConfig::Zenoh(config) => {
+                let subscriber_builder = me.session.subscribe(format!("{}/**", self.key));
+                let mut subscriber = subscriber_builder
+                    .reliability(config.reliability.into())
+                    .mode(config.sub_mode.into())
+                    .await?;
+                let stream = subscriber.receiver().clone();
 
-                sample.value = sample.value.encoding(ENCODING);
+                let future = stream
+                    .filter_map(|mut sample| async move {
+                        if sample.kind != SampleKind::Put {
+                            return None;
+                        }
 
-                guard!(let Some(value) = sample.value.as_json() else {
-                    debug!("unable to decode message: not JSON format");
-                    return None;
-                });
+                        sample.value = sample.value.encoding(ENCODING);
 
-                let value: Message<T> = match serde_json::from_value(value) {
-                    Ok(value) => value,
-                    Err(err) => {
-                        debug!("unable to decode message: {:?}", err);
-                        return None;
-                    }
-                };
+                        guard!(let Some(value) = sample.value.as_json() else {
+                            debug!("unable to decode message: not JSON format");
+                            return None;
+                        });
 
-                Some((sample, value))
-            })
-            .map(Result::<_, Error>::Ok)
-            .try_for_each_concurrent(8, move |(sample, msg)| {
-                let me = self.clone();
+                        let value: Message<T> = match serde_json::from_value(value) {
+                            Ok(value) => value,
+                            Err(err) => {
+                                debug!("unable to decode message: {:?}", err);
+                                return None;
+                            }
+                        };
 
-                async move {
-                    match msg {
-                        Message::Broadcast(msg) => me.handle_broadcast(sample, msg),
-                        Message::Present(msg) => me.handle_present(sample, msg),
-                        Message::Echo(msg) => me.handle_echo(sample, msg),
-                    }
-                    Ok(())
-                }
-            });
+                        Some((sample, value))
+                    })
+                    .map(Result::<_, Error>::Ok)
+                    .try_for_each_concurrent(8, move |(sample, msg)| {
+                        let me = self.clone();
 
-        spawn(future).await?;
+                        async move {
+                            match msg {
+                                Message::Broadcast(msg) => me.handle_broadcast(sample, msg),
+                                Message::Present(msg) => me.handle_present(sample, msg),
+                                Message::Echo(msg) => me.handle_echo(sample, msg),
+                            }
+                            Ok(())
+                        }
+                    });
+
+                spawn(future).await?;
+            }
+            IoConfig::Dds(_) => todo!(),
+        }
 
         Ok(())
     }
 
     /// Start a worker that periodically publishes batched echos.
     pub async fn run_echo_worker(self: Arc<Self>) -> Result<(), Error> {
-        spawn(async move {
+        spawn(
             async_std::stream::interval(self.echo_interval)
                 .map(Ok)
-                .try_for_each(|()| {
+                .try_for_each(move |()| {
                     let me = self.clone();
 
                     async move {
@@ -242,23 +234,15 @@ where
                             broadcast_ids,
                         }
                         .into();
-                        // let value: Value = serde_json::to_value(&msg)?.into();
-                        // me.session
-                        //     .put(&me.key, value)
-                        //     .congestion_control(CongestionControl::Drop)
-                        //     .kind(SampleKind::Put)
-                        //     .encoding(ENCODING)
-                        //     .await?;
-                        me.zn_sender.send(&msg).await?;
+                        let mut io_sender = me.io_sender.lock().await;
+                        io_sender.send(msg).await?;
                         Result::<(), Error>::Ok(())
                     }
-                })
-                .await?;
-
-            Result::<(), Error>::Ok(())
-        })
+                }),
+        )
         .await?;
-        Ok(())
+
+        Result::<(), Error>::Ok(())
     }
 
     /// Start a worker for a received broadcast.

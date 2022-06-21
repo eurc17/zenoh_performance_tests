@@ -2,12 +2,11 @@ use async_std::task::JoinHandle;
 use collected::SumVal;
 use futures::stream::{self, StreamExt as _, TryStreamExt as _};
 use rand::{prelude::*, rngs::OsRng};
-use reliable_broadcast as rb;
+use reliable_broadcast::{self as rb, config::IoConfig};
 use serde::{Deserialize, Serialize};
+use serde_loader::Json5Path;
 use std::{
     error::Error as StdError,
-    fs,
-    path::Path,
     sync::Arc,
     time::{Duration, Instant},
 };
@@ -15,90 +14,27 @@ use zenoh as zn;
 
 type Error = Box<dyn StdError + Send + Sync + 'static>;
 
-mod config {
-    use super::*;
-
-    #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-    #[serde(rename_all = "snake_case")]
-    pub enum SubMode {
-        Push,
-        Pull,
-    }
-
-    impl From<SubMode> for zn::subscriber::SubMode {
-        fn from(from: SubMode) -> Self {
-            use zn::subscriber::SubMode as O;
-            use SubMode as I;
-
-            match from {
-                I::Push => O::Push,
-                I::Pull => O::Pull,
-            }
-        }
-    }
-
-    #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-    #[serde(rename_all = "snake_case")]
-    pub enum Reliability {
-        BestEffort,
-        Reliable,
-    }
-
-    impl From<Reliability> for zn::subscriber::Reliability {
-        fn from(from: Reliability) -> Self {
-            use zn::subscriber::Reliability as O;
-            use Reliability as I;
-
-            match from {
-                I::BestEffort => O::BestEffort,
-                I::Reliable => O::Reliable,
-            }
-        }
-    }
-
-    #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-    #[serde(rename_all = "snake_case")]
-    pub enum CongestionControl {
-        Block,
-        Drop,
-    }
-
-    impl From<CongestionControl> for zn::publication::CongestionControl {
-        fn from(from: CongestionControl) -> Self {
-            use zn::publication::CongestionControl as O;
-            use CongestionControl as I;
-
-            match from {
-                I::Block => O::Block,
-                I::Drop => O::Drop,
-            }
-        }
-    }
-
-    #[derive(Debug, Clone, Serialize, Deserialize)]
-    pub struct TestConfig {
-        pub num_peers: usize,
-        pub num_msgs: usize,
-        pub zenoh_key: String,
-        #[serde(with = "humantime_serde")]
-        pub round_timeout: Duration,
-        #[serde(with = "humantime_serde")]
-        pub echo_interval: Duration,
-        #[serde(with = "humantime_serde")]
-        pub publisher_startup_delay: Duration,
-        pub max_rounds: usize,
-        pub extra_rounds: usize,
-        pub sub_mode: SubMode,
-        pub reliability: Reliability,
-        pub congestion_control: CongestionControl,
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TestConfig {
+    pub num_peers: usize,
+    pub num_msgs: usize,
+    pub zenoh_key: String,
+    #[serde(with = "humantime_serde")]
+    pub round_timeout: Duration,
+    #[serde(with = "humantime_serde")]
+    pub echo_interval: Duration,
+    #[serde(with = "humantime_serde")]
+    pub publisher_startup_delay: Duration,
+    pub max_rounds: usize,
+    pub extra_rounds: usize,
+    pub io: Json5Path<IoConfig>,
 }
 
 #[async_std::main]
 async fn main() -> Result<(), Error> {
     pretty_env_logger::init();
 
-    let config::TestConfig {
+    let TestConfig {
         num_peers,
         num_msgs,
         zenoh_key,
@@ -106,25 +42,22 @@ async fn main() -> Result<(), Error> {
         echo_interval,
         max_rounds,
         extra_rounds,
-        congestion_control,
-        reliability,
-        sub_mode,
         publisher_startup_delay,
+        io: io_config,
     } = {
-        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("examples")
-            .join("config.json5");
-        let text = fs::read_to_string(path)?;
-        json5::from_str(&text)?
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/examples/config.json5");
+        Json5Path::open_and_take(path)?
     };
 
+    let io_config = io_config.take();
     // let startup_duration = Duration::from_millis(3000);
 
     let num_expected = num_msgs * num_peers;
     let interval_timeout = (round_timeout * max_rounds as u32) + Duration::from_millis(50);
 
-    let futures = (0..num_peers).map(|_| -> JoinHandle<Result<(usize, usize), Error>> {
+    let futures = (0..num_peers).map(move |_| -> JoinHandle<Result<(usize, usize), Error>> {
         let zenoh_key = zenoh_key.clone();
+        let io_config = io_config.clone();
 
         async_std::task::spawn(async move {
             let mut config = zn::config::default();
@@ -137,9 +70,7 @@ async fn main() -> Result<(), Error> {
                 extra_rounds,
                 round_timeout,
                 echo_interval,
-                sub_mode: sub_mode.into(),
-                reliability: reliability.into(),
-                congestion_control: congestion_control.into(),
+                io: io_config,
             }
             .build(session, zenoh_key)
             .await?;

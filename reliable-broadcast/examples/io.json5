@@ -1,0 +1,6 @@
+{
+    "type": "zenoh",
+    "reliability": "reliable",     // reliable or best_effort
+    "sub_mode": "push",            // push or pull
+    "congestion_control": "block", // drop or block
+}
