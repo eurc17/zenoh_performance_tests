@@ -87,7 +87,6 @@ impl Config {
             round_timeout: self.round_timeout,
             echo_interval: self.echo_interval,
             commit_tx,
-            congestion_control: self.congestion_control,
             sub_mode: self.sub_mode,
             reliability: self.reliability,
             hlc: HLC::default(),

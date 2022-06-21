@@ -81,4 +81,25 @@ impl<'a> ZnReceiver<'a> {
         let sample = self.subscriber.receiver().recv_async().await?;
         Ok(sample)
     }
+
+    pub fn into_stream(mut self) -> ZnStream<'a> {
+        // let receiver = self.subscriber.receiver().clone();
+        ZnStream {
+            subscriber: self.subscriber,
+        }
+    }
+}
+
+#[pin_project]
+pub struct ZnStream<'a> {
+    #[pin]
+    subscriber: Subscriber<'a>,
+}
+
+impl<'a> Stream for ZnStream<'a> {
+    type Item = Sample;
+
+    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        self.project().subscriber.receiver().poll_next_unpin(cx)
+    }
 }

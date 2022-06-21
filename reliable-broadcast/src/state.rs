@@ -1,10 +1,12 @@
-use crate::{common::*, message::*, zenoh_io::ZnSender, ConsensusError, Event};
+use crate::{
+    common::*,
+    message::*,
+    zenoh_io::{ZnReceiverConfig, ZnSender},
+    ConsensusError, Event,
+};
 use async_std::task::spawn;
 use uhlc::HLC;
-use zenoh::{
-    publication::CongestionControl,
-    subscriber::{Reliability, SubMode},
-};
+use zenoh::subscriber::{Reliability, SubMode};
 
 const ENCODING: Encoding = Encoding::APP_JSON;
 
@@ -30,7 +32,6 @@ where
     pub(crate) echo_interval: Duration,
     pub(crate) sub_mode: SubMode,
     pub(crate) reliability: Reliability,
-    pub(crate) congestion_control: CongestionControl,
     pub(crate) hlc: HLC,
     pub(crate) zn_sender: ZnSender,
     // pub(crate) zn_stream: ZnStream,
@@ -169,6 +170,17 @@ where
             let receiver = subscriber.receiver().clone();
             (subscriber, receiver)
         };
+
+        // let me = self.clone();
+        // let key = format!("{}/**", self.key);
+        // let stream = ZnReceiverConfig {
+        //     reliability: self.reliability,
+        //     sub_mode: self.sub_mode,
+        // }
+        // .build(&me.session, key)
+        // .await?
+        // .into_stream();
+
         let future = stream
             .filter_map(|mut sample| async move {
                 if sample.kind != SampleKind::Put {
