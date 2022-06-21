@@ -1,3 +1,4 @@
+use async_std::task::JoinHandle;
 use collected::SumVal;
 use futures::stream::{self, StreamExt as _, TryStreamExt as _};
 use rand::{prelude::*, rngs::OsRng};
@@ -14,29 +15,90 @@ use zenoh as zn;
 
 type Error = Box<dyn StdError + Send + Sync + 'static>;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct TestConfig {
-    pub num_peers: usize,
-    pub num_msgs: usize,
-    pub zenoh_key: String,
-    #[serde(with = "humantime_serde")]
-    pub round_timeout: Duration,
-    #[serde(with = "humantime_serde")]
-    pub echo_interval: Duration,
-    #[serde(with = "humantime_serde")]
-    pub publisher_startup_delay: Duration,
-    pub max_rounds: usize,
-    pub extra_rounds: usize,
-    pub sub_mode: rb::SubMode,
-    pub reliability: rb::Reliability,
-    pub congestion_control: rb::CongestionControl,
+mod config {
+    use super::*;
+
+    #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+    #[serde(rename_all = "snake_case")]
+    pub enum SubMode {
+        Push,
+        Pull,
+    }
+
+    impl From<SubMode> for zn::subscriber::SubMode {
+        fn from(from: SubMode) -> Self {
+            use zn::subscriber::SubMode as O;
+            use SubMode as I;
+
+            match from {
+                I::Push => O::Push,
+                I::Pull => O::Pull,
+            }
+        }
+    }
+
+    #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+    #[serde(rename_all = "snake_case")]
+    pub enum Reliability {
+        BestEffort,
+        Reliable,
+    }
+
+    impl From<Reliability> for zn::subscriber::Reliability {
+        fn from(from: Reliability) -> Self {
+            use zn::subscriber::Reliability as O;
+            use Reliability as I;
+
+            match from {
+                I::BestEffort => O::BestEffort,
+                I::Reliable => O::Reliable,
+            }
+        }
+    }
+
+    #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+    #[serde(rename_all = "snake_case")]
+    pub enum CongestionControl {
+        Block,
+        Drop,
+    }
+
+    impl From<CongestionControl> for zn::publication::CongestionControl {
+        fn from(from: CongestionControl) -> Self {
+            use zn::publication::CongestionControl as O;
+            use CongestionControl as I;
+
+            match from {
+                I::Block => O::Block,
+                I::Drop => O::Drop,
+            }
+        }
+    }
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct TestConfig {
+        pub num_peers: usize,
+        pub num_msgs: usize,
+        pub zenoh_key: String,
+        #[serde(with = "humantime_serde")]
+        pub round_timeout: Duration,
+        #[serde(with = "humantime_serde")]
+        pub echo_interval: Duration,
+        #[serde(with = "humantime_serde")]
+        pub publisher_startup_delay: Duration,
+        pub max_rounds: usize,
+        pub extra_rounds: usize,
+        pub sub_mode: SubMode,
+        pub reliability: Reliability,
+        pub congestion_control: CongestionControl,
+    }
 }
 
 #[async_std::main]
 async fn main() -> Result<(), Error> {
     pretty_env_logger::init();
 
-    let TestConfig {
+    let config::TestConfig {
         num_peers,
         num_msgs,
         zenoh_key,
@@ -57,10 +119,11 @@ async fn main() -> Result<(), Error> {
     };
 
     // let startup_duration = Duration::from_millis(3000);
-    let num_expected = num_msgs * num_peers;
-    let interval = (round_timeout * max_rounds as u32) + Duration::from_millis(50);
 
-    let futures = (0..num_peers).map(|_| {
+    let num_expected = num_msgs * num_peers;
+    let interval_timeout = (round_timeout * max_rounds as u32) + Duration::from_millis(50);
+
+    let futures = (0..num_peers).map(|_| -> JoinHandle<Result<(usize, usize), Error>> {
         let zenoh_key = zenoh_key.clone();
 
         async_std::task::spawn(async move {
@@ -74,9 +137,9 @@ async fn main() -> Result<(), Error> {
                 extra_rounds,
                 round_timeout,
                 echo_interval,
-                congestion_control,
-                reliability,
-                sub_mode,
+                sub_mode: sub_mode.into(),
+                reliability: reliability.into(),
+                congestion_control: congestion_control.into(),
             }
             .build(session, zenoh_key)
             .await?;
@@ -88,8 +151,8 @@ async fn main() -> Result<(), Error> {
                 async move {
                     async_std::task::sleep(publisher_startup_delay).await;
 
-                    stream::once(async move { () })
-                        .chain(async_std::stream::interval(interval))
+                    stream::once(async move {})
+                        .chain(async_std::stream::interval(interval_timeout))
                         .take(num_msgs)
                         .enumerate()
                         .map(move |(seq, ())| {
@@ -108,7 +171,7 @@ async fn main() -> Result<(), Error> {
                 let my_id = my_id.clone();
 
                 async move {
-                    let timeout = interval * num_msgs as u32 + Duration::from_millis(500);
+                    let timeout = interval_timeout * num_msgs as u32 + publisher_startup_delay + Duration::from_millis(500);
 
                     let num_received = stream
                         .take(num_peers * num_msgs)
@@ -127,13 +190,15 @@ async fn main() -> Result<(), Error> {
                                 let rb::Event {
                                     result,
                                     broadcast_id,
+                                    latency,
+                                    num_rounds,
                                 } = event;
 
                                 match result {
                                     Ok(data) => {
                                         eprintln!(
-                                            "{} accepted data={} for broadcast_id={}",
-                                            my_id, data, broadcast_id
+                                            "{} accepted data={} for broadcast_id={} latency={:?} n_rounds={}",
+                                            my_id, data, broadcast_id, latency, num_rounds
                                         );
 
                                         Ok(cnt + 1)
