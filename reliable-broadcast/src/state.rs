@@ -1,4 +1,9 @@
-use crate::{common::*, message::*, ConsensusError, Event};
+use crate::{
+    common::*,
+    message::*,
+    zenoh_io::{ZnReceiverConfig, ZnSender, ZnStream},
+    ConsensusError, Event,
+};
 use async_std::task::spawn;
 use uhlc::HLC;
 use zenoh::{
@@ -32,6 +37,8 @@ where
     pub(crate) reliability: Reliability,
     pub(crate) congestion_control: CongestionControl,
     pub(crate) hlc: HLC,
+    pub(crate) zn_sender: ZnSender,
+    // pub(crate) zn_stream: ZnStream,
 }
 
 impl<T> State<T>
@@ -53,13 +60,7 @@ where
             data,
         }
         .into();
-        let value: Value = serde_json::to_value(&msg)?.into();
-        self.session
-            .put(format!("{}/{}", self.key, self.my_id), value)
-            .congestion_control(self.congestion_control)
-            .kind(SampleKind::Put)
-            .encoding(Encoding::TEXT_PLAIN)
-            .await?;
+        self.zn_sender.send(&msg).await?;
         Ok(())
     }
 
@@ -229,13 +230,14 @@ where
                             broadcast_ids,
                         }
                         .into();
-                        let value: Value = serde_json::to_value(&msg)?.into();
-                        me.session
-                            .put(&me.key, value)
-                            .congestion_control(CongestionControl::Drop)
-                            .kind(SampleKind::Put)
-                            .encoding(ENCODING)
-                            .await?;
+                        // let value: Value = serde_json::to_value(&msg)?.into();
+                        // me.session
+                        //     .put(&me.key, value)
+                        //     .congestion_control(CongestionControl::Drop)
+                        //     .kind(SampleKind::Put)
+                        //     .encoding(ENCODING)
+                        //     .await?;
+                        me.zn_sender.send(&msg).await?;
                         Result::<(), Error>::Ok(())
                     }
                 })

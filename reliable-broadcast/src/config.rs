@@ -1,6 +1,12 @@
 use uhlc::HLC;
 
-use crate::{common::*, sender::Sender, state::State, stream::Event};
+use crate::{
+    common::*,
+    sender::Sender,
+    state::State,
+    stream::Event,
+    zenoh_io::{ZnReceiverConfig, ZnSenderConfig},
+};
 
 #[derive(Debug, Clone, PartialEq)]
 /// Defines the structure of the config file.
@@ -42,12 +48,34 @@ impl Config {
             return Err(anyhow!("extra_rounds must be less than max_rounds").into());
         }
 
+        let my_id = session.id().await.parse()?;
         let key = key.into().to_owned();
         let (commit_tx, commit_rx) = flume::unbounded();
 
+        let zn_sender = {
+            let send_key = format!("{}/{}", key, my_id);
+            ZnSenderConfig {
+                congestion_control: self.congestion_control,
+                kind: Default::default(),
+            }
+            .build(session.clone(), send_key)
+            .await?
+        };
+
+        // let zn_stream = {
+        //     let recv_key = format!("{}/**", key);
+        //     ZnReceiverConfig {
+        //         reliability: self.reliability,
+        //         sub_mode: self.sub_mode,
+        //     }
+        //     .build(&session, recv_key)
+        //     .await?
+        //     .into_stream()
+        // };
+
         let state = Arc::new(State::<T> {
             key,
-            my_id: session.id().await.parse()?,
+            my_id,
             seq_number: AtomicUsize::new(0),
             active_peers: DashSet::new(),
             echo_requests: RwLock::new(DashSet::new()),
@@ -63,6 +91,8 @@ impl Config {
             sub_mode: self.sub_mode,
             reliability: self.reliability,
             hlc: HLC::default(),
+            zn_sender,
+            // zn_stream,
         });
         let receiving_worker = state.clone().run_receiving_worker();
         let echo_worker = state.clone().run_echo_worker();
