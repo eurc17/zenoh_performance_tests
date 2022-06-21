@@ -1,9 +1,4 @@
-use crate::{
-    common::*,
-    message::*,
-    zenoh_io::{ZnReceiverConfig, ZnSender, ZnStream},
-    ConsensusError, Event,
-};
+use crate::{common::*, message::*, zenoh_io::ZnSender, ConsensusError, Event};
 use async_std::task::spawn;
 use uhlc::HLC;
 use zenoh::{
@@ -162,14 +157,19 @@ where
 
     /// Start a worker that consumes input messages and handle each message accordingly.
     pub async fn run_receiving_worker(self: Arc<Self>) -> Result<(), Error> {
-        let me = self.clone();
-        let subscriber_builder = me.session.subscribe(format!("{}/**", self.key));
-        let mut subscriber = subscriber_builder
-            .reliability(self.reliability)
-            .mode(self.sub_mode)
-            .await?;
-        let receiver = subscriber.receiver().clone();
-        let future = receiver
+        // The lifetime of subscriber must be longer than the stream.
+        // Otherwise, the stream is unable to retrieve input message.
+        let (_subscriber, stream) = {
+            let me = self.clone();
+            let subscriber_builder = me.session.subscribe(format!("{}/**", self.key));
+            let mut subscriber = subscriber_builder
+                .reliability(self.reliability)
+                .mode(self.sub_mode)
+                .await?;
+            let receiver = subscriber.receiver().clone();
+            (subscriber, receiver)
+        };
+        let future = stream
             .filter_map(|mut sample| async move {
                 if sample.kind != SampleKind::Put {
                     return None;
