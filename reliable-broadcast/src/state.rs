@@ -1,11 +1,14 @@
 use async_std::sync::Mutex;
 
-use crate::{common::*, config::IoConfig, io::Sender, message::*, ConsensusError, Event};
+use crate::{
+    common::*,
+    config::IoConfig,
+    io::{generic::Sample, Sender},
+    message::*,
+    ConsensusError, Event,
+};
 use async_std::task::spawn;
 use uhlc::HLC;
-use zenoh::prelude::{Encoding, KeyExpr, Sample, SampleKind};
-
-const ENCODING: Encoding = Encoding::APP_JSON;
 
 pub(crate) struct State<T>
 where
@@ -14,7 +17,6 @@ where
     pub(crate) session: Arc<zenoh::Session>,
     pub(crate) my_id: Uuid,
     pub(crate) seq_number: AtomicUsize,
-    pub(crate) key: KeyExpr<'static>,
     pub(crate) active_peers: DashSet<Uuid>,
     pub(crate) echo_requests: RwLock<DashSet<BroadcastId>>,
     pub(crate) contexts: DashMap<BroadcastId, BroadcastContext>,
@@ -27,8 +29,6 @@ where
     /// The timeout for each round. Must be larger than 2 * `recv_timeout`.
     pub(crate) round_timeout: Duration,
     pub(crate) echo_interval: Duration,
-    // pub(crate) sub_mode: SubMode,
-    // pub(crate) reliability: Reliability,
     pub(crate) io_config: IoConfig,
     pub(crate) hlc: HLC,
     pub(crate) io_sender: Mutex<Sender<Message<T>>>,
@@ -36,7 +36,7 @@ where
 
 impl<T> State<T>
 where
-    T: 'static + Serialize + DeserializeOwned + Send + Sync,
+    T: 'static + Serialize + DeserializeOwned + Send + Sync + Clone,
 {
     /// Schedule a future task to publish an echo.
     async fn request_sending_echo(self: Arc<Self>, broadcast_id: BroadcastId) {
@@ -59,7 +59,7 @@ where
     }
 
     /// Process an input broadcast.
-    fn handle_broadcast(self: Arc<Self>, sample: Sample, msg: Broadcast<T>) {
+    fn handle_broadcast(self: Arc<Self>, sample: Sample<Message<T>>, msg: Broadcast<T>) {
         // TODO: check timestamp
         // let peer_id = sample.source_info.source_id.unwrap();
         // let seq = sample.source_info.source_sn.unwrap();
@@ -106,7 +106,7 @@ where
     }
 
     /// Process an input present message.
-    fn handle_present(&self, _sample: Sample, msg: Present) {
+    fn handle_present(&self, _sample: Sample<Message<T>>, msg: Present) {
         let Present { from: sender } = msg;
         // TODO: check timestamp
         // let peer_id = sample.source_info.source_id.unwrap();
@@ -116,7 +116,7 @@ where
     }
 
     /// Process an input echo.
-    fn handle_echo(&self, _sample: Sample, msg: Echo) {
+    fn handle_echo(&self, _sample: Sample<Message<T>>, msg: Echo) {
         // TODO: check timestamp
         // let peer_id = sample.source_info.source_id.unwrap();
 
@@ -161,56 +161,60 @@ where
 
         let me = self.clone();
 
-        match &me.io_config {
+        let receiver: crate::io::generic::Receiver<_> = match &me.io_config {
             IoConfig::Zenoh(config) => {
-                let subscriber_builder = me.session.subscribe(format!("{}/**", self.key));
-                let mut subscriber = subscriber_builder
-                    .reliability(config.reliability.into())
-                    .mode(config.sub_mode.into())
-                    .await?;
-                let stream = subscriber.receiver().clone();
+                let recv_key = format!("{}/*", config.key);
 
-                let future = stream
-                    .filter_map(|mut sample| async move {
-                        if sample.kind != SampleKind::Put {
-                            return None;
-                        }
+                let receiver = crate::io::zenoh::ReceiverConfig {
+                    reliability: config.reliability.into(),
+                    sub_mode: config.sub_mode.into(),
+                }
+                .build::<Message<T>, _>(me.session.clone(), &recv_key)
+                .await?;
 
-                        sample.value = sample.value.encoding(ENCODING);
-
-                        guard!(let Some(value) = sample.value.as_json() else {
-                            debug!("unable to decode message: not JSON format");
-                            return None;
-                        });
-
-                        let value: Message<T> = match serde_json::from_value(value) {
-                            Ok(value) => value,
-                            Err(err) => {
-                                debug!("unable to decode message: {:?}", err);
-                                return None;
-                            }
-                        };
-
-                        Some((sample, value))
-                    })
-                    .map(Result::<_, Error>::Ok)
-                    .try_for_each_concurrent(8, move |(sample, msg)| {
-                        let me = self.clone();
-
-                        async move {
-                            match msg {
-                                Message::Broadcast(msg) => me.handle_broadcast(sample, msg),
-                                Message::Present(msg) => me.handle_present(sample, msg),
-                                Message::Echo(msg) => me.handle_echo(sample, msg),
-                            }
-                            Ok(())
-                        }
-                    });
-
-                spawn(future).await?;
+                receiver.into()
             }
-            IoConfig::Dds(_) => todo!(),
-        }
+            IoConfig::Dds(config) => config.build_receiver()?.into(),
+        };
+
+        let future = receiver
+            .into_sample_stream()
+            .try_filter_map(|sample| async move {
+                let value = match sample.to_value()? {
+                    Some(value) => value,
+                    None => return Ok(None),
+                };
+                // sample.value = sample.value.encoding(ENCODING);
+
+                // guard!(let Some(value) = sample.value.as_json() else {
+                //     debug!("unable to decode message: not JSON format");
+                //     return None;
+                // });
+
+                // let value: Message<T> = match serde_json::from_value(value) {
+                //     Ok(value) => value,
+                //     Err(err) => {
+                //         debug!("unable to decode message: {:?}", err);
+                //         return None;
+                //     }
+                // };
+
+                Ok(Some((sample, value)))
+            })
+            .try_for_each_concurrent(8, move |(sample, msg)| {
+                let me = self.clone();
+
+                async move {
+                    match msg {
+                        Message::Broadcast(msg) => me.handle_broadcast(sample, msg),
+                        Message::Present(msg) => me.handle_present(sample, msg),
+                        Message::Echo(msg) => me.handle_echo(sample, msg),
+                    }
+                    Ok(())
+                }
+            });
+
+        spawn(future).await?;
 
         Ok(())
     }
@@ -250,19 +254,17 @@ where
         self: Arc<Self>,
         broadcast_id: BroadcastId,
         acked_peers: Arc<DashSet<Uuid>>,
-        sample: Sample,
+        sample: Sample<Message<T>>,
         data: T,
     ) {
         spawn(async move {
             let get_latency = || {
-                let sample_timestamp = sample
-                    .timestamp
-                    .unwrap_or_else(|| panic!("HLC feature must be enabled for Zenoh"));
+                let sample_timestamp = sample.timestamp();
 
                 let ok = self.hlc.update_with_timestamp(&sample_timestamp).is_ok();
                 assert!(ok, "timestamp drifts too much");
                 let tagged_timestamp = self.hlc.new_timestamp();
-                tagged_timestamp.get_diff_duration(sample.timestamp.as_ref().unwrap())
+                tagged_timestamp.get_diff_duration(&sample.timestamp())
             };
 
             // TODO: determine start time from timestamp in broadcast message

@@ -1,7 +1,6 @@
 use async_std::sync::Mutex;
 
 use uhlc::HLC;
-use zn::prelude::KeyExpr;
 
 use crate::{common::*, sender::Sender, state::State, stream::Event};
 use zenoh as zn;
@@ -22,10 +21,9 @@ pub struct Config {
 }
 
 impl Config {
-    pub async fn build<'a, T, K>(
+    pub async fn build<T>(
         &self,
         session: Arc<zn::Session>,
-        key: K,
     ) -> Result<
         (
             Sender<T>,
@@ -34,8 +32,7 @@ impl Config {
         Error,
     >
     where
-        T: 'static + Serialize + DeserializeOwned + Send + Sync,
-        K: Into<KeyExpr<'a>>,
+        T: 'static + Serialize + DeserializeOwned + Send + Sync + Clone,
     {
         // sanity check
         if self.echo_interval >= self.round_timeout {
@@ -46,7 +43,6 @@ impl Config {
         }
 
         let my_id = session.id().await.parse()?;
-        let key = key.into().to_owned();
         let (commit_tx, commit_rx) = flume::unbounded();
 
         let io_config = self.io.clone();
@@ -54,7 +50,7 @@ impl Config {
         let io_sender: crate::io::Sender<_> = {
             match &io_config {
                 IoConfig::Zenoh(config) => {
-                    let send_key = format!("{}/{}", key, my_id);
+                    let send_key = format!("{}/{}", config.key, my_id);
                     crate::io::zenoh::SenderConfig {
                         congestion_control: config.congestion_control.into(),
                         kind: Default::default(),
@@ -63,12 +59,11 @@ impl Config {
                     .await?
                     .into()
                 }
-                IoConfig::Dds(_) => todo!(),
+                IoConfig::Dds(config) => config.build_sender()?.into(),
             }
         };
 
         let state = Arc::new(State::<T> {
-            key,
             my_id,
             seq_number: AtomicUsize::new(0),
             active_peers: DashSet::new(),
@@ -81,8 +76,6 @@ impl Config {
             round_timeout: self.round_timeout,
             echo_interval: self.echo_interval,
             commit_tx,
-            // sub_mode: self.sub_mode,
-            // reliability: self.reliability,
             io_config,
             hlc: HLC::default(),
             io_sender: Mutex::new(io_sender),
@@ -135,6 +128,7 @@ pub mod zenoh_config {
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
     #[serde(tag = "type", rename_all = "snake_case")]
     pub struct ZenohConfig {
+        pub key: String,
         pub sub_mode: SubMode,
         pub reliability: Reliability,
         pub congestion_control: CongestionControl,

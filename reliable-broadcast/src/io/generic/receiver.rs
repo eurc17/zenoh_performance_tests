@@ -13,6 +13,24 @@ where
     Dds(dds_io::Receiver<T>),
 }
 
+impl<T> From<dds_io::Receiver<T>> for Receiver<T>
+where
+    T: for<'de> Deserialize<'de> + Send + 'static,
+{
+    fn from(v: dds_io::Receiver<T>) -> Self {
+        Self::Dds(v)
+    }
+}
+
+impl<T> From<zenoh_io::Receiver<T>> for Receiver<T>
+where
+    T: for<'de> Deserialize<'de> + Send + 'static,
+{
+    fn from(v: zenoh_io::Receiver<T>) -> Self {
+        Self::Zenoh(v)
+    }
+}
+
 impl<T> Receiver<T>
 where
     T: for<'de> Deserialize<'de> + Send + 'static,

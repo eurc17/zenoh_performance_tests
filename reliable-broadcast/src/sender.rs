@@ -10,7 +10,7 @@ where
 
 impl<T> Sender<T>
 where
-    T: 'static + Serialize + DeserializeOwned + Send + Sync,
+    T: 'static + Serialize + DeserializeOwned + Send + Sync + Clone,
 {
     pub async fn send(&self, data: T) -> Result<(), Error> {
         self.state.clone().broadcast(data).await?;

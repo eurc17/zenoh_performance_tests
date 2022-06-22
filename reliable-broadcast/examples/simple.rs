@@ -18,7 +18,6 @@ type Error = Box<dyn StdError + Send + Sync + 'static>;
 pub struct TestConfig {
     pub num_peers: usize,
     pub num_msgs: usize,
-    pub zenoh_key: String,
     #[serde(with = "humantime_serde")]
     pub round_timeout: Duration,
     #[serde(with = "humantime_serde")]
@@ -37,7 +36,6 @@ async fn main() -> Result<(), Error> {
     let TestConfig {
         num_peers,
         num_msgs,
-        zenoh_key,
         round_timeout,
         echo_interval,
         max_rounds,
@@ -56,7 +54,6 @@ async fn main() -> Result<(), Error> {
     let interval_timeout = (round_timeout * max_rounds as u32) + Duration::from_millis(50);
 
     let futures = (0..num_peers).map(move |_| -> JoinHandle<Result<(usize, usize), Error>> {
-        let zenoh_key = zenoh_key.clone();
         let io_config = io_config.clone();
 
         async_std::task::spawn(async move {
@@ -72,7 +69,7 @@ async fn main() -> Result<(), Error> {
                 echo_interval,
                 io: io_config,
             }
-            .build(session, zenoh_key)
+            .build(session)
             .await?;
             let sink = sender.into_sink();
 
