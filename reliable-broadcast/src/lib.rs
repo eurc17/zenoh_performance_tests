@@ -5,6 +5,7 @@ mod message;
 mod sender;
 mod state;
 mod stream;
+mod worker;
 
 pub use config::Config;
 pub use message::BroadcastId;

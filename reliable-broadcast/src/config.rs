@@ -1,7 +1,3 @@
-use async_std::sync::Mutex;
-
-use uhlc::HLC;
-
 use crate::{common::*, sender::Sender, state::State, stream::Event};
 use zenoh as zn;
 
@@ -23,7 +19,8 @@ pub struct Config {
 impl Config {
     pub async fn build<T>(
         &self,
-        session: Arc<zn::Session>,
+        zenoh_session: Option<Arc<zenoh::Session>>,
+        dds_domain_participant: Option<&rustdds::DomainParticipant>,
     ) -> Result<
         (
             Sender<T>,
@@ -34,84 +31,7 @@ impl Config {
     where
         T: 'static + Serialize + DeserializeOwned + Send + Sync + Clone,
     {
-        // sanity check
-        if self.echo_interval >= self.round_timeout {
-            return Err(anyhow!("echo_interval must be less than round_timeout").into());
-        }
-        if self.extra_rounds >= self.max_rounds {
-            return Err(anyhow!("extra_rounds must be less than max_rounds").into());
-        }
-
-        let my_id = session.id().await.parse()?;
-        let (commit_tx, commit_rx) = flume::unbounded();
-
-        let io_config = self.io.clone();
-
-        let io_sender: crate::io::Sender<_> = {
-            match &io_config {
-                IoConfig::Zenoh(config) => {
-                    let send_key = format!("{}/{}", config.key, my_id);
-                    crate::io::zenoh::SenderConfig {
-                        congestion_control: config.congestion_control.into(),
-                        kind: Default::default(),
-                    }
-                    .build(session.clone(), send_key)
-                    .await?
-                    .into()
-                }
-                IoConfig::Dds(config) => config.build_sender()?.into(),
-            }
-        };
-
-        let state = Arc::new(State::<T> {
-            my_id,
-            seq_number: AtomicUsize::new(0),
-            active_peers: DashSet::new(),
-            echo_requests: RwLock::new(DashSet::new()),
-            contexts: DashMap::new(),
-            pending_echos: DashMap::new(),
-            session,
-            max_rounds: self.max_rounds,
-            extra_rounds: self.extra_rounds,
-            round_timeout: self.round_timeout,
-            echo_interval: self.echo_interval,
-            commit_tx,
-            io_config,
-            hlc: HLC::default(),
-            io_sender: Mutex::new(io_sender),
-        });
-        let receiving_worker = state.clone().run_receiving_worker();
-        let echo_worker = state.clone().run_echo_worker();
-
-        let sender = Sender {
-            state: state.clone(),
-        };
-        let stream = {
-            let stream = commit_rx.into_stream().then(move |event| {
-                let state = state.clone();
-
-                async move {
-                    state
-                        .contexts
-                        .remove(&event.broadcast_id)
-                        .unwrap()
-                        .1
-                        .task
-                        .await;
-                    event
-                }
-            });
-
-            stream::select(
-                future::try_join(receiving_worker, echo_worker)
-                    .map_ok(|_| None)
-                    .into_stream(),
-                stream.map(|event| Ok(Some(event))),
-            )
-            .try_filter_map(|data| async move { Ok(data) })
-        };
-
-        Ok((sender, stream))
+        State::new(self, zenoh_session, dds_domain_participant).await
     }
 }
 
@@ -120,6 +40,22 @@ impl Config {
 pub enum IoConfig {
     Zenoh(zenoh_config::ZenohConfig),
     Dds(crate::io::dds::Config),
+}
+
+impl IoConfig {
+    /// Returns `true` if the io config is [`Zenoh`].
+    ///
+    /// [`Zenoh`]: IoConfig::Zenoh
+    pub fn is_zenoh(&self) -> bool {
+        matches!(self, Self::Zenoh(..))
+    }
+
+    /// Returns `true` if the io config is [`Dds`].
+    ///
+    /// [`Dds`]: IoConfig::Dds
+    pub fn is_dds(&self) -> bool {
+        matches!(self, Self::Dds(..))
+    }
 }
 
 pub mod zenoh_config {

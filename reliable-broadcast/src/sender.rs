@@ -1,17 +1,21 @@
-use crate::{common::*, state::State};
+use crate::{common::*, message::MessageT, state::State};
 
 #[derive(Clone)]
 pub struct Sender<T>
 where
-    T: 'static + Serialize + DeserializeOwned + Send + Sync,
+    T: MessageT,
 {
     pub(super) state: Arc<State<T>>,
 }
 
 impl<T> Sender<T>
 where
-    T: 'static + Serialize + DeserializeOwned + Send + Sync + Clone,
+    T: MessageT,
 {
+    pub fn id(&self) -> Uuid {
+        self.state.my_id
+    }
+
     pub async fn send(&self, data: T) -> Result<(), Error> {
         self.state.clone().broadcast(data).await?;
         Ok(())

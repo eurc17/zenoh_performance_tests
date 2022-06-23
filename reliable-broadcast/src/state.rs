@@ -3,18 +3,18 @@ use async_std::sync::Mutex;
 use crate::{
     common::*,
     config::IoConfig,
-    io::{generic::Sample, Sender},
+    io::generic::Sample,
     message::*,
-    ConsensusError, Event,
+    worker::{run_echo_worker, run_receiving_worker},
+    Config, ConsensusError, Event,
 };
 use async_std::task::spawn;
 use uhlc::HLC;
 
 pub(crate) struct State<T>
 where
-    T: 'static + Serialize + DeserializeOwned + Send + Sync,
+    T: MessageT,
 {
-    pub(crate) session: Arc<zenoh::Session>,
     pub(crate) my_id: Uuid,
     pub(crate) seq_number: AtomicUsize,
     pub(crate) active_peers: DashSet<Uuid>,
@@ -29,15 +29,130 @@ where
     /// The timeout for each round. Must be larger than 2 * `recv_timeout`.
     pub(crate) round_timeout: Duration,
     pub(crate) echo_interval: Duration,
-    pub(crate) io_config: IoConfig,
     pub(crate) hlc: HLC,
-    pub(crate) io_sender: Mutex<Sender<Message<T>>>,
+    pub(crate) io_sender: Mutex<crate::io::Sender<Message<T>>>,
 }
 
 impl<T> State<T>
 where
     T: 'static + Serialize + DeserializeOwned + Send + Sync + Clone,
 {
+    pub(crate) async fn new(
+        config: &Config,
+        zenoh_session: Option<Arc<zenoh::Session>>,
+        dds_domain_participant: Option<&rustdds::DomainParticipant>,
+    ) -> Result<
+        (
+            crate::sender::Sender<T>,
+            impl Stream<Item = Result<Event<T>, Error>> + Send,
+        ),
+        Error,
+    >
+    where
+        T: 'static + Serialize + DeserializeOwned + Send + Sync + Clone,
+    {
+        // sanity check
+        if config.echo_interval >= config.round_timeout {
+            return Err(anyhow!("echo_interval must be less than round_timeout").into());
+        }
+        if config.extra_rounds >= config.max_rounds {
+            return Err(anyhow!("extra_rounds must be less than max_rounds").into());
+        }
+
+        let my_id = Uuid::new_v4();
+        let (commit_tx, commit_rx) = flume::unbounded();
+
+        let io_config = config.io.clone();
+
+        let io_sender: crate::io::Sender<_>;
+        let io_receiver: crate::io::Receiver<_>;
+        (io_sender, io_receiver) = match &io_config {
+            IoConfig::Zenoh(config) => {
+                let session =
+                    zenoh_session.ok_or_else(|| anyhow!("Zenoh session is not provided"))?;
+                let zenoh_id: Uuid = session.id().await.parse()?;
+
+                let sender = {
+                    let send_key = format!("{}/{}", config.key, zenoh_id);
+
+                    crate::io::zenoh::SenderConfig {
+                        congestion_control: config.congestion_control.into(),
+                        kind: Default::default(),
+                    }
+                    .build(session.clone(), send_key)
+                    .await?
+                };
+
+                let receiver = {
+                    let recv_key = format!("{}/*", config.key);
+
+                    crate::io::zenoh::ReceiverConfig {
+                        reliability: config.reliability.into(),
+                        sub_mode: config.sub_mode.into(),
+                    }
+                    .build(session.clone(), &recv_key)
+                    .await?
+                };
+
+                (sender.into(), receiver.into())
+            }
+            IoConfig::Dds(config) => {
+                let domain_participant = dds_domain_participant
+                    .ok_or_else(|| anyhow!("domain_participant is not provided"))?;
+
+                let sender = config.build_sender(domain_participant)?;
+                let receiver = config.build_receiver(domain_participant)?;
+                (sender.into(), receiver.into())
+            }
+        };
+
+        let state = Arc::new(State::<T> {
+            my_id,
+            seq_number: AtomicUsize::new(0),
+            active_peers: DashSet::new(),
+            echo_requests: RwLock::new(DashSet::new()),
+            contexts: DashMap::new(),
+            pending_echos: DashMap::new(),
+            max_rounds: config.max_rounds,
+            extra_rounds: config.extra_rounds,
+            round_timeout: config.round_timeout,
+            echo_interval: config.echo_interval,
+            commit_tx,
+            hlc: HLC::default(),
+            io_sender: Mutex::new(io_sender),
+        });
+
+        let receiving_worker = spawn(run_receiving_worker(state.clone(), io_receiver));
+        let echo_worker = spawn(run_echo_worker(state.clone()));
+        let join_task = future::try_join(receiving_worker, echo_worker);
+
+        let sender = crate::sender::Sender {
+            state: state.clone(),
+        };
+        let event_stream = commit_rx.into_stream().then(move |event| {
+            let state = state.clone();
+
+            async move {
+                state
+                    .contexts
+                    .remove(&event.broadcast_id)
+                    .unwrap()
+                    .1
+                    .task
+                    .await;
+                event
+            }
+        });
+
+        let select_stream = stream::select(
+            join_task.map_ok(|_| None).into_stream(),
+            event_stream.map(|event| Ok(Some(event))),
+        )
+        .try_filter_map(|data| async move { Ok(data) });
+
+        Ok((sender, select_stream))
+    }
+
     /// Schedule a future task to publish an echo.
     async fn request_sending_echo(self: Arc<Self>, broadcast_id: BroadcastId) {
         self.echo_requests.read().await.insert(broadcast_id);
@@ -59,11 +174,7 @@ where
     }
 
     /// Process an input broadcast.
-    fn handle_broadcast(self: Arc<Self>, sample: Sample<Message<T>>, msg: Broadcast<T>) {
-        // TODO: check timestamp
-        // let peer_id = sample.source_info.source_id.unwrap();
-        // let seq = sample.source_info.source_sn.unwrap();
-
+    pub(crate) fn handle_broadcast(self: Arc<Self>, sample: Sample<Message<T>>, msg: Broadcast<T>) {
         let broadcast_id = msg.broadcast_id();
         self.active_peers.insert(broadcast_id.broadcaster);
         debug!(
@@ -106,20 +217,15 @@ where
     }
 
     /// Process an input present message.
-    fn handle_present(&self, _sample: Sample<Message<T>>, msg: Present) {
+    pub(crate) fn handle_present(&self, _sample: Sample<Message<T>>, msg: Present) {
         let Present { from: sender } = msg;
-        // TODO: check timestamp
-        // let peer_id = sample.source_info.source_id.unwrap();
 
         debug!("{} -> {}: present", sender, self.my_id);
         self.active_peers.insert(sender);
     }
 
     /// Process an input echo.
-    fn handle_echo(&self, _sample: Sample<Message<T>>, msg: Echo) {
-        // TODO: check timestamp
-        // let peer_id = sample.source_info.source_id.unwrap();
-
+    pub(crate) fn handle_echo(&self, _sample: Sample<Message<T>>, msg: Echo) {
         let sender = msg.from;
         self.active_peers.insert(sender);
 
@@ -152,101 +258,6 @@ where
                 }
             }
         });
-    }
-
-    /// Start a worker that consumes input messages and handle each message accordingly.
-    pub async fn run_receiving_worker(self: Arc<Self>) -> Result<(), Error> {
-        // The lifetime of subscriber must be longer than the stream.
-        // Otherwise, the stream is unable to retrieve input message.
-
-        let me = self.clone();
-
-        let receiver: crate::io::generic::Receiver<_> = match &me.io_config {
-            IoConfig::Zenoh(config) => {
-                let recv_key = format!("{}/*", config.key);
-
-                let receiver = crate::io::zenoh::ReceiverConfig {
-                    reliability: config.reliability.into(),
-                    sub_mode: config.sub_mode.into(),
-                }
-                .build::<Message<T>, _>(me.session.clone(), &recv_key)
-                .await?;
-
-                receiver.into()
-            }
-            IoConfig::Dds(config) => config.build_receiver()?.into(),
-        };
-
-        let future = receiver
-            .into_sample_stream()
-            .try_filter_map(|sample| async move {
-                let value = match sample.to_value()? {
-                    Some(value) => value,
-                    None => return Ok(None),
-                };
-                // sample.value = sample.value.encoding(ENCODING);
-
-                // guard!(let Some(value) = sample.value.as_json() else {
-                //     debug!("unable to decode message: not JSON format");
-                //     return None;
-                // });
-
-                // let value: Message<T> = match serde_json::from_value(value) {
-                //     Ok(value) => value,
-                //     Err(err) => {
-                //         debug!("unable to decode message: {:?}", err);
-                //         return None;
-                //     }
-                // };
-
-                Ok(Some((sample, value)))
-            })
-            .try_for_each_concurrent(8, move |(sample, msg)| {
-                let me = self.clone();
-
-                async move {
-                    match msg {
-                        Message::Broadcast(msg) => me.handle_broadcast(sample, msg),
-                        Message::Present(msg) => me.handle_present(sample, msg),
-                        Message::Echo(msg) => me.handle_echo(sample, msg),
-                    }
-                    Ok(())
-                }
-            });
-
-        spawn(future).await?;
-
-        Ok(())
-    }
-
-    /// Start a worker that periodically publishes batched echos.
-    pub async fn run_echo_worker(self: Arc<Self>) -> Result<(), Error> {
-        spawn(
-            async_std::stream::interval(self.echo_interval)
-                .map(Ok)
-                .try_for_each(move |()| {
-                    let me = self.clone();
-
-                    async move {
-                        let echo_requests = {
-                            let mut echo_requests = me.echo_requests.write().await;
-                            mem::take(&mut *echo_requests)
-                        };
-                        let broadcast_ids: Vec<_> = echo_requests.into_iter().collect();
-                        let msg: Message<T> = Echo {
-                            from: me.my_id,
-                            broadcast_ids,
-                        }
-                        .into();
-                        let mut io_sender = me.io_sender.lock().await;
-                        io_sender.send(msg).await?;
-                        Result::<(), Error>::Ok(())
-                    }
-                }),
-        )
-        .await?;
-
-        Result::<(), Error>::Ok(())
     }
 
     /// Start a worker for a received broadcast.

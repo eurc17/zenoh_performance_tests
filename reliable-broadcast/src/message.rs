@@ -2,6 +2,17 @@
 
 use crate::common::*;
 
+pub trait MessageT
+where
+    Self: 'static + Serialize + for<'de> Deserialize<'de> + Send + Sync + Clone,
+{
+}
+
+impl<T> MessageT for T where
+    Self: 'static + Serialize + for<'de> Deserialize<'de> + Send + Sync + Clone
+{
+}
+
 /// The identifier for a broadcast.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct BroadcastId {

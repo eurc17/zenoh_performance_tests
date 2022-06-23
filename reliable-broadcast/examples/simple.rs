@@ -59,9 +59,20 @@ async fn main() -> Result<(), Error> {
         async_std::task::spawn(async move {
             let mut config = zn::config::default();
             config.set_add_timestamp(true.into()).unwrap();
-            let session = Arc::new(zenoh::open(config).await?);
-            let my_id = session.id().await;
-
+            let zenoh_session =
+                if io_config.is_zenoh() {
+                    let session = zenoh::open(config).await?;
+                    Some(Arc::new(session))
+                } else {
+                    None
+                };
+            let dds_domain_participant =
+                if io_config.is_dds() {
+                    let part = rustdds::DomainParticipant::new(0)?;
+                    Some(part)
+                } else {
+                    None
+                };
             let (sender, stream) = rb::Config {
                 max_rounds,
                 extra_rounds,
@@ -69,12 +80,13 @@ async fn main() -> Result<(), Error> {
                 echo_interval,
                 io: io_config,
             }
-            .build(session)
+            .build(zenoh_session, dds_domain_participant.as_ref())
             .await?;
+            let my_id = sender.id();
             let sink = sender.into_sink();
 
             let producer_task = {
-                let my_id = my_id.clone();
+                // let my_id = my_id.clone();
 
                 async move {
                     async_std::task::sleep(publisher_startup_delay).await;
@@ -99,7 +111,7 @@ async fn main() -> Result<(), Error> {
                 let my_id = my_id.clone();
 
                 async move {
-                    let timeout = interval_timeout * num_msgs as u32 + publisher_startup_delay + Duration::from_millis(500);
+                    let timeout = interval_timeout * num_msgs as u32 + publisher_startup_delay + Duration::from_millis(10000);
 
                     let num_received = stream
                         .take(num_peers * num_msgs)

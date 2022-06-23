@@ -1,35 +1,25 @@
-use super::{
-    global::{get_domain_participant, get_key_for_topic},
-    Receiver, Sender,
-};
+use super::{Receiver, Sender};
 use anyhow::Result;
 use rustdds::{
     policy::{Durability, History, Reliability},
-    QosPolicies, QosPolicyBuilder, TopicKind,
+    DomainParticipant, QosPolicies, QosPolicyBuilder, TopicKind, GUID,
 };
 use serde::{Deserialize, Serialize};
 use std::any;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Config {
-    #[serde(default = "default_domain_id")]
-    pub domain_id: u16,
     pub topic: String,
     pub durability: Durability,
     pub reliability: Reliability,
     pub history: History,
 }
 
-fn default_domain_id() -> u16 {
-    0
-}
-
 impl Config {
-    pub fn build_sender<T>(&self) -> Result<Sender<T>>
+    pub fn build_sender<T>(&self, domain_participant: &DomainParticipant) -> Result<Sender<T>>
     where
         T: Serialize,
     {
-        let domain_participant = get_domain_participant(self.domain_id)?;
         let qos = self.qos();
         let topic = domain_participant.create_topic(
             self.topic.clone(),
@@ -42,15 +32,15 @@ impl Config {
 
         Ok(Sender {
             writer: Some(writer),
-            key: get_key_for_topic(&self.topic),
+            // key: get_key_for_topic(&self.topic),
+            key: GUID::new_participant_guid(),
         })
     }
 
-    pub fn build_receiver<T>(&self) -> Result<Receiver<T>>
+    pub fn build_receiver<T>(&self, domain_participant: &DomainParticipant) -> Result<Receiver<T>>
     where
         T: 'static + for<'de> Deserialize<'de>,
     {
-        let domain_participant = get_domain_participant(self.domain_id)?;
         let qos = self.qos();
         let topic = domain_participant.create_topic(
             self.topic.clone(),
