@@ -1,0 +1,19 @@
+{
+    "type": "dds",
+    "topic": "simple",
+    "durability": "Persistent",
+    "reliability": {
+        "Reliable": {
+            "max_blocking_time": {
+                "seconds": 1,
+                "fraction": 0,
+            }
+        }
+    },
+    // "history": "KeepAll",
+    "history": {
+        "KeepLast": {
+            "depth": 1,
+        }
+    },
+}
