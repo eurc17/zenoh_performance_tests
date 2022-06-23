@@ -34,10 +34,7 @@ where
 
     pub async fn recv(&mut self) -> Result<Option<T>> {
         let sample = self.recv_sample().await?;
-        let data = sample
-            .map(|s| s.into_value().ok())
-            .flatten()
-            .map(|s| s.data);
+        let data = sample.and_then(|s| s.into_value().ok()).map(|s| s.data);
         Ok(data)
     }
 

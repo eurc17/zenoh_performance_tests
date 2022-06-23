@@ -177,6 +177,7 @@ where
     pub(crate) fn handle_broadcast(self: Arc<Self>, sample: Sample<Message<T>>, msg: Broadcast<T>) {
         let broadcast_id = msg.broadcast_id();
         self.active_peers.insert(broadcast_id.broadcaster);
+
         debug!(
             "{} -> {}: broadcast, seq={}",
             broadcast_id.broadcaster, self.my_id, broadcast_id.seq
@@ -243,7 +244,7 @@ where
                 None => {
                     info!(
                         "{} received echo from {} for broadcast_id {}, \
-                 but broadcast was not received",
+                         but broadcast was not received",
                         self.my_id, sender, broadcast_id
                     );
 

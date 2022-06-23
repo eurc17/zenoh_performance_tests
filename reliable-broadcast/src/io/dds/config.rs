@@ -29,11 +29,11 @@ impl Config {
         )?;
         let publisher = domain_participant.create_publisher(&qos)?;
         let writer = publisher.create_datawriter_cdr(&topic, Some(qos))?;
+        let key = GUID::new_participant_guid();
 
         Ok(Sender {
             writer: Some(writer),
-            // key: get_key_for_topic(&self.topic),
-            key: GUID::new_participant_guid(),
+            key,
         })
     }
 

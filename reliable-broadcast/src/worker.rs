@@ -17,21 +17,6 @@ where
                 Some(value) => value,
                 None => return Ok(None),
             };
-            // sample.value = sample.value.encoding(ENCODING);
-
-            // guard!(let Some(value) = sample.value.as_json() else {
-            //     debug!("unable to decode message: not JSON format");
-            //     return None;
-            // });
-
-            // let value: Message<T> = match serde_json::from_value(value) {
-            //     Ok(value) => value,
-            //     Err(err) => {
-            //         debug!("unable to decode message: {:?}", err);
-            //         return None;
-            //     }
-            // };
-
             Ok(Some((sample, value)))
         })
         .try_for_each_concurrent(8, move |(sample, msg)| {
