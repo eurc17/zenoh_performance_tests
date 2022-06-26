@@ -3,7 +3,7 @@ use async_std::sync::Mutex;
 use crate::{
     common::*,
     config::IoConfig,
-    io::generic::Sample,
+    io::generic::{Sample, Timestamp},
     message::*,
     worker::{run_echo_worker, run_receiving_worker},
     Config, ConsensusError, Event,
@@ -29,7 +29,7 @@ where
     /// The timeout for each round. Must be larger than 2 * `recv_timeout`.
     pub(crate) round_timeout: Duration,
     pub(crate) echo_interval: Duration,
-    pub(crate) hlc: HLC,
+    // pub(crate) hlc: HLC,
     pub(crate) io_sender: Mutex<crate::io::Sender<Message<T>>>,
 }
 
@@ -118,7 +118,7 @@ where
             round_timeout: config.round_timeout,
             echo_interval: config.echo_interval,
             commit_tx,
-            hlc: HLC::default(),
+            // hlc: HLC::default(),
             io_sender: Mutex::new(io_sender),
         });
 
@@ -269,136 +269,134 @@ where
         sample: Sample<Message<T>>,
         data: T,
     ) {
-        spawn(async move {
-            let get_latency = || {
-                let sample_timestamp = sample.timestamp();
-
-                let ok = self.hlc.update_with_timestamp(&sample_timestamp).is_ok();
+        let get_latency = || match sample.timestamp() {
+            Timestamp::Zenoh(ts) => {
+                let hlc = HLC::default();
+                let ok = hlc.update_with_timestamp(&ts).is_ok();
                 assert!(ok, "timestamp drifts too much");
-                let tagged_timestamp = self.hlc.new_timestamp();
-                tagged_timestamp.get_diff_duration(&sample.timestamp())
-            };
+                let tagged_timestamp = hlc.new_timestamp();
+                tagged_timestamp.get_diff_duration(&ts)
+            }
+            Timestamp::Dds(ts) => (rustdds::Timestamp::now() - ts).to_std(),
+        };
 
-            // TODO: determine start time from timestamp in broadcast message
-            let mut interval = async_std::stream::interval(self.round_timeout);
+        // TODO: determine start time from timestamp in broadcast message
+        let mut interval = async_std::stream::interval(self.round_timeout);
 
-            // send echo
-            self.clone().request_sending_echo(broadcast_id).await;
+        // send echo
+        self.clone().request_sending_echo(broadcast_id).await;
 
-            let tuple = (&mut interval)
-                .take(self.max_rounds)
-                .enumerate()
-                .filter_map(|(round, ())| {
-                    let me = self.clone();
-                    let acked_peers = acked_peers.clone();
+        let tuple = (&mut interval)
+            .take(self.max_rounds)
+            .enumerate()
+            .filter_map(|(round, ())| {
+                let me = self.clone();
+                let acked_peers = acked_peers.clone();
 
-                    async move {
-                        debug!(
-                            "{} finishes round {} for broadcast_id {}",
-                            me.my_id, round, broadcast_id
-                        );
+                async move {
+                    debug!(
+                        "{} finishes round {} for broadcast_id {}",
+                        me.my_id, round, broadcast_id
+                    );
 
-                        let num_peers = me.active_peers.len();
-                        let num_echos = acked_peers.len();
+                    let num_peers = me.active_peers.len();
+                    let num_echos = acked_peers.len();
 
-                        if num_peers >= 4 {
-                            // case: n_echos >= 2/3 n_peers
-                            if num_echos * 3 >= num_peers * 2 {
-                                Some((round, Ok(())))
-                            }
-                            // case: n_echos >= 1/3 n_peers
-                            else if num_echos * 3 >= num_peers {
-                                // send echo and try again
-                                me.request_sending_echo(broadcast_id).await;
-                                None
-                            }
-                            // case: n_echos < 1/3 n_peers
-                            else {
-                                Some((round, Err(ConsensusError::InsufficientEchos)))
-                            }
+                    if num_peers >= 4 {
+                        // case: n_echos >= 2/3 n_peers
+                        if num_echos * 3 >= num_peers * 2 {
+                            Some((round, Ok(())))
                         }
-                        // case: n_peers < 4
+                        // case: n_echos >= 1/3 n_peers
+                        else if num_echos * 3 >= num_peers {
+                            // send echo and try again
+                            me.request_sending_echo(broadcast_id).await;
+                            None
+                        }
+                        // case: n_echos < 1/3 n_peers
                         else {
-                            Some((round, Err(ConsensusError::InsufficientPeers)))
+                            Some((round, Err(ConsensusError::InsufficientEchos)))
                         }
                     }
-                })
-                .boxed()
-                .next()
-                .await;
-
-            match tuple {
-                // accepted before max_roudns
-                Some((last_round, Ok(()))) => {
-                    debug!(
-                        "{} accepts a msg in round {} for broadcast_id {}",
-                        self.my_id, last_round, broadcast_id
-                    );
-
-                    // trigger event
-                    let event = Event {
-                        result: Ok(data),
-                        broadcast_id,
-                        latency: get_latency(),
-                        num_rounds: last_round + 1,
-                    };
-                    let _ = self.commit_tx.send_async(event).await;
-
-                    // unconditionally send echo for more extra rounds
-                    let extra_rounds =
-                        cmp::min(self.extra_rounds, self.max_rounds - last_round - 1);
-
-                    interval
-                        .take(extra_rounds)
-                        .enumerate()
-                        .for_each(|(round, ())| {
-                            let me = self.clone();
-
-                            async move {
-                                debug!(
-                                    "{} runs extra round {} for broadcast_id {}",
-                                    me.my_id,
-                                    round + last_round + 1,
-                                    broadcast_id
-                                );
-                                me.request_sending_echo(broadcast_id).await;
-                            }
-                        })
-                        .await;
+                    // case: n_peers < 4
+                    else {
+                        Some((round, Err(ConsensusError::InsufficientPeers)))
+                    }
                 }
-                // error before max_roudns
-                Some((last_round, Err(err))) => {
-                    debug!(
-                        "{} rejects the msg for broadcast_id {} due to {:?}",
-                        self.my_id, broadcast_id, err
-                    );
+            })
+            .boxed()
+            .next()
+            .await;
 
-                    let event = Event {
-                        result: Err(err),
-                        broadcast_id,
-                        latency: get_latency(),
-                        num_rounds: last_round + 1,
-                    };
-                    let _ = self.commit_tx.send_async(event).await;
-                }
-                // not accepted when reaching max_rounds
-                None => {
-                    debug!(
-                        "{} rejects the msg for broadcast_id {} due to reach max_round",
-                        self.my_id, broadcast_id
-                    );
+        match tuple {
+            // accepted before max_roudns
+            Some((last_round, Ok(()))) => {
+                debug!(
+                    "{} accepts a msg in round {} for broadcast_id {}",
+                    self.my_id, last_round, broadcast_id
+                );
 
-                    let event = Event {
-                        result: Err(ConsensusError::ConsensusLost),
-                        broadcast_id,
-                        latency: get_latency(),
-                        num_rounds: self.max_rounds,
-                    };
-                    let _ = self.commit_tx.send_async(event).await;
-                }
+                // trigger event
+                let event = Event {
+                    result: Ok(data),
+                    broadcast_id,
+                    latency: get_latency(),
+                    num_rounds: last_round + 1,
+                };
+                let _ = self.commit_tx.send_async(event).await;
+
+                // unconditionally send echo for more extra rounds
+                let extra_rounds = cmp::min(self.extra_rounds, self.max_rounds - last_round - 1);
+
+                interval
+                    .take(extra_rounds)
+                    .enumerate()
+                    .for_each(|(round, ())| {
+                        let me = self.clone();
+
+                        async move {
+                            debug!(
+                                "{} runs extra round {} for broadcast_id {}",
+                                me.my_id,
+                                round + last_round + 1,
+                                broadcast_id
+                            );
+                            me.request_sending_echo(broadcast_id).await;
+                        }
+                    })
+                    .await;
             }
-        })
-        .await
+            // error before max_roudns
+            Some((last_round, Err(err))) => {
+                debug!(
+                    "{} rejects the msg for broadcast_id {} due to {:?}",
+                    self.my_id, broadcast_id, err
+                );
+
+                let event = Event {
+                    result: Err(err),
+                    broadcast_id,
+                    latency: get_latency(),
+                    num_rounds: last_round + 1,
+                };
+                let _ = self.commit_tx.send_async(event).await;
+            }
+            // not accepted when reaching max_rounds
+            None => {
+                debug!(
+                    "{} rejects the msg for broadcast_id {} due to reach max_round",
+                    self.my_id, broadcast_id
+                );
+
+                let event = Event {
+                    result: Err(ConsensusError::ConsensusLost),
+                    broadcast_id,
+                    latency: get_latency(),
+                    num_rounds: self.max_rounds,
+                };
+                let _ = self.commit_tx.send_async(event).await;
+            }
+        }
     }
 }
 

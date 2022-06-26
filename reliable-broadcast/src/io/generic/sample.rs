@@ -13,12 +13,17 @@ impl<T> Sample<T>
 where
     T: for<'de> Deserialize<'de>,
 {
-    pub fn timestamp(&self) -> uhlc::Timestamp {
+    pub fn timestamp(&self) -> Timestamp {
         match self {
             Sample::Zenoh(sample) => sample
                 .timestamp
-                .unwrap_or_else(|| panic!("HLC feature must be enabled for Zenoh")),
-            Sample::Dds(sample) => todo!(),
+                .unwrap_or_else(|| panic!("HLC feature must be enabled for Zenoh"))
+                .into(),
+            Sample::Dds(sample) => sample
+                .sample_info()
+                .source_timestamp()
+                .unwrap_or_else(|| panic!("unable to retrieve source timestamp from DDS publisher"))
+                .into(),
         }
     }
 
@@ -68,6 +73,24 @@ where
     T: for<'de> Deserialize<'de>,
 {
     fn from(v: zenoh::prelude::Sample) -> Self {
+        Self::Zenoh(v)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Timestamp {
+    Zenoh(uhlc::Timestamp),
+    Dds(rustdds::Timestamp),
+}
+
+impl From<rustdds::Timestamp> for Timestamp {
+    fn from(v: rustdds::Timestamp) -> Self {
+        Self::Dds(v)
+    }
+}
+
+impl From<uhlc::Timestamp> for Timestamp {
+    fn from(v: uhlc::Timestamp) -> Self {
         Self::Zenoh(v)
     }
 }

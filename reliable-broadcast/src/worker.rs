@@ -1,3 +1,5 @@
+use async_std::stream::interval;
+
 use crate::{common::*, message::*, state::State};
 
 /// Start a worker that consumes input messages and handle each message accordingly.
@@ -15,7 +17,9 @@ where
         .try_filter_map(|sample| async move {
             let value = match sample.to_value()? {
                 Some(value) => value,
-                None => return Ok(None),
+                None => {
+                    return Ok(None);
+                }
             };
             Ok(Some((sample, value)))
         })
@@ -41,7 +45,7 @@ pub(crate) async fn run_echo_worker<T>(state: Arc<State<T>>) -> Result<(), Error
 where
     T: MessageT,
 {
-    async_std::stream::interval(state.echo_interval)
+    interval(state.echo_interval)
         .map(Ok)
         .try_for_each(move |()| {
             let state = state.clone();

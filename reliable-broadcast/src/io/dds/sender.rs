@@ -2,7 +2,7 @@ use super::sample::KeyedSample;
 use anyhow::{Error, Result};
 use blocking::unblock;
 use futures::{sink, Sink};
-use rustdds::{with_key::DataWriter, CDRSerializerAdapter, GUID};
+use rustdds::{with_key::DataWriter, CDRSerializerAdapter, Timestamp, GUID};
 use serde::Serialize;
 
 pub struct Sender<T>
@@ -22,7 +22,7 @@ where
         let key = self.key;
         let writer = unblock(move || -> Result<_> {
             let sample = KeyedSample { key, data };
-            writer.write(sample, None)?;
+            writer.write(sample, Some(Timestamp::now()))?;
             Ok(writer)
         })
         .await?;
