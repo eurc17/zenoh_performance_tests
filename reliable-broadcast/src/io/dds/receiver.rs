@@ -3,7 +3,7 @@ use blocking::unblock;
 use futures::{stream, Stream};
 use rustdds::{
     with_key::{DataReader, DataSample},
-    CDRDeserializerAdapter,
+    CDRDeserializerAdapter, ReadCondition,
 };
 use serde::Deserialize;
 
@@ -22,14 +22,22 @@ where
 {
     pub async fn recv_sample(&mut self) -> Result<Option<DataSample<KeyedSample<T>>>> {
         let mut reader = self.reader.take().unwrap();
+
         let (reader, sample) = unblock(move || -> Result<_> {
-            let sample = reader.take_next_sample()?;
-            Ok((reader, sample))
+            loop {
+                let samples = reader.take(1, ReadCondition::not_read())?;
+                let sample = match samples.into_iter().next() {
+                    Some(s) => s,
+                    None => continue,
+                };
+                break Ok((reader, sample));
+            }
         })
         .await?;
+
         self.reader = Some(reader);
 
-        Ok(sample)
+        Ok(Some(sample))
     }
 
     pub async fn recv(&mut self) -> Result<Option<T>> {
