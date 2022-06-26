@@ -1,6 +1,6 @@
 mod common;
 pub mod config;
-mod io;
+pub mod io;
 mod message;
 mod sender;
 mod state;
