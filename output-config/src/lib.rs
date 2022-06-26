@@ -61,15 +61,6 @@ pub struct Cli {
 
     // params for Reliable Broadcast
     #[clap(long)]
-    /// Subscription mode for Zenoh
-    pub sub_mode: Option<SubMode>,
-    #[clap(long)]
-    /// Reliability QoS for Zenoh
-    pub reliability: Option<Reliability>,
-    #[clap(long)]
-    /// Congestion control QoS for Zenoh
-    pub congestion_control: Option<CongestionControl>,
-    #[clap(long)]
     /// The waiting time to publish batched echo in milliseconds for RB
     pub echo_interval: Option<u64>,
     #[clap(long)]
@@ -81,6 +72,9 @@ pub struct Cli {
     #[clap(long)]
     /// # of extra rounds for RB
     pub extra_rounds: Option<usize>,
+    #[clap(long)]
+    /// Config file for underlyingg I/O of reliable broadcast
+    pub rb_io: Option<PathBuf>,
 }
 
 impl Cli {

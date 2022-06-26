@@ -2,48 +2,63 @@ use std::collections::HashMap;
 
 use crate::{common::*, msg::Msg, utils::sleep_until};
 use async_std::{stream::interval, task::sleep};
+use once_cell::sync::OnceCell;
 use output_config::{get_msg_payload, Cli, PeerResult, PubPeerResult};
+use rb::config::IoConfig;
 use reliable_broadcast as rb;
+use rustdds::DomainParticipant;
+use serde_loader::Json5Path;
 use zn::config::{ConnectConfig, EndPoint};
-
-const KEY: &str = "/demo/example";
 
 pub async fn run(config: &Cli) -> Result<PeerResult, Error> {
     assert!(!config.pub_sub_separate, "pub_sub_separate must be false");
 
-    let session = {
-        let mut zn_config = zn::config::default();
-        let endpoints: Vec<_> = config
-            .locators
-            .iter()
-            .cloned()
-            .map(EndPoint::from)
-            .collect();
-        zn_config.set_connect(ConnectConfig { endpoints }).unwrap();
-        zn_config.set_add_timestamp(Some(true)).unwrap();
-        let session = zn::open(zn_config).await?;
-        Arc::new(session)
-    };
+    let (sender, stream) = {
+        let io_config_file = config.rb_io.as_ref().unwrap();
+        let io_config: IoConfig = Json5Path::open_and_take(&io_config_file)?;
 
-    let (sender, stream) = rb::Config {
-        max_rounds: config.max_rounds.unwrap(),
-        extra_rounds: config.extra_rounds.unwrap(),
-        round_timeout: config.round_interval(),
-        echo_interval: config.echo_interval(),
-        congestion_control: config.congestion_control.unwrap().into(),
-        reliability: config.reliability.unwrap().into(),
-        sub_mode: config.sub_mode.unwrap().into(),
-    }
-    .build(session.clone(), KEY)
-    .await?;
+        // Create Zenoh session
+        let zenoh_session = if io_config.is_zenoh() {
+            let mut zn_config = zn::config::default();
+            let endpoints: Vec<_> = config
+                .locators
+                .iter()
+                .cloned()
+                .map(EndPoint::from)
+                .collect();
+            zn_config.set_connect(ConnectConfig { endpoints }).unwrap();
+            zn_config.set_add_timestamp(Some(true)).unwrap();
+            let session = zn::open(zn_config).await?;
+            Some(Arc::new(session))
+        } else {
+            None
+        };
+
+        // Create DDS domain participant
+        let dds_domain_participant = if io_config.is_dds() {
+            static DDS_DOMAIN_PARTICIPANT: OnceCell<DomainParticipant> = OnceCell::new();
+
+            let part = DDS_DOMAIN_PARTICIPANT.get_or_try_init(|| DomainParticipant::new(0))?;
+            Some(part)
+        } else {
+            None
+        };
+
+        rb::Config {
+            max_rounds: config.max_rounds.unwrap(),
+            extra_rounds: config.extra_rounds.unwrap(),
+            round_timeout: config.round_interval(),
+            echo_interval: config.echo_interval(),
+            io: io_config,
+        }
+        .build(zenoh_session, dds_domain_participant)
+        .await?
+    };
 
     let start_time = config.start_time_from_now();
     let producer_future = producer(config, start_time, sender);
     let consumer_future = consumer(config, start_time, stream);
     let ((), report) = futures::try_join!(producer_future, consumer_future)?;
-
-    // let session = Arc::try_unwrap(session).expect("please report bug");
-    // session.close().await?;
 
     Ok(report)
 }
@@ -66,12 +81,7 @@ async fn producer(config: &Cli, start_time: Instant, sender: rb::Sender<Msg>) ->
 
     stream::once(future::ready(()))
         .chain(interval(publish_interval))
-        .take_until({
-            async move {
-                sleep(test_timeout).await;
-                // debug!("peer {} timeout", config.peer_id);
-            }
-        })
+        .take_until(sleep(test_timeout))
         .take(num_msgs_per_peer)
         .enumerate()
         .map(ZOk)

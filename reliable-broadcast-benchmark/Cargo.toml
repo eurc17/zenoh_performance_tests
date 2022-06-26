@@ -20,3 +20,6 @@ reliable-broadcast = { version = "0.1.0", path = "../reliable-broadcast" }
 rand = { version = "0.8.5", features = ["getrandom"] }
 output-config = { version = "0.1.0", path = "../output-config" }
 log = "0.4.17"
+serde-loader = { version = "0.1.4", features = ["json5"] }
+once_cell = "1.12.0"
+rustdds = "0.7.10"

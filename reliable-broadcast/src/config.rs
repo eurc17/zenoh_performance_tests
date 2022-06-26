@@ -1,7 +1,7 @@
 use crate::{common::*, sender::Sender, state::State, stream::Event};
 use zenoh as zn;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 /// Defines the structure of the config file.
 pub struct Config {
     /// The maximum number of rounds to run the reliable broadcast.
@@ -9,8 +9,10 @@ pub struct Config {
     /// The number of extra rounds to send echo(m,s). It will not exceed the `max_rounds`
     pub extra_rounds: usize,
     /// The timeout for each round.
+    #[serde(with = "humantime_serde")]
     pub round_timeout: Duration,
     /// The interval that publishes echo messages.
+    #[serde(with = "humantime_serde")]
     pub echo_interval: Duration,
     /// I/O configuration.
     pub io: IoConfig,
@@ -65,8 +67,11 @@ pub mod zenoh_config {
     #[serde(tag = "type", rename_all = "snake_case")]
     pub struct ZenohConfig {
         pub key: String,
+        /// Subscription mode for Zenoh
         pub sub_mode: SubMode,
+        /// Reliability QoS for Zenoh
         pub reliability: Reliability,
+        /// Congestion control QoS for Zenoh
         pub congestion_control: CongestionControl,
     }
 
