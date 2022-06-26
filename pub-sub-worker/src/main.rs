@@ -1,8 +1,7 @@
 mod common;
 mod workers;
 use common::*;
-use output_config::get_msg_payload;
-use output_config::Cli;
+use output_config::{get_msg_payload, Cli};
 use workers::*;
 
 #[async_std::main]

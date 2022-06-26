@@ -2,9 +2,7 @@ use output_config::{
     Cli, PeerResult, PubPeerResult, PubPeerStatistics, PubTimeStatus, ShortConfig, SubTimeStatus,
     TestResult,
 };
-use std::io::Write;
-use std::path::PathBuf;
-use std::{collections::HashMap, fs::OpenOptions};
+use std::{collections::HashMap, fs::OpenOptions, io::Write, path::PathBuf};
 use uhlc::HLC;
 
 use super::common::*;

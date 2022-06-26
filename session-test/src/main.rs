@@ -1,8 +1,7 @@
 mod common;
 
 use crate::common::*;
-use std::io::Write;
-use std::path::PathBuf;
+use std::{io::Write, path::PathBuf};
 
 #[derive(Debug, Parser, Serialize, Deserialize, Clone)]
 #[clap(author, version, about, long_about = None)]

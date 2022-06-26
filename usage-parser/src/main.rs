@@ -1,10 +1,12 @@
 #![allow(unused)]
 use log::*;
 use pretty_env_logger;
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
-use std::vec;
+use std::{
+    fs::File,
+    io::{self, BufRead},
+    path::Path,
+    vec,
+};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]

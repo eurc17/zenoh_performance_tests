@@ -3,9 +3,7 @@ use crate::{
     utils::{PeerResult, PubTimeStatus, SubTimeStatus, TestResult},
     Cli,
 };
-use std::fs::OpenOptions;
-use std::io::Write;
-use std::path::PathBuf;
+use std::{fs::OpenOptions, io::Write, path::PathBuf};
 
 pub async fn demonstration_worker(
     rx: flume::Receiver<(usize, Vec<Sample>)>,
