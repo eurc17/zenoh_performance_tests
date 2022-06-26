@@ -13,6 +13,4 @@
 --echo-interval $ECHO_INTERVAL
 --max-rounds 3
 --extra-rounds 1
---reliability reliable
---sub-mode push
---congestion-control block
+--rb-io config/zenoh_io.json5
