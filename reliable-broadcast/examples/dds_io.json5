@@ -1,19 +1,24 @@
 {
     "type": "dds",
-    "topic": "simple",
+    "topic": "SIMPLE",
+
+    // "durability": "Volatile",
     "durability": "Persistent",
-    "reliability": {
-        "Reliable": {
-            "max_blocking_time": {
-                "seconds": 1,
-                "fraction": 0,
-            }
-        }
-    },
-    // "history": "KeepAll",
-    "history": {
-        "KeepLast": {
-            "depth": 1,
-        }
-    },
+
+    "reliability": "BestEffort",
+    // "reliability": {
+    //     "Reliable": {
+    //         "max_blocking_time": {
+    //             "seconds": 1,
+    //             "fraction": 0,
+    //         }
+    //     }
+    // },
+
+    "history": "KeepAll",
+    // "history": {
+    //     "KeepLast": {
+    //         "depth": 1,
+    //     }
+    // },
 }
