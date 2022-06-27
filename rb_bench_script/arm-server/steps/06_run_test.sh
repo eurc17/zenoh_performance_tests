@@ -7,7 +7,7 @@ echo "Running test for round_interval=$rsize echo_interval=$esize payload_size=$
 
 start_time="$(date --date="$sleep_for" +%s)"
 
-log_dir="$script_dir/rb_${log_time}_${psize}_${rsize}_${esize}"
+log_dir="$script_dir/logs/rb_${log_time}_${psize}_${rsize}_${esize}"
 
 for ((pid=0; pid<num_peers; pid++))
 do
