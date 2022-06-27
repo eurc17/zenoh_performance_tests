@@ -12,13 +12,6 @@ log_time="$(date +'%Y-%m-%d-%T')"
 # Timeout for each test in seconds
 remote_timeout=40
 
-## Base directory on RPi
-remote_dir="$script_dir/exp_logs"
-
-## The directory to store program outputs on RPi
-output_dir_suffix="test/payload/log_exp_$log_time"
-remote_output_dir="$remote_dir/$output_dir_suffix"
-
 ## Zenoh repo and commit for compiling zenohd
 zenoh_git_url="https://github.com/eclipse-zenoh/zenoh.git"
 zenoh_git_commit="90539129b1a7c9e8c7d7daaa84138d093f71fedf"
