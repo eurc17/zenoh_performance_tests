@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 6,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 256,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 6,
+  "receive_rate": 0.8333333333333334,
+  "recvd_msg_num": 300,
+  "average_rb_rounds": 1.0033333333333334,
+  "expected_msg_num": 360,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.2688049999999995,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.385406,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.411313,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.419416,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.573352,
+      "average_rb_rounds": 1.0333333333333334
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.3798129999999995,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.407261,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.407655,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.403706000000001,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/3",
+      "throughput": 0.9999912140771932,
+      "average_latency_ms": 5.438621,
+      "average_rb_rounds": 1.0
+    }
+  ]
+}

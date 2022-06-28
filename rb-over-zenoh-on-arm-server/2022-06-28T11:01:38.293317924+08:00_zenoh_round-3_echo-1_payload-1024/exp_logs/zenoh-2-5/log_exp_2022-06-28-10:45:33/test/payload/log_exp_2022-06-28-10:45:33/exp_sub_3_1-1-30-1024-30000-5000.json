@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 3,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 1024,
+    "round_timeout": 30000,
+    "init_time": 5000
+  },
+  "peer_id": 3,
+  "receive_rate": 0.8277777777777777,
+  "recvd_msg_num": 298,
+  "average_rb_rounds": 1.0134228187919463,
+  "expected_msg_num": 360,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 3.796345,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 4.075475,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 4.506389,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 3.414196,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 3.837625,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 3.406345,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 4.330229,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 4.3871329999999995,
+      "average_rb_rounds": 1.0666666666666667
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.9999989191011683,
+      "average_latency_ms": 3.942257,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/3",
+      "throughput": 0.9333323244944237,
+      "average_latency_ms": 3.55618,
+      "average_rb_rounds": 1.0714285714285714
+    }
+  ]
+}
