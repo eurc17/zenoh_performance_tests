@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use blocking::unblock;
-use cyclonedds_rs::DdsReader;
+use cyclonedds_rs::{DDSError, DdsReader};
 use futures::{stream, Stream};
 use serde::{Deserialize, Serialize};
 
@@ -23,8 +23,17 @@ where
         let reader = self.reader.take().unwrap();
 
         let (reader, sample) = unblock(move || -> Result<_> {
-            let msg: Arc<KeyedSample<T>> = reader.take1_now()?;
-            Ok((reader, msg))
+            use DDSError as E;
+
+            loop {
+                let result = reader.take1_now();
+                let sample = match result {
+                    Ok(sample) => sample,
+                    Err(E::OutOfResources) => continue,
+                    Err(err) => return Err(err.into()),
+                };
+                break Ok((reader, sample));
+            }
         })
         .await?;
 

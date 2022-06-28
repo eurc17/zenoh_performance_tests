@@ -125,7 +125,6 @@ where
             round_timeout: config.round_timeout,
             echo_interval: config.echo_interval,
             commit_tx,
-            // hlc: HLC::default(),
             io_sender: Mutex::new(io_sender),
         });
 
