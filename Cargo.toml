@@ -12,3 +12,8 @@ members = [
 [patch.crates-io]
 zenoh = {git = "https://github.com/eclipse-zenoh/zenoh.git", rev = "90539129b1a7c9e8c7d7daaa84138d093f71fedf"}
 ownref = {version = "0.3.1", git = "https://github.com/jerry73204/ownref.git", rev = "210a6bb354a8b9afeaae5509d5d74df57245c7e2" }
+cyclonedds-sys = { git = "https://github.com/jerry73204/cyclonedds-sys.git", rev = "132261ea3d0230eb5f0447d6674d962f93ed9d69" }
+# cyclonedds-rs = { path = "../cyclonedds-rs" }
+
+[profile.release]
+debug = 2
