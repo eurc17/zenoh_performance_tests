@@ -41,7 +41,26 @@ impl Config {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum IoConfig {
     Zenoh(zenoh_config::ZenohConfig),
-    Dds(crate::io::dds::Config),
+    RustDds(crate::io::rustdds::Config),
+    CycloneDds(crate::io::cyclonedds::Config),
+}
+
+impl From<crate::io::cyclonedds::Config> for IoConfig {
+    fn from(v: crate::io::cyclonedds::Config) -> Self {
+        Self::CycloneDds(v)
+    }
+}
+
+impl From<crate::io::rustdds::Config> for IoConfig {
+    fn from(v: crate::io::rustdds::Config) -> Self {
+        Self::RustDds(v)
+    }
+}
+
+impl From<zenoh_config::ZenohConfig> for IoConfig {
+    fn from(v: zenoh_config::ZenohConfig) -> Self {
+        Self::Zenoh(v)
+    }
 }
 
 impl IoConfig {
@@ -52,11 +71,18 @@ impl IoConfig {
         matches!(self, Self::Zenoh(..))
     }
 
-    /// Returns `true` if the io config is [`Dds`].
+    /// Returns `true` if the io config is [`RustDds`].
     ///
-    /// [`Dds`]: IoConfig::Dds
-    pub fn is_dds(&self) -> bool {
-        matches!(self, Self::Dds(..))
+    /// [`RustDds`]: IoConfig::RustDds
+    pub fn is_rust_dds(&self) -> bool {
+        matches!(self, Self::RustDds(..))
+    }
+
+    /// Returns `true` if the io config is [`CycloneDds`].
+    ///
+    /// [`CycloneDds`]: IoConfig::CycloneDds
+    pub fn is_cyclone_dds(&self) -> bool {
+        matches!(self, Self::CycloneDds(..))
     }
 }
 

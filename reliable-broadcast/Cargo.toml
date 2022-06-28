@@ -27,6 +27,7 @@ uhlc = "0.4.0"
 uuid = { version = "0.8.2", features = ["serde"] }
 zenoh = "0.6.0-dev.0"
 humantime-serde = "1.0.1"
+cyclonedds-rs = { git = "https://github.com/sjames/cyclonedds-rs.git", rev = "d48ccbc1367119d859d26815959d28e12b837d6c" }
 
 [dev-dependencies]
 async-std = { version = "1.11.0", features = ["attributes"] }

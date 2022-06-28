@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 use async_std::sync::Mutex;
 
 use crate::{
@@ -96,12 +98,17 @@ where
 
                 (sender.into(), receiver.into())
             }
-            IoConfig::Dds(config) => {
+            IoConfig::RustDds(config) => {
                 let domain_participant = dds_domain_participant
                     .ok_or_else(|| anyhow!("domain_participant is not provided"))?;
 
                 let sender = config.build_sender(domain_participant)?;
                 let receiver = config.build_receiver(domain_participant)?;
+                (sender.into(), receiver.into())
+            }
+            IoConfig::CycloneDds(config) => {
+                let sender = config.build_sender()?;
+                let receiver = config.build_receiver()?;
                 (sender.into(), receiver.into())
             }
         };
@@ -277,7 +284,13 @@ where
                 let tagged_timestamp = hlc.new_timestamp();
                 tagged_timestamp.get_diff_duration(&ts)
             }
-            Timestamp::Dds(ts) => (rustdds::Timestamp::now() - ts).to_std(),
+            Timestamp::RustDds(ts) => (rustdds::Timestamp::now() - ts).to_std(),
+            Timestamp::CycloneDds(ts) => {
+                let now = SystemTime::now()
+                    .duration_since(SystemTime::UNIX_EPOCH)
+                    .unwrap();
+                now.saturating_sub(ts)
+            }
         };
 
         // TODO: determine start time from timestamp in broadcast message

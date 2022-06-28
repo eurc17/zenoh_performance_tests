@@ -1,4 +1,4 @@
-use super::super::dds as dds_io;
+use super::super::{cyclonedds as cdds_io, rustdds as rustdds_io};
 use crate::common::*;
 
 pub enum Sample<T>
@@ -6,7 +6,8 @@ where
     T: for<'de> Deserialize<'de>,
 {
     Zenoh(zenoh::prelude::Sample),
-    Dds(rustdds::with_key::DataSample<dds_io::KeyedSample<T>>),
+    RustDds(rustdds::with_key::DataSample<rustdds_io::KeyedSample<T>>),
+    CycloneDds(cdds_io::KeyedSample<T>),
 }
 
 impl<T> Sample<T>
@@ -14,16 +15,22 @@ where
     T: for<'de> Deserialize<'de>,
 {
     pub fn timestamp(&self) -> Timestamp {
+        use Timestamp as T;
+
         match self {
-            Sample::Zenoh(sample) => sample
-                .timestamp
-                .unwrap_or_else(|| panic!("HLC feature must be enabled for Zenoh"))
-                .into(),
-            Sample::Dds(sample) => sample
-                .sample_info()
-                .source_timestamp()
-                .unwrap_or_else(|| panic!("unable to retrieve source timestamp from DDS publisher"))
-                .into(),
+            Sample::Zenoh(sample) => {
+                let ts = sample
+                    .timestamp
+                    .unwrap_or_else(|| panic!("HLC feature must be enabled for Zenoh"));
+                T::Zenoh(ts)
+            }
+            Sample::RustDds(sample) => {
+                let ts = sample.sample_info().source_timestamp().unwrap_or_else(|| {
+                    panic!("unable to retrieve source timestamp from DDS publisher")
+                });
+                T::RustDds(ts)
+            }
+            Sample::CycloneDds(sample) => T::CycloneDds(sample.timestamp),
         }
     }
 
@@ -46,25 +53,35 @@ where
                 let value: T = serde_json::from_value(value)?;
                 value
             }
-            Sample::Dds(sample) => {
+            Sample::RustDds(sample) => {
                 let value = match sample.value().as_ref().ok() {
                     Some(value) => value,
                     None => return Ok(None),
                 };
                 value.data.clone()
             }
+            Sample::CycloneDds(sample) => sample.data.clone(),
         };
 
         Ok(Some(value))
     }
 }
 
-impl<T> From<rustdds::with_key::DataSample<dds_io::KeyedSample<T>>> for Sample<T>
+impl<T> From<cdds_io::KeyedSample<T>> for Sample<T>
 where
     T: for<'de> Deserialize<'de>,
 {
-    fn from(v: rustdds::with_key::DataSample<dds_io::KeyedSample<T>>) -> Self {
-        Self::Dds(v)
+    fn from(v: cdds_io::KeyedSample<T>) -> Self {
+        Self::CycloneDds(v)
+    }
+}
+
+impl<T> From<rustdds::with_key::DataSample<rustdds_io::KeyedSample<T>>> for Sample<T>
+where
+    T: for<'de> Deserialize<'de>,
+{
+    fn from(v: rustdds::with_key::DataSample<rustdds_io::KeyedSample<T>>) -> Self {
+        Self::RustDds(v)
     }
 }
 
@@ -80,17 +97,18 @@ where
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Timestamp {
     Zenoh(uhlc::Timestamp),
-    Dds(rustdds::Timestamp),
+    RustDds(rustdds::Timestamp),
+    CycloneDds(Duration),
 }
 
-impl From<rustdds::Timestamp> for Timestamp {
-    fn from(v: rustdds::Timestamp) -> Self {
-        Self::Dds(v)
-    }
-}
+// impl From<rustdds::Timestamp> for Timestamp {
+//     fn from(v: rustdds::Timestamp) -> Self {
+//         Self::RustDds(v)
+//     }
+// }
 
-impl From<uhlc::Timestamp> for Timestamp {
-    fn from(v: uhlc::Timestamp) -> Self {
-        Self::Zenoh(v)
-    }
-}
+// impl From<uhlc::Timestamp> for Timestamp {
+//     fn from(v: uhlc::Timestamp) -> Self {
+//         Self::Zenoh(v)
+//     }
+// }

@@ -118,7 +118,7 @@ async fn run(test_config: Arc<TestConfig>) -> Result<(usize, usize), Error> {
         };
 
         // Create DDS domain participant
-        let dds_domain_participant = if io_config.is_dds() {
+        let dds_domain_participant = if io_config.is_rust_dds() {
             let part =
                 DDS_DOMAIN_PARTICIPANT.get_or_try_init(|| rustdds::DomainParticipant::new(0))?;
             Some(part)
