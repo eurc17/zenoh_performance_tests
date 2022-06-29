@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 7,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 2048,
+    "round_timeout": 5000,
+    "init_time": 5000
+  },
+  "peer_id": 7,
+  "receive_rate": 0.05555555555555555,
+  "recvd_msg_num": 20,
+  "average_rb_rounds": 2.1,
+  "expected_msg_num": 360,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.19999438387770857,
+      "average_latency_ms": 9.368167,
+      "average_rb_rounds": 3.0
+    },
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 0.19999438387770857,
+      "average_latency_ms": 7.027046,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.19999438387770857,
+      "average_latency_ms": 6.662725,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.39998876775541714,
+      "average_latency_ms": 4.956784,
+      "average_rb_rounds": 1.5
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.19999438387770857,
+      "average_latency_ms": 9.502207,
+      "average_rb_rounds": 3.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.5999831516331258,
+      "average_latency_ms": 7.412019,
+      "average_rb_rounds": 2.3333333333333335
+    },
+    {
+      "key_expr": "/demo/example/3",
+      "throughput": 0.39998876775541714,
+      "average_latency_ms": 7.839245999999999,
+      "average_rb_rounds": 2.5
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 0.39998876775541714,
+      "average_latency_ms": 6.296604,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.19999438387770857,
+      "average_latency_ms": 6.738525,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 1.1999663032662515,
+      "average_latency_ms": 5.829003999999999,
+      "average_rb_rounds": 1.8333333333333333
+    }
+  ]
+}
