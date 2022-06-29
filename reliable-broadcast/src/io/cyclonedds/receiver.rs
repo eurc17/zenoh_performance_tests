@@ -29,7 +29,7 @@ where
                 let result = reader.take1_now();
                 let sample = match result {
                     Ok(sample) => sample,
-                    Err(E::OutOfResources) => continue,
+                    Err(E::OutOfResources | E::NoData) => continue,
                     Err(err) => return Err(err.into()),
                 };
                 break Ok((reader, sample));

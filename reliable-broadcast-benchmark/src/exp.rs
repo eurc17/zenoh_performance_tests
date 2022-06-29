@@ -35,7 +35,7 @@ pub async fn run(config: &Cli) -> Result<PeerResult, Error> {
         };
 
         // Create DDS domain participant
-        let dds_domain_participant = if io_config.is_dds() {
+        let dds_domain_participant = if io_config.is_rust_dds() {
             static DDS_DOMAIN_PARTICIPANT: OnceCell<DomainParticipant> = OnceCell::new();
 
             let part = DDS_DOMAIN_PARTICIPANT.get_or_try_init(|| DomainParticipant::new(0))?;
