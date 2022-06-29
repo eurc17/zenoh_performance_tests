@@ -11,7 +11,7 @@ peer_id=0
 
 while read peer_name
 do
-    exp_name="cyclonedds_round-${rsize}_echo-${esize}_payload-${psize}"
+    exp_name="256kbps-zenoh_round-${rsize}_echo-${esize}_payload-${psize}"
     output_dir="${script_dir}/${exp_name}/exp_logs/${peer_name}/log_exp_${log_time}/test/payload/log_exp_${log_time}"
     mkdir -p "$output_dir"
 

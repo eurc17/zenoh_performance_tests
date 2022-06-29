@@ -10,7 +10,7 @@ pushd "$script_dir"
 # do
 for rsize in 3
 do
-    for esize in 1
+    for esize in 0 1
     do
         for psize in 128 256 512 1024 2048 4096 8192
         do

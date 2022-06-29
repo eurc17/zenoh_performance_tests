@@ -2,7 +2,7 @@
 --remote-pub-peers 11
 --init-time 5000
 --num-msgs-per-peer 30
---round-timeout 30000
+--round-timeout 5000
 --pub-interval 50
 
 --peer-id $PEER_ID
@@ -13,4 +13,4 @@
 --echo-interval $ECHO_INTERVAL
 --max-rounds 3
 --extra-rounds 1
---rb-io config/cyclonedds_io.json5
+--rb-io config/zenoh_io.json5

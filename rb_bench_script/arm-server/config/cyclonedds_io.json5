@@ -2,8 +2,8 @@
     "type": "cyclone_dds",
     "topic": "SIMPLE",
 
-    // "durability": "Volatile",
-    "durability": "Persistent",
+    "durability": "Volatile",
+    // "durability": "Persistent",
 
     "reliability": "BestEffort",
     // "reliability": {
@@ -15,10 +15,10 @@
     //     }
     // },
 
-    "history": "KeepAll",
-    // "history": {
-    //     "KeepLast": {
-    //         "depth": 1,
-    //     }
-    // },
+    // "history": "KeepAll",
+    "history": {
+        "KeepLast": {
+            "depth": 1,
+        }
+    },
 }
