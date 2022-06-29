@@ -31,7 +31,6 @@ where
     /// The timeout for each round. Must be larger than 2 * `recv_timeout`.
     pub(crate) round_timeout: Duration,
     pub(crate) echo_interval: Duration,
-    // pub(crate) hlc: HLC,
     pub(crate) io_sender: Mutex<crate::io::Sender<Message<T>>>,
 }
 

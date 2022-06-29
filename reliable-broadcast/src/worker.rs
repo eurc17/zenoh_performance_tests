@@ -45,7 +45,13 @@ pub(crate) async fn run_echo_worker<T>(state: Arc<State<T>>) -> Result<(), Error
 where
     T: MessageT,
 {
-    interval(state.echo_interval)
+    let echo_interval = if state.echo_interval > Duration::ZERO {
+        state.echo_interval
+    } else {
+        Duration::from_micros(10)
+    };
+
+    interval(echo_interval)
         .map(Ok)
         .try_for_each(move |()| {
             let state = state.clone();
