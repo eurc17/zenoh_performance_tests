@@ -26,15 +26,15 @@ function throttle()
     proc_id="$3"
     
     # Create a net_cls cgroup
-    cgcreate -g net_cls:slow
+    sudo cgcreate -g net_cls:slow
     # Set the class id for the cgroup
-    echo 0x10001 > /sys/fs/cgroup/net_cls/slow/net_cls.classid
+    sudo sh -c 'echo 0x10001 > /sys/fs/cgroup/net_cls/slow/net_cls.classid'
     # Classify packets from pid into cgroup
-    cgclassify -g net_cls:slow "$proc_id"
+    sudo cgclassify -g net_cls:slow "$proc_id"
     # Rate limit packets in cgroup class
-    tc qdisc add dev "$ifc" root handle 1: htb
-    tc filter add dev "$ifc" parent 1: handle 1: cgroup
-    tc class add dev "$ifc" parent 1: classid 1:1 htb rate "$rate"
+    sudo tc qdisc add dev "$ifc" root handle 1: htb
+    sudo tc filter add dev "$ifc" parent 1: handle 1: cgroup
+    sudo tc class add dev "$ifc" parent 1: classid 1:1 htb rate "$rate"
 }
 
 rate="$1"
@@ -63,14 +63,14 @@ fi
 
 # Ensure previous use of cgroup is removed
 if [[ -d /sys/fs/cgroup/net_cls/slow/ ]]; then
-    cgdelete net_cls:slow
+    sudo cgdelete net_cls:slow
 fi
 
 # Ensure previous tc settings are cleared
-tc qdisc del dev "$ifc" root || true
+sudo tc qdisc del dev "$ifc" root || true
 
 # Run command in background
-sudo -u "$user" "$@" &
+"$@" &
 proc_id=$!
 
 # Rate limit process
