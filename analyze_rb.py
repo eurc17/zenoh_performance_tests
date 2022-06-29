@@ -5,7 +5,7 @@ import plotly.express as px
 import pandas as pd
 import json
 import os
-
+import numpy as np
 
 DIR_LIST = [
     #  './rb/2022-05-11 16:52:16+08:00_round-50_echo-1',
@@ -539,8 +539,8 @@ def load_data(exp_dir: str):
 df = pd.concat([load_data(dir) for dir in DIR_LIST], axis=0).reset_index(drop=True)
 
 df["throughput"] = df["throughput"].fillna(0.0)
-df["latency"] = df["latency"].fillna(100.0)
-df["rb_rounds"] = df["rb_rounds"].fillna(100.0)
+# df["latency"] = df["latency"].fillna(100.0)
+# df["rb_rounds"] = df["rb_rounds"].fillna(100.0)
 df["receive_rate"] = df["receive_rate"].fillna(0.0)
 
 #  df = df.dropna()
@@ -553,12 +553,13 @@ df["exp"] = df.apply(
 
 payloads = list(df["payload"].unique())
 
+
 group_df = df.groupby(["payload", "exp"], as_index=False).agg(
     {
         "receive_rate": ["mean", "std"],
-        "rb_rounds": ["mean", "std"],
         "throughput": ["mean", "std"],
-        "latency": ["mean", "std"],
+        "rb_rounds": [np.nanmean, np.nanstd],
+        "latency": [np.nanmean, np.nanstd],
     }
 )
 group_df.columns = [" ".join(col).strip() for col in group_df.columns.values]
@@ -593,7 +594,7 @@ fig_title = "Reliable Broadcast Number of Rounds"
 fig = px.line(
     group_df,
     x="payload",
-    y="rb_rounds mean",
+    y="rb_rounds nanmean",
     #  error_y='receive_rate std',
     color="exp",
     symbol="exp",
@@ -612,7 +613,7 @@ fig_title = "Latency"
 fig = px.line(
     group_df,
     x="payload",
-    y="latency mean",
+    y="latency nanmean",
     #  error_y='latency std',
     color="exp",
     symbol="exp",
