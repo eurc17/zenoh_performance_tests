@@ -12,10 +12,9 @@ function help()
 {
     echo "Rate Limit: Prefix with any command to throttle network usage of the process"
     echo
-    echo "Usage: $0 RATE INTERFACE USER COMMAND..."
+    echo "Usage: $0 RATE INTERFACE COMMAND..."
     echo "    RATE: rate at which to throttle (<number>[mk]bps format)"
     echo "    INTERFACE: interface to rate limit"
-    echo "    USER: The username of the process"
     echo "    COMMAND...: The command to be executed"
 }
 
@@ -48,9 +47,6 @@ if [[ ! "$rate" =~ ^[0-9]*\.*[0-9]*[mk]bps$ ]]; then
 fi
 
 ifc="$1"
-shift
-
-user="$1"
 shift
 
 # Check interface exists
