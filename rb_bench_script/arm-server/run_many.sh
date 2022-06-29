@@ -8,9 +8,9 @@ pushd "$script_dir"
 
 # while read -u10 rsize esize psize
 # do
-for rsize in 20 30 40 50 60 70 80 90 100
+for rsize in 3
 do
-    for esize in 1 10 20 30 40 50 60 70 80 90
+    for esize in 1
     do
         for psize in 128 256 512 1024 2048 4096 8192
         do
