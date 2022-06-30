@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 8,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 4096,
+    "round_timeout": 5000,
+    "init_time": 5000
+  },
+  "peer_id": 8,
+  "receive_rate": 0.6,
+  "recvd_msg_num": 216,
+  "average_rb_rounds": 1.2407407407407407,
+  "expected_msg_num": 360,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.7999944083590834,
+      "average_latency_ms": 14.571560000000002,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 3.999972041795417,
+      "average_latency_ms": 13.117676,
+      "average_rb_rounds": 1.95
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 5.999958062693126,
+      "average_latency_ms": 6.502374,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 4.7999664501545,
+      "average_latency_ms": 9.153738,
+      "average_rb_rounds": 1.3333333333333333
+    },
+    {
+      "key_expr": "/demo/example/3",
+      "throughput": 5.999958062693126,
+      "average_latency_ms": 8.218937,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 5.999958062693126,
+      "average_latency_ms": 7.765771,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 3.3999762355261045,
+      "average_latency_ms": 12.968211,
+      "average_rb_rounds": 1.411764705882353
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.3999972041795417,
+      "average_latency_ms": 13.685704,
+      "average_rb_rounds": 1.5
+    },
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 5.999958062693126,
+      "average_latency_ms": 6.58262,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 5.799959460603355,
+      "average_latency_ms": 13.966645999999999,
+      "average_rb_rounds": 1.4482758620689655
+    }
+  ]
+}
