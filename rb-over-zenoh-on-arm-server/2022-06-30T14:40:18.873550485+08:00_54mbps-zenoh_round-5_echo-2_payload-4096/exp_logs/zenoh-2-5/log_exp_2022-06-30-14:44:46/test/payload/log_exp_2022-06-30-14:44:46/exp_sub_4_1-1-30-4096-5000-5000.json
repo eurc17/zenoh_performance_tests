@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 4,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 4096,
+    "round_timeout": 5000,
+    "init_time": 5000
+  },
+  "peer_id": 4,
+  "receive_rate": 0.42777777777777776,
+  "recvd_msg_num": 154,
+  "average_rb_rounds": 1.0714285714285714,
+  "expected_msg_num": 360,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.39999615939687594,
+      "average_latency_ms": 13.968024000000002,
+      "average_rb_rounds": 1.5
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 5.999942390953139,
+      "average_latency_ms": 6.252058,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.39999615939687594,
+      "average_latency_ms": 21.592259,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 5.599946231556263,
+      "average_latency_ms": 6.467752,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.19999807969843797,
+      "average_latency_ms": 11.673934000000001,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 5.999942390953139,
+      "average_latency_ms": 6.4747390000000005,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 5.999942390953139,
+      "average_latency_ms": 6.295965,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 2.9999711954765695,
+      "average_latency_ms": 19.146171,
+      "average_rb_rounds": 1.2
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.5999942390953139,
+      "average_latency_ms": 20.616692,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 2.5999750360796936,
+      "average_latency_ms": 12.121754000000001,
+      "average_rb_rounds": 1.1538461538461537
+    }
+  ]
+}
