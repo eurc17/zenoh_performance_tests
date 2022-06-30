@@ -601,7 +601,7 @@ fig = px.line(
     labels={
         "exp": "Experiment",
         "payload": "Payload size (Byte)",
-        "rb_rounds mean": "Number of rounds",
+        "rb_rounds nanmean": "Number of rounds",
     },
     markers=True,
     log_x=True,
@@ -620,7 +620,7 @@ fig = px.line(
     labels={
         "exp": "Experiment",
         "payload": "Payload size (Byte)",
-        "latency mean": "Latency (ms)",
+        "latency nanmean": "Latency (ms)",
     },
     markers=True,
     log_x=True,
