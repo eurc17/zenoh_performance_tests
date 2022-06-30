@@ -1,4 +1,4 @@
-use std::time::SystemTime;
+use std::time::{Instant, SystemTime};
 
 use async_std::sync::Mutex;
 
@@ -297,6 +297,7 @@ where
         // send echo
         self.clone().request_sending_echo(broadcast_id).await;
 
+        let since = Instant::now();
         let tuple = (&mut interval)
             .take(self.max_rounds)
             .enumerate()
@@ -339,8 +340,20 @@ where
             .next()
             .await;
 
+        {
+            let elapsed = since.elapsed();
+            let max = self.round_timeout * self.max_rounds as u32;
+            let diff = elapsed.saturating_sub(max);
+            assert!(
+                diff <= Duration::from_millis(5),
+                "Blocked poll detected. The RB runs for {:?}, which exceeds the maximum {:?}",
+                elapsed,
+                max
+            );
+        }
+
         match tuple {
-            // accepted before max_roudns
+            // accepted before max_rounds
             Some((last_round, Ok(()))) => {
                 debug!(
                     "{} accepts a msg in round {} for broadcast_id {}",
@@ -377,7 +390,7 @@ where
                     })
                     .await;
             }
-            // error before max_roudns
+            // error before max_rounds
             Some((last_round, Err(err))) => {
                 debug!(
                     "{} rejects the msg for broadcast_id {} due to {:?}",
