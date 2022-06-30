@@ -1,0 +1,89 @@
+{
+  "short_config": {
+    "peer_id": 4,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 8192,
+    "round_timeout": 5000,
+    "init_time": 5000
+  },
+  "peer_id": 4,
+  "receive_rate": 0.20833333333333334,
+  "recvd_msg_num": 75,
+  "average_rb_rounds": 2.2,
+  "expected_msg_num": 360,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 1.799982251455008,
+      "average_latency_ms": 9.460491,
+      "average_rb_rounds": 1.7777777777777777
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.19999802793944532,
+      "average_latency_ms": 5.6449739999999995,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/1",
+      "throughput": 0.599994083818336,
+      "average_latency_ms": 10.652436,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 2.1999783073338985,
+      "average_latency_ms": 10.114734,
+      "average_rb_rounds": 1.9090909090909092
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 1.3999861955761173,
+      "average_latency_ms": 12.063831,
+      "average_rb_rounds": 2.2857142857142856
+    },
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 0.9999901396972266,
+      "average_latency_ms": 13.855542,
+      "average_rb_rounds": 2.6
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 1.5999842235155626,
+      "average_latency_ms": 11.863554,
+      "average_rb_rounds": 2.25
+    },
+    {
+      "key_expr": "/demo/example/3",
+      "throughput": 1.199988167636672,
+      "average_latency_ms": 13.124759999999998,
+      "average_rb_rounds": 2.5
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.7999921117577813,
+      "average_latency_ms": 13.242837999999999,
+      "average_rb_rounds": 2.5
+    },
+    {
+      "key_expr": "/demo/example/5",
+      "throughput": 0.599994083818336,
+      "average_latency_ms": 10.878305,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 1.799982251455008,
+      "average_latency_ms": 12.767248,
+      "average_rb_rounds": 2.4444444444444446
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 1.799982251455008,
+      "average_latency_ms": 12.339639,
+      "average_rb_rounds": 2.3333333333333335
+    }
+  ]
+}
