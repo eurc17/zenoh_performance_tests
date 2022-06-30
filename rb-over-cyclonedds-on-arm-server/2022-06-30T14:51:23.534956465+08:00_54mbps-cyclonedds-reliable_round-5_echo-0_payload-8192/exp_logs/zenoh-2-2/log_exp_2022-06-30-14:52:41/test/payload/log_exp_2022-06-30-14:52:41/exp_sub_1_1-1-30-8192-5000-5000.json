@@ -1,0 +1,77 @@
+{
+  "short_config": {
+    "peer_id": 1,
+    "total_put_number": 1,
+    "num_msgs_per_peer": 30,
+    "payload_size": 8192,
+    "round_timeout": 5000,
+    "init_time": 5000
+  },
+  "peer_id": 1,
+  "receive_rate": 0.10277777777777777,
+  "recvd_msg_num": 37,
+  "average_rb_rounds": 2.135135135135135,
+  "expected_msg_num": 360,
+  "result_vec": [
+    {
+      "key_expr": "/demo/example/10",
+      "throughput": 1.1999862983164484,
+      "average_latency_ms": 10.537524,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/4",
+      "throughput": 0.9999885819303738,
+      "average_latency_ms": 10.621881,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/7",
+      "throughput": 0.19999771638607475,
+      "average_latency_ms": 17.754974999999998,
+      "average_rb_rounds": 3.0
+    },
+    {
+      "key_expr": "/demo/example/0",
+      "throughput": 0.19999771638607475,
+      "average_latency_ms": 5.517414,
+      "average_rb_rounds": 1.0
+    },
+    {
+      "key_expr": "/demo/example/6",
+      "throughput": 1.1999862983164484,
+      "average_latency_ms": 14.318381,
+      "average_rb_rounds": 2.5
+    },
+    {
+      "key_expr": "/demo/example/3",
+      "throughput": 0.19999771638607475,
+      "average_latency_ms": 10.714945,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/2",
+      "throughput": 0.19999771638607475,
+      "average_latency_ms": 10.460064,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/8",
+      "throughput": 0.19999771638607475,
+      "average_latency_ms": 10.852986999999999,
+      "average_rb_rounds": 2.0
+    },
+    {
+      "key_expr": "/demo/example/9",
+      "throughput": 1.599981731088598,
+      "average_latency_ms": 12.471973,
+      "average_rb_rounds": 2.375
+    },
+    {
+      "key_expr": "/demo/example/11",
+      "throughput": 1.3999840147025233,
+      "average_latency_ms": 10.107174,
+      "average_rb_rounds": 1.8571428571428572
+    }
+  ]
+}
