@@ -527,7 +527,7 @@ def load_data(exp_dir: str):
     )
 
     #  convert throughput in MiB / sec
-    df["throughput"] *= df["payload"] / 1024.0 / 1024.0
+    df["throughput"] *= df["payload"] / 1024.0
     #  df['throughput'] *= df['payload']
 
     #  # convert latency in second
@@ -539,8 +539,8 @@ def load_data(exp_dir: str):
 df = pd.concat([load_data(dir) for dir in DIR_LIST], axis=0).reset_index(drop=True)
 
 df["throughput"] = df["throughput"].fillna(0.0)
-# df["latency"] = df["latency"].fillna(100.0)
-# df["rb_rounds"] = df["rb_rounds"].fillna(100.0)
+df["latency"] = df["latency"].mask(df["latency"] >= 50.0)
+df["rb_rounds"] = df["rb_rounds"].mask(df["rb_rounds"] >= 3)
 df["receive_rate"] = df["receive_rate"].fillna(0.0)
 
 #  df = df.dropna()
@@ -568,7 +568,7 @@ group_df["batched"] = group_df["exp"].apply(lambda x: int(x.split("-")[1]))
 group_df = group_df.sort_values(by=["round", "batched", "payload"])
 #  group_df = group_df[group_df['batched'] == 10]
 #  group_df = group_df[group_df['round'] == 50]
-print(group_df)
+print(group_df.to_csv(float_format='%.3f'))
 
 fig_dict = dict()
 
@@ -588,6 +588,7 @@ fig = px.line(
     markers=True,
     log_x=True,
 )
+fig.update(layout_yaxis_range = [0, 100])
 fig_dict[fig_title] = fig
 
 fig_title = "Reliable Broadcast Number of Rounds"
@@ -606,6 +607,7 @@ fig = px.line(
     markers=True,
     log_x=True,
 )
+fig.update(layout_yaxis_range = [0, 3])
 fig_dict[fig_title] = fig
 
 
@@ -625,6 +627,7 @@ fig = px.line(
     markers=True,
     log_x=True,
 )
+fig.update(layout_yaxis_range = [0, 30])
 fig_dict[fig_title] = fig
 
 
@@ -639,11 +642,12 @@ fig = px.line(
     labels={
         "exp": "Experiment",
         "payload": "Payload size (Byte)",
-        "throughput mean": "Throughput (MiB/s)",
+        "throughput mean": "Throughput (KiB/s)",
     },
     markers=True,
     log_x=True,
 )
+fig.update(layout_yaxis_range = [0, 50])
 fig_dict[fig_title] = fig
 
 
