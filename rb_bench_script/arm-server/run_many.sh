@@ -21,7 +21,7 @@ do
                 continue
             fi
 
-            exp_name="${exp_dt}_unlimited-zenoh_round-${rsize}_echo-${esize}_payload-${psize}"
+            exp_name="${exp_dt}_250kbps-zenoh_round-${rsize}_echo-${esize}_payload-${psize}"
 
             export rsize
             export esize

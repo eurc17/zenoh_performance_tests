@@ -10,7 +10,7 @@ binary_name="reliable-broadcast-benchmark"
 log_time="$(date +'%Y-%m-%d-%T')"
 
 # Timeout for each test in seconds
-remote_timeout=40
+remote_timeout=90
 
 ## Zenoh repo and commit for compiling zenohd
 zenoh_git_url="https://github.com/eclipse-zenoh/zenoh.git"
@@ -39,4 +39,4 @@ fi
 
 ## The RUST_LOG env set on RPi. It is intended for debug purpose.
 # remote_rust_log=""
-remote_rust_log="reliable_broadcast=debug,reliable_broadcast_benchmark=debug"
+remote_rust_log="reliable_broadcast=debug,reliable_broadcast_benchmark=debug,zenoh=trace"

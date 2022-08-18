@@ -9,6 +9,8 @@ start_time="$(date --date="$sleep_for" +%s)"
 log_dir="$script_dir/logs/rb_${log_time}_${psize}_${rsize}_${esize}"
 peer_id=0
 
+export RUST_LOG="${remote_rust_log}"
+
 while read peer_name
 do
     output_dir="${script_dir}/${exp_name}/exp_logs/${peer_name}/log_exp_${log_time}/test/payload/log_exp_${log_time}"
@@ -18,12 +20,11 @@ do
     program="$repo_dir/target/release/$binary_name"
 
     # the command options derived from command_args.template
-    export PAYLOAD_SIZE=${psize}
-    export ROUND_INTERVAL=${rsize}
-    export ECHO_INTERVAL=${esize}
+    export PAYLOAD_SIZE="${psize}"
+    export ROUND_INTERVAL="${rsize}"
+    export ECHO_INTERVAL="${esize}"
     export OUTPUT_DIR="${output_dir}"
-    export PEER_ID=${peer_id}
-    export RUST_LOG=${remote_rust_log}
+    export PEER_ID="${peer_id}"
     args="$(envsubst < $script_dir/config/command_args.template | tr '\n' ' ')"
     echo "$script_dir/sleep_until.py $start_time && $program $args"
 
